@@ -1,9 +1,9 @@
 package com.example.weatherforecast.di;
 
-import com.example.openweatherforecast.db.OpenWeatherMapDao;
+
 import com.example.weatherforecast.api.OpenWeatherMapAPI;
 import com.example.weatherforecast.api.OpenWeatherMapRepositoryImpl;
-
+import com.example.weatherforecast.db.OpenWeatherMapDao
 
 
 import javax.inject.Singleton;
@@ -20,7 +20,7 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideOpenWeatherMapRepositoryImpl(api: OpenWeatherMapAPI, dao:OpenWeatherMapDao) : OpenWeatherMapRepositoryImpl {
+    fun provideOpenWeatherMapRepositoryImpl(api: OpenWeatherMapAPI, dao: OpenWeatherMapDao) : OpenWeatherMapRepositoryImpl {
         return OpenWeatherMapRepositoryImpl(api, dao)
     }
 
