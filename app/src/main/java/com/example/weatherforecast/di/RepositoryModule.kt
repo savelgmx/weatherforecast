@@ -16,7 +16,12 @@ import dagger.hilt.components.SingletonComponent;
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryModule {
+object RepositoryModule {
+    @Provides
+    @Singleton
+    fun provideAPI() : OpenWeatherMapAPI {
+        return NetworkObject.getAPIInstance()
+    }
 
     @Provides
     @Singleton
