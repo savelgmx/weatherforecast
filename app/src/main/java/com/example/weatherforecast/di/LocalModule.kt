@@ -13,14 +13,14 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class LocalModule {
+object LocalModule {
 
     @Provides
     @Singleton
     fun provideOpenWeatherMapDao(database: OpenWeatherMapDatabase): OpenWeatherMapDao =
         database.openWeatherMapDao()
 
-    companion object {
+
         @Provides
         @Singleton
         fun provideRoomDatabase(@ApplicationContext context: Context): OpenWeatherMapDatabase =
@@ -31,4 +31,3 @@ abstract class LocalModule {
             ).fallbackToDestructiveMigration().build()
     }
 
-}
