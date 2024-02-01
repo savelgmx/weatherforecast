@@ -2,6 +2,7 @@ package com.example.weatherforecast.di;
 
 
 import com.example.weatherforecast.api.OpenWeatherMapAPI;
+import com.example.weatherforecast.api.OpenWeatherMapRepository
 import com.example.weatherforecast.api.OpenWeatherMapRepositoryImpl;
 import com.example.weatherforecast.db.OpenWeatherMapDao
 
@@ -29,4 +30,11 @@ object RepositoryModule {
         return OpenWeatherMapRepositoryImpl(api, dao)
     }
 
-}
+        @Provides
+        @Singleton
+        fun provideOpenWeatherMapRepository(api: OpenWeatherMapAPI,dao: OpenWeatherMapDao): OpenWeatherMapRepository {
+            return OpenWeatherMapRepositoryImpl(api,dao)
+        }
+    }
+
+
