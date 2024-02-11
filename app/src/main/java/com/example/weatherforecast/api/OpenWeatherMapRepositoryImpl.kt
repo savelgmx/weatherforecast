@@ -1,6 +1,7 @@
 package com.example.weatherforecast.api
 
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.db.CurrentWeatherEntity
 import com.example.weatherforecast.db.OpenWeatherMapDao
@@ -21,6 +22,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     override suspend fun getWeatherForecast(city: String): Resource<WeatherResponse> {
         val response = openWeatherMapAPI.getCurrentWeather(city, NetworkObject.API_KEY)
+        Log.d("Repository response", response.body().toString())
+
         return if (response.isSuccessful) {
             val data = response.body()
             if (data != null) {

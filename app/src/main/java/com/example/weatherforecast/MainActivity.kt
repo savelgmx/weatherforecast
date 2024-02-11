@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     // Use the viewModel composition local to get an instance of OpenWeatherMapViewModel
-                    val openWeatherMapViewModel: OpenWeatherMapViewModel = viewModel()
+                    val openWeatherMapViewModel: OpenWeatherMapViewModel =  viewModel()
 
                     // Collect the LiveData state in a Compose State
                     var weatherState by remember { mutableStateOf<Resource<WeatherResponse>>(Resource.Loading()) }
