@@ -19,15 +19,26 @@ class OpenWeatherMapViewModel @Inject constructor(
     private val _weatherLiveData = MutableLiveData<Resource<WeatherResponse>>()
     val weatherLiveData: LiveData<Resource<WeatherResponse>> get() = _weatherLiveData
 
+    private var isWeatherLoaded = false // Flag to track if weather data is already loaded
+
+    init {
+        // Call this function when ViewModel is initialized
+        getCurrentWeather("Krasnoyarsk") // or provide a default city
+        isWeatherLoaded=true
+    }
+
     fun getCurrentWeather(city: String) {
+        if (!isWeatherLoaded) { // Check if weather data is already loaded
         viewModelScope.launch {
             _weatherLiveData.value = Resource.Loading()
             try {
                 val result = repository.getWeatherForecast(city)
                 _weatherLiveData.value = result
+                    isWeatherLoaded = true // Set flag to true after successful loading
             } catch (e: Exception) {
                 _weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
             }
         }
     }
     }
+}

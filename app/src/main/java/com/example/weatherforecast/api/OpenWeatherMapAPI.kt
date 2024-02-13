@@ -12,8 +12,9 @@ interface OpenWeatherMapAPI {
   @GET("weather")
   suspend fun getCurrentWeather(
     @Query("q") cityName: String,
-    @Query("units") units: String = "metric",
+    @Query("units") units: String,
     @Query("APPID") appId: String = NetworkObject.API_KEY,
+    @Query("lang") lang:String
   ): Response<WeatherResponse>
 
   @GET("weather")

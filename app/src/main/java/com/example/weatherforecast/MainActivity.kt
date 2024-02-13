@@ -72,13 +72,15 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (weatherState) {
             is Resource.Success -> {
                 val temperature = weatherState.data?.main?.temp
-                Greeting("Temperature: $temperature")
+                Greeting("Temperature: $temperature"+" C")
+                val pressure = weatherState.data?.main?.pressure
+                Greeting(name = "Pressure: $pressure ")
             }
             is Resource.Loading -> {
                 CircularProgressIndicator()
