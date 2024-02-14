@@ -9,6 +9,7 @@ import com.example.weatherforecast.di.NetworkObject
 
 
 import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import java.util.Locale
 
@@ -23,7 +24,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     override suspend fun getWeatherForecast(city: String): Resource<WeatherResponse> {
         val response = openWeatherMapAPI.getCurrentWeather(city,
-            "metric",NetworkObject.API_KEY,
+            "metric",AppConstants.API_KEY,
             Locale.getDefault().language)
         Log.d("Repository response", response.body().toString())
 

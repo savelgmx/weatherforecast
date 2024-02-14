@@ -3,6 +3,7 @@ package com.example.weatherforecast.api
 
 import com.example.weatherforecast.di.NetworkObject
 import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.utils.AppConstants
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,7 +14,7 @@ interface OpenWeatherMapAPI {
   suspend fun getCurrentWeather(
     @Query("q") cityName: String,
     @Query("units") units: String,
-    @Query("APPID") appId: String = NetworkObject.API_KEY,
+    @Query("APPID") appId: String = AppConstants.API_KEY,
     @Query("lang") lang:String
   ): Response<WeatherResponse>
 
@@ -22,7 +23,7 @@ interface OpenWeatherMapAPI {
     @Query("lat") lat: Double,
     @Query("lon") lon: Double,
     @Query("units") units: String = "metric",
-    @Query("APPID") appId: String = NetworkObject.API_KEY,
+    @Query("APPID") appId: String = AppConstants.API_KEY,
   ): Response<WeatherResponse>
 }
 

@@ -28,6 +28,7 @@ import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.ui.theme.WeatherforecastTheme
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherMapViewModel
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -77,10 +78,14 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
     ) {
         when (weatherState) {
             is Resource.Success -> {
-                val temperature = weatherState.data?.main?.temp
-                Greeting("Temperature: $temperature"+" C")
-                val pressure = weatherState.data?.main?.pressure
-                Greeting(name = "Pressure: $pressure ")
+                val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
+                Text("Temperature: $temperature")
+                val pressure = weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it.toInt()) }
+                Text( "Pressure: $pressure ")
+
+                //weatherState.data.weather[0].icon
+                //weatherState.data.weather[0].description
+
             }
             is Resource.Loading -> {
                 CircularProgressIndicator()
@@ -103,11 +108,4 @@ fun WeatherUIPreview() {
     WeatherUI(loadingState)
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = name,
-        modifier = modifier
-    )
-}
 
