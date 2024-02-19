@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bumptech.glide.integration.compose.GlideImage
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.Main
@@ -98,8 +97,8 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                 val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
                 val name =weatherState.data?.name
                 val day= weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-                val pressure = weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it.toInt()) }
-                val feels_like = weatherState.data?.main?.feels_like
+                val pressure = weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it) }
+                val feels_like = weatherState.data?.main?.feels_like?.let { WeatherUtils.updateTemperature(it.toInt()) }
 
                 // Row 1: Name and Day with Blue Background
                 Row(
