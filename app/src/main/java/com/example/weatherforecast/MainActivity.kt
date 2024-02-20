@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -94,11 +94,15 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
     ) {
         when (weatherState) {
             is Resource.Success -> {
+                val localContext = LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
+
                 val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
                 val name =weatherState.data?.name
-                val day= weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-                val pressure = weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it) }
-                val feels_like = weatherState.data?.main?.feels_like?.let { WeatherUtils.updateTemperature(it.toInt()) }
+                val day=  weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
+                val pressure = localContext.getString(R.string.pressure)+":"+ weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it) }
+                val feels_like =localContext.getString(R.string.feels_like)+":"+ weatherState.data?.main?.feels_like?.let { WeatherUtils.updateTemperature(it.toInt()) }
+                val wind= weatherState.data?.wind?.speed?.let { WeatherUtils.updateWind(weatherState.data?.wind?.deg.toString(), it.toInt(),localContext) }
+
 
                 // Row 1: Name and Day with Blue Background
                 Row(
@@ -129,10 +133,10 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Temperature: $temperature",
+                        text = " $temperature",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(start = 8.dp)
+                        fontSize = 22.sp,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     /*
                                          GlideImage(
@@ -143,8 +147,10 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                     */
                 }
 
-                Text(text = "Feels_like: $feels_like", modifier = Modifier.padding(8.dp))
+                Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
                 Text(text = " $pressure", modifier = Modifier.padding(8.dp))
+
+                Text(text="$wind",Modifier.padding(8.dp))
 
             }
             is Resource.Loading -> {

@@ -1,6 +1,8 @@
 package com.example.weatherforecast.utils
 
 
+import android.content.Context
+import com.example.weatherforecast.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -48,26 +50,22 @@ class WeatherUtils {
 
         fun updatePressure(pressureValue: Int):String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("mm", "in")
-            val pressure= "Pressure: $pressureValue $unitAbbreviation"
+            val pressure= "$pressureValue $unitAbbreviation"
             return pressure
         }
 
-        fun updateWind(windDirection: String, windSpeed: Int):String {
+        fun updateWind(windDirection: String, windSpeed: Int,context: Context):String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("m/sec.", "mph")
-            val wind=degToCompass((windDirection).toInt())
+            val wind=degToCompass((windDirection).toInt(),context)
             val windstring  = "$wind , $windSpeed $unitAbbreviation"
             return windstring
         }
 
 
-        private fun degToCompass(num:Int): String {
-            var winDir = Math.floor((num / 22.5) + 0.5);
-            var directions = listOf<String>("North", "North North East", "North East", "East North East",
-                "East", "East South East", "South East", "South South East", "South",
-                "South South West", "South West", "West South West", "West", "West North West",
-                "North West", "North North West")
+        private fun degToCompass(num: Int, context: Context): String {
+            val winDir = Math.floor((num / 22.5) + 0.5).toInt()
+            val directions = context.resources.getStringArray(R.array.directions_array) // Load the array from resources
             return directions[(winDir % 16).toInt()]
-
         }
 
         fun updateDateToToday(dt: Int?):String {

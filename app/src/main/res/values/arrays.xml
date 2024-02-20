@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="unitSystemValues">
+        <item>METRIC</item>
+        <item>IMPERIAL</item>
+    </string-array>
+
+    <string-array name="unitSystemEntries">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <string-array name="directions_array">
+        <item>@string/direction_north</item>
+        <item>@string/direction_north_north_east</item>
+        <item>@string/direction_north_east</item>
+        <item>@string/direction_east_north_east</item>
+        <item>@string/direction_east</item>
+        <item>@string/direction_east_south_east</item>
+        <item>@string/direction_south_east</item>
+        <item>@string/direction_south_south_east</item>
+        <item>@string/direction_south</item>
+        <item>@string/direction_south_south_west</item>
+        <item>@string/direction_south_west</item>
+        <item>@string/direction_west_south_west</item>
+        <item>@string/direction_west</item>
+        <item>@string/direction_west_north_west</item>
+        <item>@string/direction_north_west</item>
+        <item>@string/direction_north_north_west</item>
+
+    </string-array>
+</resources>

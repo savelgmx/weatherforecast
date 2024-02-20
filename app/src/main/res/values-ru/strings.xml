@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">weatherforecast</string>
+    <string name="feels_like">Чуствуется как</string>
+    <string name="wind">Ветер</string>
+    <string name="pressure">Давление</string>
+    <string name="visibility">Видимость</string>
+    <string name="day">День</string>
+    <string name="night">Ночь</string>
+    <string name="sunrise">Восход</string>
+    <string name="sunset">Закат</string>
+
+    <string name="direction_north">Север</string>
+    <string name="direction_north_north_east">Северо-северо-восток</string>
+    <string name="direction_north_east">Северо-Восток</string>
+    <string name="direction_east_north_east">Восток Северо Восток</string>
+    <string name="direction_east">Восток</string>
+    <string name="direction_east_south_east">Восток-Юго-Восток</string>
+    <string name="direction_south_east">Юго-восток</string>
+    <string name="direction_south_south_east">Юго-Юго-Восток</string>
+    <string name="direction_south">Юг</string>
+    <string name="direction_south_south_west">Юго-Юго-Запад</string>
+    <string name="direction_south_west">Юго-Запад</string>
+    <string name="direction_west_south_west">Запад-Юго-Запад</string>
+    <string name="direction_west">Запад</string>
+    <string name="direction_west_north_west">Запад Северо-Запад</string>
+    <string name="direction_north_west">Северо-Запад</string>
+    <string name="direction_north_north_west">Северо-северо-запад</string>
+
+    <string name="pref_use_device_location_title">Использовать местоположение устройства</string>
+    <string name="pref_use_device_location_summary">Разрешить приложению определять ваше местоположение</string>
+    <string name="pref_custom_location_title">Местоположение</string>
+    <string name="pref_custom_location_summary">Место, для которого отображается погода</string>
+    <string name="pref_unit_system_title">Система единиц</string>
+    <string name="pref_unit_system_summary">Выберите предпочитаемую систему единиц</string>
+    <string name="weather_location_title">Настройки</string>
+
+</resources>
