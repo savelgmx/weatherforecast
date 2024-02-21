@@ -96,6 +96,9 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
             is Resource.Success -> {
                 val localContext = LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
 
+                weatherState.data?.coord?.let { WeatherUtils.setLatitude(it.lat) }  //set latitude
+                weatherState.data?.coord?.let { WeatherUtils.setLongitude(it.lon) } //set longitude
+
                 val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
                 val name =weatherState.data?.name
                 val day=  weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }

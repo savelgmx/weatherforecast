@@ -27,7 +27,7 @@ object LocalModule {
             Room.databaseBuilder(
                 context.applicationContext,
                 OpenWeatherMapDatabase::class.java,
-                "weather_database"
+                "open_weather_map_database"
             ).fallbackToDestructiveMigration().build()
     }
 

@@ -57,9 +57,9 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     }
 
 
-    private fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
+    private suspend fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
     if (data != null) {
-            coroutineScope.launch(Dispatchers.IO) {
+           // coroutineScope.launch(Dispatchers.IO) {
             openWeatherMapDao.insertOrUpdate(
                 CurrentWeatherEntity(
                     coord = data.coord ?: Coord(0.0, 0.0),
@@ -76,7 +76,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                     cod = data.cod ?: 0
                 )
             )
-            }
+           // }
     } else {
             Log.e("AddForecastData", "WeatherResponse data is null")
         }

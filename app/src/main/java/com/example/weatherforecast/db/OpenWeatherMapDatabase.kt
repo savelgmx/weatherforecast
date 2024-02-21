@@ -25,7 +25,7 @@ abstract class OpenWeatherMapDatabase : RoomDatabase() {
             return Room.databaseBuilder(
                 context.applicationContext,
                 OpenWeatherMapDatabase::class.java,
-                "open_weather_map_database"
+                "open_weather_map_database.db"
             ).build()
         }
     }

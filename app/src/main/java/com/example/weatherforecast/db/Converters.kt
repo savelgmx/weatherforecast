@@ -52,7 +52,7 @@ class Converters {
         return Gson().toJson(sys)
     }
     @TypeConverter
-    fun tosys(sysString: String): Sys {
+    fun toSys(sysString: String): Sys {
         return Gson().fromJson(sysString, Sys::class.java)
     }
 
