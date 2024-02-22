@@ -7,6 +7,7 @@ import com.example.weatherforecast.db.CurrentWeatherEntity
 import com.example.weatherforecast.db.OpenWeatherMapDao
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
+import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
 
@@ -15,6 +16,7 @@ import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +31,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val openWeatherMapDao: OpenWeatherMapDao
 ) : OpenWeatherMapRepository {
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
-    override suspend fun getWeatherForecast(city: String): Resource<WeatherResponse> {
+    override suspend fun getCurrentWeather(city: String): Resource<WeatherResponse> {
         val response = openWeatherMapAPI.getCurrentWeather(city,
             "metric",AppConstants.API_KEY,
             Locale.getDefault().language)
@@ -48,6 +50,31 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         } else {
             Resource.Error(null, "No data found")
         }
+    }
+
+    override suspend fun getForecastWeather(): Resource<ForecastResponse> {
+
+        val response = openWeatherMapAPI.getForecastWeather(
+            AppConstants.API_KEY,
+            WeatherUtils.getLongitude().toString(),
+            WeatherUtils.getLatitude().toString(),
+            "metric",
+            Locale.getDefault().language
+        )
+        Log.d("Forecast response",response.body().toString())
+        return if (response.isSuccessful) {
+            val data = response.body()
+            if (data != null) {
+
+                Resource.Success(data)
+
+            } else {
+                Resource.Error(null, "Empty  forecast response body")
+            }
+        } else {
+            Resource.Error(null, "No data found")
+        }
+
     }
 
 
@@ -81,6 +108,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             Log.e("AddForecastData", "WeatherResponse data is null")
         }
     }
+
+
 
 
 }
