@@ -8,7 +8,7 @@ import com.example.weatherforecast.utils.Resource
 
 
 interface OpenWeatherMapRepository {
-    suspend fun getCurrentWeather(city: String): Resource<WeatherResponse>
+    suspend fun getCurrentWeather(): Resource<WeatherResponse>
     suspend fun getForecastWeather():Resource<ForecastResponse>
     suspend fun getWeatherForecastFromDB(): LiveData<List<CurrentWeatherEntity>>
 }

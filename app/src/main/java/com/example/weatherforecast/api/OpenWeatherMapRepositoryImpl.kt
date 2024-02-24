@@ -19,23 +19,29 @@ import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 import javax.inject.Inject
 
-
+private var lon=0.0
+private var lat=0.0
 
 class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val openWeatherMapAPI: OpenWeatherMapAPI,
     private val openWeatherMapDao: OpenWeatherMapDao
 ) : OpenWeatherMapRepository {
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
-    override suspend fun getCurrentWeather(city: String): Resource<WeatherResponse> {
-        val response = openWeatherMapAPI.getCurrentWeather(city,
+
+    override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
+        val response = openWeatherMapAPI.getCurrentWeather(
+            AppConstants.CITY_FORECAST, //TODO change constant to value from settings
+            // as soon as they will be implemented
             "metric",AppConstants.API_KEY,
             Locale.getDefault().language)
         Log.d("Repository response", response.body().toString())
+
+        response.body()?.coord?.lat?.let { WeatherUtils.setLatitude(it) }
+        response.body()?.coord?.lon?.let { WeatherUtils.setLongitude(it) }
 
         return if (response.isSuccessful) {
             val data = response.body()
@@ -54,10 +60,16 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
 
+        //lon=92.7917, lat=56.0097
+         lon =92.7917// ""WeatherUtils.getLongitude()
+         lat = 56.0097//""WeatherUtils.getLatitude()
+
+        Log.d("Log Lan response",lon.toString()+"  "+lat.toString())
+
         val response = openWeatherMapAPI.getForecastWeather(
             AppConstants.API_KEY,
-            WeatherUtils.getLongitude().toString(),
-            WeatherUtils.getLatitude().toString(),
+            lon.toString(),
+            lat.toString(),
             "metric",
             Locale.getDefault().language
         )

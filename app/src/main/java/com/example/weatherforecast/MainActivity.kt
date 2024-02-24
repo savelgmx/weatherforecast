@@ -1,6 +1,7 @@
 package com.example.weatherforecast
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,14 +35,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
+import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.ui.theme.WeatherforecastTheme
+import com.example.weatherforecast.ui.viewmodel.OpenWeatherForecastViewModel
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherMapViewModel
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
@@ -59,12 +67,17 @@ class MainActivity : ComponentActivity() {
                 ) {
                     // Use the viewModel composition local to get an instance of OpenWeatherMapViewModel
                     val openWeatherMapViewModel: OpenWeatherMapViewModel =  viewModel()
+                    val openWeatherForecastViewModel:OpenWeatherForecastViewModel=viewModel()
 
                     // Collect the LiveData state in a Compose State
                     var weatherState by remember { mutableStateOf<Resource<WeatherResponse>>(Resource.Loading()) }
+                    //Collect LiveData state of Forecast in Compose state
+                    var forecatState by remember { mutableStateOf<Resource<ForecastResponse>>(Resource.Loading())}
 
                     // Call getCurrentWeather with the desired city
-                    openWeatherMapViewModel.getCurrentWeather("Krasnoyarsk")
+                    openWeatherMapViewModel.getCurrentWeather()
+                    //Call getForecastWeather
+                    openWeatherForecastViewModel.getForecastWeather()
 
                     // Observe the LiveData and update the weatherState
                     LaunchedEffect(openWeatherMapViewModel.weatherLiveData) {
@@ -73,14 +86,26 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    //Observe LiveData and update the forecastState
+                    LaunchedEffect(openWeatherForecastViewModel.forecastLiveData){
+                        openWeatherForecastViewModel.forecastLiveData.observe(this@MainActivity){ resource ->
+                            forecatState =resource
+                        }
+                    }
+
                     // Display a structured UI based on the state
                     WeatherUI(weatherState)
+                    ForecastUI(forecatState)
                 }
             }
         }
     }
 }
 
+
+fun ForecastUI(forecastState:Resource<ForecastResponse>){
+    Log.d("Forecast2 response",forecastState.data.toString())
+}
 
 @Composable
 fun WeatherUI(weatherState: Resource<WeatherResponse>) {
@@ -105,6 +130,8 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                 val pressure = localContext.getString(R.string.pressure)+":"+ weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it) }
                 val feels_like =localContext.getString(R.string.feels_like)+":"+ weatherState.data?.main?.feels_like?.let { WeatherUtils.updateTemperature(it.toInt()) }
                 val wind= weatherState.data?.wind?.speed?.let { WeatherUtils.updateWind(weatherState.data?.wind?.deg.toString(), it.toInt(),localContext) }
+
+                val icon =  weatherState.data?.weather?.get(0)?.icon
 
 
                 // Row 1: Name and Day with Blue Background
@@ -133,7 +160,8 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                 // Row 2: Temperature with Weather Icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = " $temperature",
@@ -141,13 +169,11 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                         fontSize = 22.sp,
                         modifier = Modifier.padding(start = 16.dp)
                     )
-                    /*
-                                         GlideImage(
-                                            model = "$iconurl${weatherState.data?.weather?.get(0)?.icon}.png",
-                                            contentDescription = "Weather Icon",
-                                            modifier = Modifier.size(50.dp)
-                                        )
-                    */
+                    AsyncImage(
+                        model = "$iconurl$icon.png",
+                        contentDescription = "Weather icon",
+                        modifier = Modifier.size(50.dp) // Define your desired width and height
+                    )
                 }
 
                 Text(text = " $feels_like", modifier = Modifier.padding(8.dp))

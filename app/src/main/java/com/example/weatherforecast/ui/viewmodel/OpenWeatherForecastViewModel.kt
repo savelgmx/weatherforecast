@@ -16,7 +16,6 @@ class OpenWeatherForecastViewModel @Inject constructor(
     private val repository: OpenWeatherMapRepository
 ):ViewModel(){
     private val _forecastLiveData = MutableLiveData<Resource<ForecastResponse>>()
-
     val forecastLiveData: LiveData<Resource<ForecastResponse>> get()=_forecastLiveData
 
     private var isForecastLoaded = false //flag to track is forecast loaded or jet not

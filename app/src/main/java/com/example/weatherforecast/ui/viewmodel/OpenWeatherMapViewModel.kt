@@ -23,16 +23,16 @@ class OpenWeatherMapViewModel @Inject constructor(
 
     init {
         // Call this function when ViewModel is initialized
-        getCurrentWeather("Krasnoyarsk") // or provide a default city
+        getCurrentWeather() // or provide a default city
         isWeatherLoaded=true
     }
 
-    fun getCurrentWeather(city: String) {
+    fun getCurrentWeather() {
         if (!isWeatherLoaded) { // Check if weather data is already loaded
             viewModelScope.launch {
                 _weatherLiveData.value = Resource.Loading()
                 try {
-                    val result = repository.getCurrentWeather(city)
+                    val result = repository.getCurrentWeather()
                     _weatherLiveData.value = result
                     isWeatherLoaded = true // Set flag to true after successful loading
                 } catch (e: Exception) {
