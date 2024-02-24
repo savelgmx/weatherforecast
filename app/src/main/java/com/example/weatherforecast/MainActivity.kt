@@ -160,26 +160,35 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                 // Row 2: Temperature with Weather Icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = " $temperature",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
+                        fontSize = 35.sp,
                         modifier = Modifier.padding(start = 16.dp)
                     )
+                    Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
                     AsyncImage(
                         model = "$iconurl$icon.png",
                         contentDescription = "Weather icon",
-                        modifier = Modifier.size(50.dp) // Define your desired width and height
+                        modifier = Modifier
+                            .size(75.dp) // Define your desired width and height
                     )
                 }
 
-                Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
-                Text(text = " $pressure", modifier = Modifier.padding(8.dp))
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment= Alignment.CenterVertically
+                ) {
+                    Text(text="$wind",Modifier.padding(16.dp))
 
-                Text(text="$wind",Modifier.padding(8.dp))
+                    Text(text = " $pressure", modifier = Modifier.padding(16.dp))
+
+                }
+
+
 
             }
             is Resource.Loading -> {
