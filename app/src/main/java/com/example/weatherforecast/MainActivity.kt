@@ -1,5 +1,6 @@
 package com.example.weatherforecast
 
+import android.health.connect.datatypes.units.Temperature
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -40,9 +41,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
+import com.example.weatherforecast.response.Current
+import com.example.weatherforecast.response.Daily
+import com.example.weatherforecast.response.FeelsLike
 import com.example.weatherforecast.response.ForecastResponse
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
+import com.example.weatherforecast.response.Temp
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
@@ -102,9 +108,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
+ @Composable
 fun ForecastUI(forecastState:Resource<ForecastResponse>){
     Log.d("Forecast2 response",forecastState.data.toString())
+
+    // Assuming forecastState contains the list of daily forecast data
+    val dailyForecast = forecastState.data?.daily
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        if (dailyForecast != null) {
+            dailyForecast.forEach { dayForecast ->
+                Text(
+                    text = "Date: ${WeatherUtils.updateDateToToday(dayForecast.dt)}\n" +
+                            "Sunrise: ${WeatherUtils.updateTime(dayForecast.sunrise)}\n" +
+                            "Sunset: ${WeatherUtils.updateTime(dayForecast.sunset)}\n" +
+                            "Moonrise: ${WeatherUtils.updateTime(dayForecast.moonrise)}\n" +
+                            "Moonset: ${WeatherUtils.updateTime(dayForecast.moonset)}\n" +
+                            "Temperature: ${dayForecast.temp.day} °C\n" +
+                            "Feels Like: ${dayForecast.feelsLike.day} °C\n" +
+                            "Weather: ${dayForecast.weather[0].description}\n" +
+                            "Clouds: ${dayForecast.clouds}%\n" +
+                            "UV Index: ${dayForecast.uvi}\n",
+
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -120,9 +150,6 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
         when (weatherState) {
             is Resource.Success -> {
                 val localContext = LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-
-                weatherState.data?.coord?.let { WeatherUtils.setLatitude(it.lat) }  //set latitude
-                weatherState.data?.coord?.let { WeatherUtils.setLongitude(it.lon) } //set longitude
 
                 val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
                 val name =weatherState.data?.name
@@ -210,6 +237,8 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
 fun WeatherUISuccessPreview() {
     val successState = Resource.Success(getMockWeatherResponse())
     WeatherUI(successState)
+ //   val successForecastState = Resource.Success(getMockForecastResponse())
+  //  ForecastUI(successForecastState)
 }
 fun getMockWeatherResponse(): WeatherResponse {
     return WeatherResponse(
@@ -228,5 +257,28 @@ fun getMockWeatherResponse(): WeatherResponse {
         200
     )
 }
+    fun getMockForecastResponse(): ForecastResponse {
+        return ForecastResponse(
+
+            Current (100, -18.32, 1708774497, -17.78, 95, 1037,
+                1708736117, 1708772966, -17.78, 0.0, 10000,
+                listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
+                228,0.6,6.0),
+                listOf( Daily(100,-18.32,1708754400,
+                    FeelsLike(-19.14,-16.77,-27.53,-19.14),
+                    73,0.5, 1708862520,1708824420,0.0,1036,
+                    1708736117, 1708772966,
+                   Temp(-19.14,-16.77,-27.53,-19.14,-20.0,-24.4),
+                    0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
+                    224,1.37,2.40) ),
+                listOf(Hourly(99,-18.32,1708774497,-17.78, 95,
+                    0,1037,-21.2,0.3,10000,
+                    listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                    223,2.2,1.8)),
+            56.0097, 92.79, "Asia/Krasnoyarsk", 25200
+        )
+     }
+
+
 
 

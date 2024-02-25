@@ -23,8 +23,10 @@ import java.util.Locale
 
 import javax.inject.Inject
 
+/*
 private var lon=0.0
 private var lat=0.0
+*/
 
 class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val openWeatherMapAPI: OpenWeatherMapAPI,
@@ -39,9 +41,6 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             "metric",AppConstants.API_KEY,
             Locale.getDefault().language)
         Log.d("Repository response", response.body().toString())
-
-        response.body()?.coord?.lat?.let { WeatherUtils.setLatitude(it) }
-        response.body()?.coord?.lon?.let { WeatherUtils.setLongitude(it) }
 
         return if (response.isSuccessful) {
             val data = response.body()
@@ -59,17 +58,17 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
-
+    try {
         //lon=92.7917, lat=56.0097
-         lon =92.7917// ""WeatherUtils.getLongitude()
-         lat = 56.0097//""WeatherUtils.getLatitude()
+        var lon ="92.7917"// ""WeatherUtils.getLongitude()
+        var lat = "56.0097"//""WeatherUtils.getLatitude()
 
-        Log.d("Log Lan response",lon.toString()+"  "+lat.toString())
+        Log.d("Log Lan response", lon +"  "+ lat)
 
         val response = openWeatherMapAPI.getForecastWeather(
             AppConstants.API_KEY,
-            lon.toString(),
-            lat.toString(),
+            lon,
+            lat,
             "metric",
             Locale.getDefault().language
         )
@@ -86,7 +85,10 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         } else {
             Resource.Error(null, "No data found")
         }
-
+    } catch (e: Exception) {
+        Log.e("ForecastAPIError", "Error fetching forecast: ${e.message}")
+        return Resource.Error(null, "An error occurred: ${e.message}")
+    }
     }
 
 
