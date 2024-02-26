@@ -1,14 +1,16 @@
 package com.example.weatherforecast
 
-import android.health.connect.datatypes.units.Temperature
+
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +18,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -37,8 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.Current
@@ -59,6 +63,20 @@ import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.AndroidEntryPoint
+
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+
+
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+
+
+
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -100,46 +118,101 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Display a structured UI based on the state
-                    WeatherUI(weatherState)
-                    ForecastUI(forecatState)
+                    WeatherUI(weatherState,forecatState)
+                    //ForecastUI(forecatState)
                 }
             }
         }
     }
 }
 
- @Composable
+@Composable
 fun ForecastUI(forecastState:Resource<ForecastResponse>){
     Log.d("Forecast2 response",forecastState.data.toString())
 
     // Assuming forecastState contains the list of daily forecast data
     val dailyForecast = forecastState.data?.daily
+    val count = dailyForecast?.size ?: 0
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        if (dailyForecast != null) {
-            dailyForecast.forEach { dayForecast ->
-                Text(
-                    text = "Date: ${WeatherUtils.updateDateToToday(dayForecast.dt)}\n" +
-                            "Sunrise: ${WeatherUtils.updateTime(dayForecast.sunrise)}\n" +
-                            "Sunset: ${WeatherUtils.updateTime(dayForecast.sunset)}\n" +
-                            "Moonrise: ${WeatherUtils.updateTime(dayForecast.moonrise)}\n" +
-                            "Moonset: ${WeatherUtils.updateTime(dayForecast.moonset)}\n" +
-                            "Temperature: ${dayForecast.temp.day} °C\n" +
-                            "Feels Like: ${dayForecast.feelsLike.day} °C\n" +
-                            "Weather: ${dayForecast.weather[0].description}\n" +
-                            "Clouds: ${dayForecast.clouds}%\n" +
-                            "UV Index: ${dayForecast.uvi}\n",
-
-                    modifier = Modifier.padding(8.dp)
-                )
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+    ) {
+        items(count) { index ->
+            dailyForecast?.getOrNull(index)?.let { daily ->
+                ClickableDayForecastItem(daily = daily)
             }
         }
     }
 }
 
+
 @Composable
-fun WeatherUI(weatherState: Resource<WeatherResponse>) {
-    val iconurl=AppConstants.WEATHER_API_IMAGE_ENDPOINT
+fun ClickableDayForecastItem(daily: Daily) {
+    val localContext = LocalContext.current //To access the context within a Composable function,
+                            // use the LocalContext provided by Jetpack Compose
+                            //we need this context to load  string values form strings.xml
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable {
+                // Handle click action, you can navigate to detailed info screen here
+                // or show detailed info in a bottom sheet or dialog
+            },
+        shape = RoundedCornerShape(16.dp),
+ 
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "${WeatherUtils.updateDateToToday(daily.dt)}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = localContext.getString(R.string.sunrise)+"${WeatherUtils.updateTime(daily.sunrise)}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Sunset: ${WeatherUtils.updateTime(daily.sunset)}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Moonrise: ${WeatherUtils.updateTime(daily.moonrise)}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Moonset: ${WeatherUtils.updateTime(daily.moonset)}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Temperature: ${daily.temp.day} °C",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Feels Like: ${daily.feelsLike.day} °C",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Weather: ${daily.weather[0].description}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Clouds: ${daily.clouds}%",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "UV Index: ${daily.uvi}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun WeatherUI(weatherState: Resource<WeatherResponse>, forecastState: Resource<ForecastResponse>?) {
+    val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -194,14 +267,14 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                         text = " $temperature",
                         fontWeight = FontWeight.Bold,
                         fontSize = 35.sp,
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                     Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
                     AsyncImage(
                         model = "$iconurl$icon.png",
                         contentDescription = "Weather icon",
                         modifier = Modifier
-                            .size(75.dp) // Define your desired width and height
+                            .size(50.dp) // Define your desired width and height
                     )
                 }
 
@@ -209,14 +282,14 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment= Alignment.CenterVertically
                 ) {
-                    Text(text="$wind",Modifier.padding(16.dp))
+                    Text(text="$wind",Modifier.padding(8.dp))
 
-                    Text(text = " $pressure", modifier = Modifier.padding(16.dp))
+                    Text(text = " $pressure", modifier = Modifier.padding(1.dp))
 
                 }
 
-
-
+                // Include ForecastUI here
+                forecastState?.let { ForecastUI(it) }
             }
             is Resource.Loading -> {
                 CircularProgressIndicator()
@@ -236,9 +309,10 @@ fun WeatherUI(weatherState: Resource<WeatherResponse>) {
 @Composable
 fun WeatherUISuccessPreview() {
     val successState = Resource.Success(getMockWeatherResponse())
-    WeatherUI(successState)
- //   val successForecastState = Resource.Success(getMockForecastResponse())
-  //  ForecastUI(successForecastState)
+    val successForecastState = Resource.Success(getMockForecastResponse())
+
+    WeatherUI(successState,successForecastState)
+    // ForecastUI(successForecastState)
 }
 fun getMockWeatherResponse(): WeatherResponse {
     return WeatherResponse(
@@ -257,27 +331,27 @@ fun getMockWeatherResponse(): WeatherResponse {
         200
     )
 }
-    fun getMockForecastResponse(): ForecastResponse {
-        return ForecastResponse(
+fun getMockForecastResponse(): ForecastResponse {
+    return ForecastResponse(
 
-            Current (100, -18.32, 1708774497, -17.78, 95, 1037,
-                1708736117, 1708772966, -17.78, 0.0, 10000,
-                listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
-                228,0.6,6.0),
-                listOf( Daily(100,-18.32,1708754400,
-                    FeelsLike(-19.14,-16.77,-27.53,-19.14),
-                    73,0.5, 1708862520,1708824420,0.0,1036,
-                    1708736117, 1708772966,
-                   Temp(-19.14,-16.77,-27.53,-19.14,-20.0,-24.4),
-                    0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
-                    224,1.37,2.40) ),
-                listOf(Hourly(99,-18.32,1708774497,-17.78, 95,
-                    0,1037,-21.2,0.3,10000,
-                    listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                    223,2.2,1.8)),
-            56.0097, 92.79, "Asia/Krasnoyarsk", 25200
-        )
-     }
+        Current (100, -18.32, 1708774497, -17.78, 95, 1037,
+            1708736117, 1708772966, -17.78, 0.0, 10000,
+            listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
+            228,0.6,6.0),
+        listOf( Daily(100,-18.32,1708754400,
+            FeelsLike(-19.14,-16.77,-27.53,-19.14),
+            73,0.5, 1708862520,1708824420,0.0,1036,
+            1708736117, 1708772966,
+            Temp(-19.14,-16.77,-27.53,-19.14,-20.0,-24.4),
+            0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
+            224,1.37,2.40) ),
+        listOf(Hourly(99,-18.32,1708774497,-17.78, 95,
+            0,1037,-21.2,0.3,10000,
+            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+            223,2.2,1.8)),
+        56.0097, 92.79, "Asia/Krasnoyarsk", 25200
+    )
+}
 
 
 
