@@ -76,37 +76,45 @@ class UIUtils {
 
                 ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = WeatherUtils.updateDateToToday(daily.dt),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                        horizontalArrangement = Arrangement.Start
 
+                    ) {
                         Text(
-                            text = WeatherUtils.updateTemperature(daily.temp.day.toInt()),
+
+                            text = WeatherUtils.updateDateToToday(daily.dt),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                          //  fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
                         AsyncImage(
                             model = "$iconurl${daily.weather[0].icon}.png",
                             contentDescription = "Weather icon",
                             modifier = Modifier
                                 .size(50.dp) // Define your desired width and height
+                                .padding(all =3.dp)
+
                         )
+                        Text(
+                            text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
+                            WeatherUtils.updateTemperature(daily.temp.night.toInt()),
+                            fontWeight = FontWeight.Bold,
+                          //  fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
                     }
+
+
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Text(
-                            text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day} °C",
+                            text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C",
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         Text(
@@ -115,6 +123,7 @@ class UIUtils {
                         )
 
                     }
+
 
 
                 }
