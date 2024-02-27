@@ -80,6 +80,8 @@ import androidx.compose.ui.unit.dp
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -152,10 +154,11 @@ fun ClickableDayForecastItem(daily: Daily) {
     val localContext = LocalContext.current //To access the context within a Composable function,
                             // use the LocalContext provided by Jetpack Compose
                             //we need this context to load  string values form strings.xml
+    val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 3.dp)
             .clickable {
                 // Handle click action, you can navigate to detailed info screen here
                 // or show detailed info in a bottom sheet or dialog
@@ -165,17 +168,53 @@ fun ClickableDayForecastItem(daily: Daily) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "${WeatherUtils.updateDateToToday(daily.dt)}",
+                text = WeatherUtils.updateDateToToday(daily.dt),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = WeatherUtils.updateTemperature(daily.temp.day.toInt()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                AsyncImage(
+                    model = "$iconurl${daily.weather[0].icon}.png",
+                    contentDescription = "Weather icon",
+                    modifier = Modifier
+                        .size(50.dp) // Define your desired width and height
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = localContext.getString(R.string.feels_like)+": ${daily.feelsLike.day} °C",
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = daily.weather[0].description,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+            }
+
+
+/*
             Text(
-                text = localContext.getString(R.string.sunrise)+"${WeatherUtils.updateTime(daily.sunrise)}",
+                text = localContext.getString(R.string.sunrise)+":"+ WeatherUtils.updateTime(daily.sunrise),
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "Sunset: ${WeatherUtils.updateTime(daily.sunset)}",
+                text = localContext.getString(R.string.sunset)+": ${WeatherUtils.updateTime(daily.sunset)}",
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
@@ -187,18 +226,6 @@ fun ClickableDayForecastItem(daily: Daily) {
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "Temperature: ${daily.temp.day} °C",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Feels Like: ${daily.feelsLike.day} °C",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Weather: ${daily.weather[0].description}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
                 text = "Clouds: ${daily.clouds}%",
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -206,6 +233,7 @@ fun ClickableDayForecastItem(daily: Daily) {
                 text = "UV Index: ${daily.uvi}",
                 modifier = Modifier.padding(bottom = 4.dp)
             )
+*/
         }
     }
 }
@@ -312,7 +340,7 @@ fun WeatherUISuccessPreview() {
     val successForecastState = Resource.Success(getMockForecastResponse())
 
     WeatherUI(successState,successForecastState)
-    // ForecastUI(successForecastState)
+    ForecastUI(successForecastState)
 }
 fun getMockWeatherResponse(): WeatherResponse {
     return WeatherResponse(
@@ -340,13 +368,13 @@ fun getMockForecastResponse(): ForecastResponse {
             228,0.6,6.0),
         listOf( Daily(100,-18.32,1708754400,
             FeelsLike(-19.14,-16.77,-27.53,-19.14),
-            73,0.5, 1708862520,1708824420,0.0,1036,
+            73,0.5, 1708862520,1708824420,1036,
             1708736117, 1708772966,
             Temp(-19.14,-16.77,-27.53,-19.14,-20.0,-24.4),
             0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")) ,
             224,1.37,2.40) ),
         listOf(Hourly(99,-18.32,1708774497,-17.78, 95,
-            0,1037,-21.2,0.3,10000,
+            1037,-21.2,0.0,10000,
             listOf(Weather(804, "Clouds", "пасмурно", "04n")),
             223,2.2,1.8)),
         56.0097, 92.79, "Asia/Krasnoyarsk", 25200

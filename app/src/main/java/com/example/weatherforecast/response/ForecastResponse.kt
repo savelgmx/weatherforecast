@@ -69,8 +69,10 @@ data class Daily(
     val moonrise: Int,
     @SerializedName("moonset")
     val moonset: Int,
+/*
     @SerializedName("pop")
     val pop: Double,
+*/
     @SerializedName("pressure")
     val pressure: Int,
     @SerializedName("sunrise")
@@ -113,8 +115,10 @@ data class Hourly(
     val feelsLike: Double,
     @SerializedName("humidity")
     val humidity: Int,
+/*
     @SerializedName("pop")
     val pop: Int,
+*/
     @SerializedName("pressure")
     val pressure: Int,
     @SerializedName("temp")
