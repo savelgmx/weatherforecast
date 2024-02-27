@@ -72,10 +72,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
-
-
-
+import com.example.weatherforecast.utils.UIUtils
 
 
 @AndroidEntryPoint
@@ -120,218 +117,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Display a structured UI based on the state
-                    WeatherUI(weatherState,forecatState)
-                    //ForecastUI(forecatState)
+                    UIUtils.WeatherUI(weatherState,forecatState)
                 }
             }
         }
     }
 }
 
-@Composable
-fun ForecastUI(forecastState:Resource<ForecastResponse>){
-    Log.d("Forecast2 response",forecastState.data.toString())
-
-    // Assuming forecastState contains the list of daily forecast data
-    val dailyForecast = forecastState.data?.daily
-    val count = dailyForecast?.size ?: 0
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
-    ) {
-        items(count) { index ->
-            dailyForecast?.getOrNull(index)?.let { daily ->
-                ClickableDayForecastItem(daily = daily)
-            }
-        }
-    }
-}
 
 
-@Composable
-fun ClickableDayForecastItem(daily: Daily) {
-    val localContext = LocalContext.current //To access the context within a Composable function,
-                            // use the LocalContext provided by Jetpack Compose
-                            //we need this context to load  string values form strings.xml
-    val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 3.dp)
-            .clickable {
-                // Handle click action, you can navigate to detailed info screen here
-                // or show detailed info in a bottom sheet or dialog
-            },
-        shape = RoundedCornerShape(16.dp),
- 
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = WeatherUtils.updateDateToToday(daily.dt),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                Text(
-                    text = WeatherUtils.updateTemperature(daily.temp.day.toInt()),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                AsyncImage(
-                    model = "$iconurl${daily.weather[0].icon}.png",
-                    contentDescription = "Weather icon",
-                    modifier = Modifier
-                        .size(50.dp) // Define your desired width and height
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = localContext.getString(R.string.feels_like)+": ${daily.feelsLike.day} °C",
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = daily.weather[0].description,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-            }
-
-
-/*
-            Text(
-                text = localContext.getString(R.string.sunrise)+":"+ WeatherUtils.updateTime(daily.sunrise),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = localContext.getString(R.string.sunset)+": ${WeatherUtils.updateTime(daily.sunset)}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Moonrise: ${WeatherUtils.updateTime(daily.moonrise)}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Moonset: ${WeatherUtils.updateTime(daily.moonset)}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Clouds: ${daily.clouds}%",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "UV Index: ${daily.uvi}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-*/
-        }
-    }
-}
-
-@Composable
-fun WeatherUI(weatherState: Resource<WeatherResponse>, forecastState: Resource<ForecastResponse>?) {
-    val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (weatherState) {
-            is Resource.Success -> {
-                val localContext = LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-
-                val temperature = weatherState.data?.main?.temp?.let { WeatherUtils.updateTemperature(it.toInt()) }
-                val name =weatherState.data?.name
-                val day=  weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-                val pressure = localContext.getString(R.string.pressure)+":"+ weatherState.data?.main?.pressure?.let { WeatherUtils.updatePressure(it) }
-                val feels_like =localContext.getString(R.string.feels_like)+":"+ weatherState.data?.main?.feels_like?.let { WeatherUtils.updateTemperature(it.toInt()) }
-                val wind= weatherState.data?.wind?.speed?.let { WeatherUtils.updateWind(weatherState.data?.wind?.deg.toString(), it.toInt(),localContext) }
-
-                val icon =  weatherState.data?.weather?.get(0)?.icon
-
-
-                // Row 1: Name and Day with Blue Background
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(Color.Blue)
-                            .padding(horizontal = 10.dp, vertical = 5.dp)
-                    ) {
-                        Text(text = name!!, color = Color.White)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(Color.Blue)
-                            .padding(horizontal = 10.dp, vertical = 5.dp)
-                    ) {
-                        Text(text = day!!, color = Color.White)
-                    }
-                }
-
-                // Row 2: Temperature with Weather Icon
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = " $temperature",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 35.sp,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                    Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
-                    AsyncImage(
-                        model = "$iconurl$icon.png",
-                        contentDescription = "Weather icon",
-                        modifier = Modifier
-                            .size(50.dp) // Define your desired width and height
-                    )
-                }
-
-                Row(Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment= Alignment.CenterVertically
-                ) {
-                    Text(text="$wind",Modifier.padding(8.dp))
-
-                    Text(text = " $pressure", modifier = Modifier.padding(1.dp))
-
-                }
-
-                // Include ForecastUI here
-                forecastState?.let { ForecastUI(it) }
-            }
-            is Resource.Loading -> {
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading...")
-            }
-            is Resource.Error -> {
-                Text("Error: ${weatherState.msg}")
-            }
-
-            else -> {}
-        }
-    }
-}
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
@@ -339,8 +133,8 @@ fun WeatherUISuccessPreview() {
     val successState = Resource.Success(getMockWeatherResponse())
     val successForecastState = Resource.Success(getMockForecastResponse())
 
-    WeatherUI(successState,successForecastState)
-    ForecastUI(successForecastState)
+    UIUtils.WeatherUI(successState,successForecastState)
+    UIUtils.ForecastUI(successForecastState)
 }
 fun getMockWeatherResponse(): WeatherResponse {
     return WeatherResponse(
