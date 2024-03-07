@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,6 +35,7 @@ import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.ForecastResponse
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.WeatherResponse
 
 class UIUtils {
@@ -67,6 +71,7 @@ class UIUtils {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color.Transparent)
                     .padding(vertical = 3.dp)
                     .clickable {
                         // Handle click action, you can navigate to detailed info screen here
@@ -75,18 +80,20 @@ class UIUtils {
                 shape = RoundedCornerShape(16.dp),
 
                 ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier
+                    .padding(1.dp)
+                    .background(Color.Cyan)) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.SpaceEvenly
 
                     ) {
                         Text(
 
                             text = WeatherUtils.updateDateToToday(daily.dt),
                             fontWeight = FontWeight.Bold,
-                          //  fontSize = 12.sp,
+                            //  fontSize = 12.sp,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         AsyncImage(
@@ -94,14 +101,14 @@ class UIUtils {
                             contentDescription = "Weather icon",
                             modifier = Modifier
                                 .size(50.dp) // Define your desired width and height
-                                .padding(all =3.dp)
+                                .padding(all = 3.dp)
 
                         )
                         Text(
                             text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
-                            WeatherUtils.updateTemperature(daily.temp.night.toInt()),
+                                    WeatherUtils.updateTemperature(daily.temp.night.toInt()),
                             fontWeight = FontWeight.Bold,
-                          //  fontSize = 12.sp,
+                            //  fontSize = 12.sp,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -228,6 +235,18 @@ class UIUtils {
 
                         }
 
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Погода на сутки",fontWeight = FontWeight.Bold)
+                        //And now include hourly UI here
+                        forecastState?.data?.hourly.let {
+                            if (it != null) {
+                                HourlyWeatherRow(it)
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Погода на 7 дней",fontWeight = FontWeight.Bold)
+
+
                         // Include ForecastUI here
                         forecastState?.let { ForecastUI(it) }
                     }
@@ -246,6 +265,49 @@ class UIUtils {
                 }
             }
         }
+        @Composable
+        fun HourlyWeatherRow(hourlyForecast: List<Hourly>) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth() ,
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                items(hourlyForecast) { hourly ->
+                    HourlyWeatherItem(hourly = hourly)
+                }
+            }
+        }
+
+        @Composable
+        fun HourlyWeatherItem(hourly: Hourly) {
+            val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth() // Define your desired width
+                    .padding(vertical = 8.dp).background(Color.Transparent),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(4.dp).background(Color.Cyan)) {
+                    Text(
+                        text = WeatherUtils.updateTime(hourly.dt),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(all = 4.dp)
+                    )
+                    AsyncImage(
+                        model = "$iconurl${hourly.weather[0].icon}.png",
+                        contentDescription = "Weather icon",
+                        modifier = Modifier
+                            .size(40.dp) // Define your desired width and height
+                            .padding(all = 3.dp)
+                    )
+                    Text(
+                        text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(all = 4.dp)
+                    )
+                }
+            }
+        }
+
     }
 }
 
