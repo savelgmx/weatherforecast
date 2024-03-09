@@ -33,5 +33,7 @@
     <string name="pref_unit_system_title">Система единиц</string>
     <string name="pref_unit_system_summary">Выберите предпочитаемую систему единиц</string>
     <string name="weather_location_title">Настройки</string>
+    <string name="weather_24_hour">Погода на сутки</string>
+    <string name="weather_7_days">Погода на неделю</string>
 
 </resources>

@@ -27,7 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +42,7 @@ import com.example.weatherforecast.response.WeatherResponse
 
 class UIUtils {
     companion object {
+        val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
         @Composable
         fun ForecastUI(forecastState: Resource<ForecastResponse>) {
             Log.d("Forecast2 response", forecastState.data.toString())
@@ -67,7 +70,6 @@ class UIUtils {
                 LocalContext.current //To access the context within a Composable function,
             // use the LocalContext provided by Jetpack Compose
             //we need this context to load  string values form strings.xml
-            val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,10 +84,10 @@ class UIUtils {
                 ) {
                 Column(modifier = Modifier
                     .padding(1.dp)
-                    .background(Color.Cyan)) {
+                    .background(Color(0x3498eb))) {
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(40.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
 
                     ) {
@@ -94,7 +96,7 @@ class UIUtils {
                             text = WeatherUtils.updateDateToToday(daily.dt),
                             fontWeight = FontWeight.Bold,
                             //  fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 3.dp)
                         )
                         AsyncImage(
                             model = "$iconurl${daily.weather[0].icon}.png",
@@ -109,7 +111,7 @@ class UIUtils {
                                     WeatherUtils.updateTemperature(daily.temp.night.toInt()),
                             fontWeight = FontWeight.Bold,
                             //  fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 3.dp)
                         )
 
                     }
@@ -121,12 +123,12 @@ class UIUtils {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Text(
-                            text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C",
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C ",
+                            modifier = Modifier.padding(bottom = 3.dp)
                         )
                         Text(
                             text = daily.weather[0].description,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            modifier = Modifier.padding(bottom = 3.dp)
                         )
 
                     }
@@ -143,7 +145,7 @@ class UIUtils {
             weatherState: Resource<WeatherResponse>,
             forecastState: Resource<ForecastResponse>?
         ) {
-            val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
+            //  val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -235,16 +237,18 @@ class UIUtils {
 
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Погода на сутки",fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(1.dp))
+                        Text(localContext.resources.getString(R.string.weather_24_hour),//"Погода на сутки",
+                            fontWeight = FontWeight.Bold)
                         //And now include hourly UI here
                         forecastState?.data?.hourly.let {
                             if (it != null) {
                                 HourlyWeatherRow(it)
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Погода на 7 дней",fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(1.dp))
+                        Text(localContext.resources.getString(R.string.weather_7_days),//"Погода на 7 дней"
+                            fontWeight = FontWeight.Bold)
 
 
                         // Include ForecastUI here
@@ -269,7 +273,7 @@ class UIUtils {
         fun HourlyWeatherRow(hourlyForecast: List<Hourly>) {
             LazyRow(
                 modifier = Modifier.fillMaxWidth() ,
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+                contentPadding = PaddingValues(horizontal = 1.dp, vertical = 1.dp)
             ) {
                 items(hourlyForecast) { hourly ->
                     HourlyWeatherItem(hourly = hourly)
@@ -279,30 +283,45 @@ class UIUtils {
 
         @Composable
         fun HourlyWeatherItem(hourly: Hourly) {
-            val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
+            //  val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
             Card(
                 modifier = Modifier
                     .fillMaxWidth() // Define your desired width
-                    .padding(vertical = 8.dp).background(Color.Transparent),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Column(modifier = Modifier.padding(4.dp).background(Color.Cyan)) {
+                    .padding(horizontal =1.dp, vertical = 1.dp).background(Color.Transparent),
+                shape = RoundedCornerShape(3.dp)
+
+            )
+            {
+                Column(modifier = Modifier.padding(3.dp)
+                    .background(Color(0x34c0eb)) //#
+                ) {
                     Text(
                         text = WeatherUtils.updateTime(hourly.dt),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(all = 4.dp)
+                        style = TextStyle(
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(all = 3.dp)
                     )
                     AsyncImage(
                         model = "$iconurl${hourly.weather[0].icon}.png",
                         contentDescription = "Weather icon",
                         modifier = Modifier
-                            .size(40.dp) // Define your desired width and height
-                            .padding(all = 3.dp)
+                            .size(50.dp) // Define your desired width and height
+                            .padding(all = 1.dp)
                     )
                     Text(
                         text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(all = 4.dp)
+
+                        style = TextStyle(
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Black
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(all = 1.dp)
                     )
                 }
             }
