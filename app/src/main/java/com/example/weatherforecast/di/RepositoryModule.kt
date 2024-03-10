@@ -26,14 +26,20 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideOpenWeatherMapRepositoryImpl(api: OpenWeatherMapAPI, dao: OpenWeatherMapDao) : OpenWeatherMapRepositoryImpl {
-        return OpenWeatherMapRepositoryImpl(api, dao)
+    fun provideOpenWeatherMapRepositoryImpl(api: OpenWeatherMapAPI,
+    dao: OpenWeatherMapDao,
+    contextProvider: ContextProvider) : OpenWeatherMapRepositoryImpl {
+        return OpenWeatherMapRepositoryImpl(api, dao, contextProvider)
     }
 
         @Provides
         @Singleton
-        fun provideOpenWeatherMapRepository(api: OpenWeatherMapAPI,dao: OpenWeatherMapDao): OpenWeatherMapRepository {
-            return OpenWeatherMapRepositoryImpl(api,dao)
+    fun provideOpenWeatherMapRepository(
+        api: OpenWeatherMapAPI,
+        dao: OpenWeatherMapDao,
+        contextProvider: ContextProvider
+    ): OpenWeatherMapRepository {
+        return provideOpenWeatherMapRepositoryImpl(api, dao, contextProvider)
         }
     }
 

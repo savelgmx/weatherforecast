@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.db.CurrentWeatherEntity
 import com.example.weatherforecast.db.OpenWeatherMapDao
+import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.ForecastResponse
@@ -30,7 +31,8 @@ private var lat=0.0
 
 class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val openWeatherMapAPI: OpenWeatherMapAPI,
-    private val openWeatherMapDao: OpenWeatherMapDao
+    private val openWeatherMapDao: OpenWeatherMapDao,
+    private val contextProvider: ContextProvider
 ) : OpenWeatherMapRepository {
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
