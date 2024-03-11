@@ -1,6 +1,7 @@
 package com.example.weatherforecast
 
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -72,12 +73,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.weatherforecast.utils.UIUtils
+import android.Manifest
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val PERMISSION_REQUEST_CODE = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,10 +102,24 @@ class MainActivity : ComponentActivity() {
                     //Collect LiveData state of Forecast in Compose state
                     var forecatState by remember { mutableStateOf<Resource<ForecastResponse>>(Resource.Loading())}
 
+                    // Check and request permission if not granted
+                    if (ContextCompat.checkSelfPermission(
+                            this@MainActivity,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            this@MainActivity,
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                            PERMISSION_REQUEST_CODE
+                        )
+                    } else {
+                        // Permission already granted, proceed with location-related operations
                     // Call getCurrentWeather with the desired city
                     openWeatherMapViewModel.getCurrentWeather()
                     //Call getForecastWeather
                     openWeatherForecastViewModel.getForecastWeather()
+                    }
 
                     // Observe the LiveData and update the weatherState
                     LaunchedEffect(openWeatherMapViewModel.weatherLiveData) {

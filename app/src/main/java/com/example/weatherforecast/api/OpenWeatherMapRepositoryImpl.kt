@@ -16,6 +16,7 @@ import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.utils.AppConstants
+import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +36,24 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val contextProvider: ContextProvider
 ) : OpenWeatherMapRepository {
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
+    private lateinit var latitude:String
+    private lateinit var longitude:String
+    private lateinit var cityName:String
+    init {
+        val locationProvider = DefineDeviceLocation(contextProvider.provideContext())
+        val locationArray = locationProvider.getLocation()
+
+        if (locationArray.isNotEmpty() && locationArray.size == 3) {
+            latitude = locationArray[0] ?: ""
+            longitude = locationArray[1] ?: ""
+            cityName = locationArray[2] ?: ""
+
+            Log.d("getlocation",latitude+" "+longitude+cityName)
+        } else {
+            // Handle case when location retrieval fails
+            // You might want to provide default values or throw an exception
+        }
+    }
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
         val response = openWeatherMapAPI.getCurrentWeather(
@@ -60,37 +79,37 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
-    try {
-        //lon=92.7917, lat=56.0097
-        var lon ="92.7917"// ""WeatherUtils.getLongitude()
-        var lat = "56.0097"//""WeatherUtils.getLatitude()
+        try {
+            //lon=92.7917, lat=56.0097
+            var lon ="92.7917"// ""WeatherUtils.getLongitude()
+            var lat = "56.0097"//""WeatherUtils.getLatitude()
 
-        Log.d("Log Lan response", lon +"  "+ lat)
+            Log.d("Log Lan response", lon +"  "+ lat)
 
-        val response = openWeatherMapAPI.getForecastWeather(
-            AppConstants.API_KEY,
-            lon,
-            lat,
-            "metric",
-            Locale.getDefault().language
-        )
-        Log.d("Forecast response",response.body().toString())
-        return if (response.isSuccessful) {
-            val data = response.body()
-            if (data != null) {
+            val response = openWeatherMapAPI.getForecastWeather(
+                AppConstants.API_KEY,
+                lon,
+                lat,
+                "metric",
+                Locale.getDefault().language
+            )
+            Log.d("Forecast response",response.body().toString())
+            return if (response.isSuccessful) {
+                val data = response.body()
+                if (data != null) {
 
-                Resource.Success(data)
+                    Resource.Success(data)
 
+                } else {
+                    Resource.Error(null, "Empty  forecast response body")
+                }
             } else {
-                Resource.Error(null, "Empty  forecast response body")
+                Resource.Error(null, "No data found")
             }
-        } else {
-            Resource.Error(null, "No data found")
+        } catch (e: Exception) {
+            Log.e("ForecastAPIError", "Error fetching forecast: ${e.message}")
+            return Resource.Error(null, "An error occurred: ${e.message}")
         }
-    } catch (e: Exception) {
-        Log.e("ForecastAPIError", "Error fetching forecast: ${e.message}")
-        return Resource.Error(null, "An error occurred: ${e.message}")
-    }
     }
 
 
@@ -101,8 +120,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
 
     private suspend fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
-    if (data != null) {
-           // coroutineScope.launch(Dispatchers.IO) {
+        if (data != null) {
+            // coroutineScope.launch(Dispatchers.IO) {
             openWeatherMapDao.insertOrUpdate(
                 CurrentWeatherEntity(
                     coord = data.coord ?: Coord(0.0, 0.0),
@@ -119,8 +138,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                     cod = data.cod ?: 0
                 )
             )
-           // }
-    } else {
+            // }
+        } else {
             Log.e("AddForecastData", "WeatherResponse data is null")
         }
     }
