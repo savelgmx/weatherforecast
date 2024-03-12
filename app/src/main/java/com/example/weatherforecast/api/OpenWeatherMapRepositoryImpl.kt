@@ -52,12 +52,16 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         } else {
             // Handle case when location retrieval fails
             // You might want to provide default values or throw an exception
+            //i prefer use default values
+            latitude=AppConstants.CITY_LAT
+            longitude=AppConstants.CITY_LON
+            cityName=AppConstants.CITY_FORECAST
         }
     }
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
         val response = openWeatherMapAPI.getCurrentWeather(
-            AppConstants.CITY_FORECAST, //TODO change constant to value from settings
+            cityName,
             // as soon as they will be implemented
             "metric",AppConstants.API_KEY,
             Locale.getDefault().language)
@@ -84,12 +88,12 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             var lon ="92.7917"// ""WeatherUtils.getLongitude()
             var lat = "56.0097"//""WeatherUtils.getLatitude()
 
-            Log.d("Log Lan response", lon +"  "+ lat)
+            Log.d("Log Lan response", longitude +"  "+ latitude)
 
             val response = openWeatherMapAPI.getForecastWeather(
                 AppConstants.API_KEY,
-                lon,
-                lat,
+                longitude,
+                latitude,
                 "metric",
                 Locale.getDefault().language
             )
