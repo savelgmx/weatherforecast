@@ -11,25 +11,15 @@ import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
-
-
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.Locale
-
 import javax.inject.Inject
-
-/*
-private var lon=0.0
-private var lat=0.0
-*/
-
 class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val openWeatherMapAPI: OpenWeatherMapAPI,
     private val openWeatherMapDao: OpenWeatherMapDao,
@@ -48,7 +38,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             longitude = locationArray[1] ?: ""
             cityName = locationArray[2] ?: ""
 
-            Log.d("getlocation",latitude+" "+longitude+cityName)
+            Log.d(" ",latitude+" "+longitude+cityName)
         } else {
             // Handle case when location retrieval fails
             // You might want to provide default values or throw an exception
@@ -84,10 +74,6 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
         try {
-            //lon=92.7917, lat=56.0097
-            var lon ="92.7917"// ""WeatherUtils.getLongitude()
-            var lat = "56.0097"//""WeatherUtils.getLatitude()
-
             Log.d("Log Lan response", longitude +"  "+ latitude)
 
             val response = openWeatherMapAPI.getForecastWeather(
@@ -101,7 +87,6 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             return if (response.isSuccessful) {
                 val data = response.body()
                 if (data != null) {
-
                     Resource.Success(data)
 
                 } else {
@@ -121,6 +106,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
         return openWeatherMapDao.getWeather()
     }
+
+
 
 
     private suspend fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {

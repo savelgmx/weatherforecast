@@ -3,11 +3,15 @@ package com.example.weatherforecast.db
 import androidx.room.TypeConverter
 import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
+import com.example.weatherforecast.response.Current
+import com.example.weatherforecast.response.Daily
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.Wind
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class Converters {
     // Implement similar methods for other nested data classes
@@ -82,4 +86,38 @@ class Converters {
     fun toWeather(value: Weather): String {
         return "${value.id}|${value.main}|${value.description}|${value.icon}"
     }
+
+
+        @TypeConverter
+        fun fromCurrent(current: Current): String {
+            return Gson().toJson(current)
+        }
+
+        @TypeConverter
+        fun toCurrent(currentString: String): Current {
+            return Gson().fromJson(currentString, Current::class.java)
+        }
+
+        @TypeConverter
+        fun fromDailyList(daily: List<Daily>): String {
+            return Gson().toJson(daily)
+        }
+
+        @TypeConverter
+        fun toDailyList(dailyString: String): List<Daily> {
+            val listType = object : TypeToken<List<Daily>>() {}.type
+            return Gson().fromJson(dailyString, listType)
+        }
+
+        @TypeConverter
+        fun fromHourlyList(hourly: List<Hourly>): String {
+            return Gson().toJson(hourly)
+        }
+
+        @TypeConverter
+        fun toHourlyList(hourlyString: String): List<Hourly> {
+            val listType = object : TypeToken<List<Hourly>>() {}.type
+            return Gson().fromJson(hourlyString, listType)
+        }
+
 }

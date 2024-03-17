@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.weatherforecast.response.ForecastResponse
 
 
-@Database(entities = [CurrentWeatherEntity::class], version = 1, exportSchema = false)
+@Database(entities = [CurrentWeatherEntity::class, ForecastResponse::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class OpenWeatherMapDatabase : RoomDatabase() {
     abstract fun openWeatherMapDao(): OpenWeatherMapDao
