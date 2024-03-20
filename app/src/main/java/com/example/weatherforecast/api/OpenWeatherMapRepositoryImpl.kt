@@ -18,6 +18,7 @@ import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 class OpenWeatherMapRepositoryImpl @Inject constructor(
@@ -26,9 +27,9 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     private val contextProvider: ContextProvider
 ) : OpenWeatherMapRepository {
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
-    private lateinit var latitude:String
-    private lateinit var longitude:String
-    private lateinit var cityName:String
+    private var latitude:String
+    private var longitude:String
+    private var cityName:String
     init {
         val locationProvider = DefineDeviceLocation(contextProvider.provideContext())
         val locationArray = locationProvider.getLocation()
@@ -38,7 +39,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             longitude = locationArray[1] ?: ""
             cityName = locationArray[2] ?: ""
 
-            Log.d(" ",latitude+" "+longitude+cityName)
+            Log.d("getlocation response",latitude+" "+longitude+cityName)
         } else {
             // Handle case when location retrieval fails
             // You might want to provide default values or throw an exception
@@ -112,7 +113,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     private suspend fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
         if (data != null) {
-            // coroutineScope.launch(Dispatchers.IO) {
+             coroutineScope.launch(Dispatchers.IO) {
             openWeatherMapDao.insertOrUpdate(
                 CurrentWeatherEntity(
                     coord = data.coord ?: Coord(0.0, 0.0),
@@ -129,7 +130,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                     cod = data.cod ?: 0
                 )
             )
-            // }
+             }
         } else {
             Log.e("AddForecastData", "WeatherResponse data is null")
         }

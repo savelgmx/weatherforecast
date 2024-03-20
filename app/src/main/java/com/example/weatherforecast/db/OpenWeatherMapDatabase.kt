@@ -16,7 +16,8 @@ abstract class OpenWeatherMapDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var instance: OpenWeatherMapDatabase? = null
-        fun getInstance(context: Context): OpenWeatherMapDatabase {
+
+        operator fun invoke(context: Context): OpenWeatherMapDatabase {
             return instance ?: synchronized(this) {
                 instance ?: buildDatabase(context).also { instance = it }
             }
