@@ -62,7 +62,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             val data = response.body()
             if (data != null) {
 
-                addForecastDataToDB(data,repositoryScope) //first we
+                addCurrentWeatherDataToDB(data,repositoryScope) //first we
+
                 Resource.Success(data)
 
             } else {
@@ -88,6 +89,8 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             return if (response.isSuccessful) {
                 val data = response.body()
                 if (data != null) {
+
+                    addForecastDataToDB(data,repositoryScope)
                     Resource.Success(data)
 
                 } else {
@@ -108,36 +111,40 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         return openWeatherMapDao.getWeather()
     }
 
-
-
-
-    private suspend fun addForecastDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
+    private suspend fun addCurrentWeatherDataToDB(data: WeatherResponse?, coroutineScope: CoroutineScope) {
         if (data != null) {
-             coroutineScope.launch(Dispatchers.IO) {
-            openWeatherMapDao.insertOrUpdate(
-                CurrentWeatherEntity(
-                    coord = data.coord ?: Coord(0.0, 0.0),
-                    weather = data.weather ?: emptyList(),
-                    base = data.base ?: "",
-                    main = data.main ?: Main(0.0, 0.0, 0.0, 0.0, 0, 0),
-                    visibility = data.visibility ?: 0,
-                    wind = data.wind ?: Wind(0.0, 0),
-                    clouds = data.clouds ?: Clouds(0),
-                    dt = data.dt ?: 0L,
-                    sys = data.sys ?: Sys(0, 0, "", 0L, 0L),
-                    timezone = data.timezone ?: 0,
-                    name = data.name ?: "",
-                    cod = data.cod ?: 0
+            coroutineScope.launch(Dispatchers.IO) {
+
+                openWeatherMapDao.deleteAllFromWeather()
+                openWeatherMapDao.insertOrUpdate(
+                    CurrentWeatherEntity(
+                        coord = data.coord,
+                        weather = data.weather,
+                        base = data.base,
+                        main = data.main,
+                        visibility = data.visibility,
+                        wind = data.wind,
+                        clouds = data.clouds,
+                        dt = data.dt,
+                        sys = data.sys,
+                        timezone = data.timezone,
+                        name = data.name,
+                        cod = data.cod
+                    )
                 )
-            )
-             }
+            }
         } else {
-            Log.e("AddForecastData", "WeatherResponse data is null")
+            Log.e("AddCurrentData", "WeatherResponse data is null")
         }
     }
-
-
-
+    private suspend fun addForecastDataToDB(data:ForecastResponse?,coroutineScope: CoroutineScope){
+        if (data!=null){
+            coroutineScope.launch(Dispatchers.IO) {
+                openWeatherMapDao.deleteAllFromForecastResponse()
+                openWeatherMapDao.upsertSevenDaysForecast(data)
+            }
+        }
+    }
 
 }
 
