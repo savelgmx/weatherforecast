@@ -11,6 +11,7 @@ import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
+import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.utils.AppConstants
@@ -116,10 +117,14 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             coroutineScope.launch(Dispatchers.IO) {
 
                 openWeatherMapDao.deleteAllFromWeather()
+                val firstWeather = data.weather.firstOrNull() ?: Weather(0, "", "", "") // Get the first Weather object or create a default one
                 openWeatherMapDao.insertOrUpdate(
                     CurrentWeatherEntity(
                         coord = data.coord,
-                        weather = data.weather,
+                        weatherId = firstWeather.id,
+                        weatherMain = firstWeather.main,
+                        weatherDescription = firstWeather.description,
+                        weatherIcon = firstWeather.icon,
                         base = data.base,
                         main = data.main,
                         visibility = data.visibility,

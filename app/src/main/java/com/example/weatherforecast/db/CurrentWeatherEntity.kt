@@ -1,5 +1,6 @@
 package com.example.weatherforecast.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -16,7 +17,17 @@ import com.example.weatherforecast.response.Wind
 data class CurrentWeatherEntity @JvmOverloads constructor(
     @Embedded
     val coord: Coord = Coord(0.0, 0.0),
-    val weather: List<Weather> = emptyList(),
+
+    // Individual fields for the first weather object
+    @ColumnInfo(name = "weather_id")
+    val weatherId: Int,
+    @ColumnInfo(name = "weather_main")
+    val weatherMain: String,
+    @ColumnInfo(name = "weather_description")
+    val weatherDescription: String,
+    @ColumnInfo(name = "weather_icon")
+
+    val weatherIcon: String,
     val base: String = "",
     @Embedded
     val main: Main = Main(0.0, 0.0, 0.0, 0.0, 0, 0),
@@ -31,7 +42,8 @@ data class CurrentWeatherEntity @JvmOverloads constructor(
     val timezone: Int = 0,
 
     val name: String,
-    val cod: Int
+    val cod: Int,
+
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

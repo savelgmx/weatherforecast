@@ -61,18 +61,18 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromWeatherList(value: String): List<Weather> {
-        val items = value.split(",")
-        return items.map {
-            val parts = it.split("|")
-            Weather(parts[0].toInt(), parts[1], parts[2], parts[3])
+    fun fromWeatherList(value: List<Weather>): String {
+        return value.joinToString(",") {
+            "${it.id}|${it.main}|${it.description}|${it.icon}"
         }
     }
 
     @TypeConverter
-    fun toWeatherList(value: List<Weather>): String {
-        return value.joinToString(",") {
-            "${it.id}|${it.main}|${it.description}|${it.icon}"
+    fun toWeatherList(value: String): List<Weather> {
+        val items = value.split(",")
+        return items.map {
+            val parts = it.split("|")
+            Weather(parts[0].toInt(), parts[1], parts[2], parts[3])
         }
     }
 
