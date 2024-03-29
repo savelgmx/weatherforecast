@@ -8,19 +8,21 @@ import androidx.room.TypeConverters
 import com.example.weatherforecast.response.FeelsLike
 import com.example.weatherforecast.response.Temp
 
-@Entity(tableName = "daily_weather")
+@Entity(tableName = "hourly_weather")
 @TypeConverters(Converters::class)
-data class DailyWeather(
+data class HourlyWeather(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name="clouds")
     val clouds: Int,
     @ColumnInfo(name="dew_point")
     val dewPoint: Double,
+    // Include other fields as required
     @ColumnInfo(name="dt")
     val dt: Int,
+
     @Embedded(prefix = "feelsLike_")
-    val feelsLike: FeelsLike= FeelsLike(0.0,0.0,0.0,0.0),
+    val feelsLike: FeelsLike = FeelsLike(0.0,0.0,0.0,0.0), //TODO split
     @ColumnInfo(name="humidity")
     val humidity: Int=0,
     @ColumnInfo(name="moon_phase")
@@ -36,7 +38,7 @@ data class DailyWeather(
     @ColumnInfo(name="sunset")
     val sunset: Int,
     @Embedded(prefix = "temp_")
-    val temp: Temp=Temp(0.0,0.0,0.0,0.0,0.0,0.0),
+    val temp: Temp = Temp(0.0,0.0,0.0,0.0,0.0,0.0),
     @ColumnInfo(name="uvi")
     val uvi: Double,
     // Individual fields for the first weather object
@@ -55,4 +57,5 @@ data class DailyWeather(
     val windGust: Double,
     @ColumnInfo(name="wind_speed")
     val windSpeed: Double
+
 )
