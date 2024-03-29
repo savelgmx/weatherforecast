@@ -120,4 +120,13 @@ class Converters {
             return Gson().fromJson(hourlyString, listType)
         }
 
+    @TypeConverter
+    fun fromDailyWeather(dailyWeather: DailyWeather): String {
+        return Gson().toJson(dailyWeather)
+    }
+    @TypeConverter
+    fun toDailyWeather(dailyWeatherString: String): DailyWeather {
+        return Gson().fromJson(dailyWeatherString, DailyWeather::class.java)
+    }
+
 }

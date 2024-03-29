@@ -24,5 +24,12 @@ interface OpenWeatherMapDao {
 
     @Query("DELETE FROM forecast_response")
     fun deleteAllFromForecastResponse()
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDailyWeather(dailyWeather: DailyWeather)
+    @Query("DELETE FROM daily_weather")
+    fun deleteAllFromDailyWeather()
+
 }
 

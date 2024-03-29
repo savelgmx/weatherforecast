@@ -4,6 +4,7 @@ package com.example.weatherforecast.api
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.db.CurrentWeatherEntity
+import com.example.weatherforecast.db.DailyWeather
 import com.example.weatherforecast.db.OpenWeatherMapDao
 import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.Clouds
@@ -92,6 +93,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                 if (data != null) {
 
                     addForecastDataToDB(data,repositoryScope)
+                    addDailyWeatherToDB(data,repositoryScope)
                     Resource.Success(data)
 
                 } else {
@@ -150,6 +152,43 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    private suspend fun addDailyWeatherToDB(data:ForecastResponse?,coroutineScope: CoroutineScope){
+        if (data!=null){
+            coroutineScope.launch(Dispatchers.IO) {
+                openWeatherMapDao.deleteAllFromDailyWeather() //first we clean all
+                for (dailyItem in data.daily) { //and then fill in loop for each daily records there must be 8
+                    openWeatherMapDao.insertDailyWeather(
+                        DailyWeather(
+                            clouds = dailyItem.clouds,
+                            dewPoint = dailyItem.dewPoint,
+                            dt = dailyItem.dt,
+                            feelsLike =dailyItem.feelsLike,
+                            // Extract and insert other fields similarly
+                            humidity = dailyItem.humidity,
+                            moonPhase = dailyItem.moonPhase,
+                            moonrise = dailyItem.moonrise,
+                            moonset = dailyItem.moonset,
+                            pressure = dailyItem.pressure,
+                            sunrise = dailyItem.sunrise,
+                            sunset = dailyItem.sunset,
+                            temp = dailyItem.temp,
+                            uvi = dailyItem.uvi,
+                            weatherId = dailyItem.weather[0].id,
+                            weatherMain = dailyItem.weather[0].main,
+                            weatherDescription = dailyItem.weather[0].description,
+                            weatherIcon = dailyItem.weather[0].icon,
+                            windDeg = dailyItem.windDeg,
+                            windGust = dailyItem.windGust,
+                            windSpeed = dailyItem.windSpeed
+                        )
+                    )
+                }
+
+            }
+        }
+    }
+
 
 }
 
