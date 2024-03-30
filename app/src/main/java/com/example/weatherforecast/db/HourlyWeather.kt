@@ -20,25 +20,14 @@ data class HourlyWeather(
     // Include other fields as required
     @ColumnInfo(name="dt")
     val dt: Int,
-
-    @Embedded(prefix = "feelsLike_")
-    val feelsLike: FeelsLike = FeelsLike(0.0,0.0,0.0,0.0), //TODO split
+    @ColumnInfo(name="feelsLike")
+    val feelsLike: Double ,
     @ColumnInfo(name="humidity")
-    val humidity: Int=0,
-    @ColumnInfo(name="moon_phase")
-    val moonPhase: Double=0.0,
-    @ColumnInfo(name="moonrise")
-    val moonrise: Int,
-    @ColumnInfo(name="moonset")
-    val moonset: Int,
+    val humidity: Int,
     @ColumnInfo(name="pressure")
     val pressure: Int,
-    @ColumnInfo(name="sunrise")
-    val sunrise: Int,
-    @ColumnInfo(name="sunset")
-    val sunset: Int,
-    @Embedded(prefix = "temp_")
-    val temp: Temp = Temp(0.0,0.0,0.0,0.0,0.0,0.0),
+    @ColumnInfo(name = "temp")
+    val temp: Double ,
     @ColumnInfo(name="uvi")
     val uvi: Double,
     // Individual fields for the first weather object

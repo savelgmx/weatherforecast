@@ -5,16 +5,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.db.CurrentWeatherEntity
 import com.example.weatherforecast.db.DailyWeather
+import com.example.weatherforecast.db.HourlyWeather
 import com.example.weatherforecast.db.OpenWeatherMapDao
 import com.example.weatherforecast.di.ContextProvider
-import com.example.weatherforecast.response.Clouds
-import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.ForecastResponse
-import com.example.weatherforecast.response.Main
-import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
-import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
@@ -94,6 +90,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
                     addForecastDataToDB(data,repositoryScope)
                     addDailyWeatherToDB(data,repositoryScope)
+                    addHourlyWeatherToDB(data,repositoryScope)
                     Resource.Success(data)
 
                 } else {
@@ -189,6 +186,36 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun addHourlyWeatherToDB(data: ForecastResponse?,coroutineScope: CoroutineScope) {
+        if(data!=null){
+            coroutineScope.launch(Dispatchers.IO) {
+                openWeatherMapDao.deleteAllFromHourlyWeather()
+                for (hourlyItem in data.hourly){
+                    openWeatherMapDao.insertHourlyWeather(
+                        HourlyWeather(
+                            clouds =hourlyItem.clouds,
+                            dewPoint = hourlyItem.dewPoint,
+                            dt = hourlyItem.dt,
+                            feelsLike =hourlyItem.feelsLike,
+                            humidity = hourlyItem.humidity,
+                            pressure = hourlyItem.pressure,
+                            temp = hourlyItem.temp,
+                            uvi = hourlyItem.uvi,
+                            weatherId = hourlyItem.weather[0].id,
+                            weatherMain = hourlyItem.weather[0].main,
+                            weatherDescription = hourlyItem.weather[0].description,
+                            weatherIcon = hourlyItem.weather[0].icon,
+                            windDeg = hourlyItem.windDeg,
+                            windGust = hourlyItem.windGust,
+                            windSpeed = hourlyItem.windSpeed
+                        )
+                    )
+
+                }
+            }
+        }
+
+    }
 
 }
 
