@@ -8,8 +8,8 @@ import androidx.room.TypeConverters
 import com.example.weatherforecast.response.ForecastResponse
 
 
-@Database(entities = [CurrentWeatherEntity::class, ForecastResponse::class,
-                DailyWeather::class,HourlyWeather::class], version = 2, exportSchema = false)
+@Database(entities = [CurrentWeatherEntity::class, ForecastWeatherEntity::class,
+                DailyWeatherEntity::class,HourlyWeatherEntity::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class OpenWeatherMapDatabase : RoomDatabase() {
     abstract fun openWeatherMapDao(): OpenWeatherMapDao

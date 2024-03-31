@@ -4,8 +4,9 @@ package com.example.weatherforecast.api
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.db.CurrentWeatherEntity
-import com.example.weatherforecast.db.DailyWeather
-import com.example.weatherforecast.db.HourlyWeather
+import com.example.weatherforecast.db.DailyWeatherEntity
+import com.example.weatherforecast.db.ForecastWeatherEntity
+import com.example.weatherforecast.db.HourlyWeatherEntity
 import com.example.weatherforecast.db.OpenWeatherMapDao
 import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.ForecastResponse
@@ -144,8 +145,15 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
     private suspend fun addForecastDataToDB(data:ForecastResponse?,coroutineScope: CoroutineScope){
         if (data!=null){
             coroutineScope.launch(Dispatchers.IO) {
-                openWeatherMapDao.deleteAllFromForecastResponse()
-                openWeatherMapDao.upsertSevenDaysForecast(data)
+                openWeatherMapDao.deleteAllFromForecastWeather()
+                openWeatherMapDao.insertSevenDaysForecast(
+                    ForecastWeatherEntity(
+                        lat=data.lat,
+                        lon=data.lon,
+                        timezone = data.timezone,
+                        timezoneOffset = data.timezoneOffset
+                    )
+                )
             }
         }
     }
@@ -156,7 +164,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                 openWeatherMapDao.deleteAllFromDailyWeather() //first we clean all
                 for (dailyItem in data.daily) { //and then fill in loop for each daily records there must be 8
                     openWeatherMapDao.insertDailyWeather(
-                        DailyWeather(
+                        DailyWeatherEntity(
                             clouds = dailyItem.clouds,
                             dewPoint = dailyItem.dewPoint,
                             dt = dailyItem.dt,
@@ -192,7 +200,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                 openWeatherMapDao.deleteAllFromHourlyWeather()
                 for (hourlyItem in data.hourly){
                     openWeatherMapDao.insertHourlyWeather(
-                        HourlyWeather(
+                        HourlyWeatherEntity(
                             clouds =hourlyItem.clouds,
                             dewPoint = hourlyItem.dewPoint,
                             dt = hourlyItem.dt,

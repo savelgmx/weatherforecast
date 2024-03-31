@@ -1,16 +1,13 @@
 package com.example.weatherforecast.db
 
 import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.weatherforecast.response.FeelsLike
-import com.example.weatherforecast.response.Temp
 
 @Entity(tableName = "hourly_weather")
 @TypeConverters(Converters::class)
-data class HourlyWeather(
+data class HourlyWeatherEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name="clouds")

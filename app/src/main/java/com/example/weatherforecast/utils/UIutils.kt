@@ -52,7 +52,7 @@ class UIUtils {
             val count = dailyForecast?.size ?: 0
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(all=16.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 items(count) { index ->
@@ -272,7 +272,8 @@ class UIUtils {
         @Composable
         fun HourlyWeatherRow(hourlyForecast: List<Hourly>) {
             LazyRow(
-                modifier = Modifier.fillMaxWidth() ,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(all=20.dp),
                 contentPadding = PaddingValues(horizontal = 1.dp, vertical = 1.dp)
             ) {
                 items(hourlyForecast) { hourly ->
@@ -288,7 +289,7 @@ class UIUtils {
                 modifier = Modifier
                     .fillMaxWidth() // Define your desired width
                     .padding(horizontal =1.dp, vertical = 1.dp).background(Color.Transparent),
-                shape = RoundedCornerShape(3.dp)
+                shape = RoundedCornerShape(16.dp)
 
             )
             {

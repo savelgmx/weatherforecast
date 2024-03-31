@@ -7,17 +7,11 @@ import androidx.room.TypeConverters
 import com.example.weatherforecast.db.Converters
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "forecast_response")
 data class ForecastResponse(
-    @PrimaryKey
-    val id: Int,
-    @TypeConverters(Converters::class)
     @SerializedName("current")
     val current: Current,
-    @TypeConverters(Converters::class)
     @SerializedName("daily")
     val daily: List<Daily>,
-    @TypeConverters(Converters::class)
     @SerializedName("hourly")
     val hourly: List<Hourly>,
     @SerializedName("lat")
@@ -79,10 +73,6 @@ data class Daily(
     val moonrise: Int,
     @SerializedName("moonset")
     val moonset: Int,
-/*
-    @SerializedName("pop")
-    val pop: Double,
-*/
     @SerializedName("pressure")
     val pressure: Int,
     @SerializedName("sunrise")
@@ -125,10 +115,6 @@ data class Hourly(
     val feelsLike: Double,
     @SerializedName("humidity")
     val humidity: Int,
-/*
-    @SerializedName("pop")
-    val pop: Int,
-*/
     @SerializedName("pressure")
     val pressure: Int,
     @SerializedName("temp")

@@ -10,7 +10,7 @@ import com.example.weatherforecast.response.Temp
 
 @Entity(tableName = "daily_weather")
 @TypeConverters(Converters::class)
-data class DailyWeather(
+data class DailyWeatherEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name="clouds")

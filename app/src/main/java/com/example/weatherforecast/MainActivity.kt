@@ -134,12 +134,10 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun WeatherUISuccessPreview() {
         val successState = Resource.Success(getMockWeatherResponse())
-/*
         val successForecastState = Resource.Success(getMockForecastResponse())
 
         UIUtils.WeatherUI(successState, successForecastState)
         UIUtils.ForecastUI(successForecastState)
-*/
     }
 
     fun getMockWeatherResponse(): WeatherResponse {
@@ -160,7 +158,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-/*
     fun getMockForecastResponse(): ForecastResponse {
         return ForecastResponse(
 
@@ -192,7 +189,6 @@ class MainActivity : ComponentActivity() {
             56.0097, 92.79, "Asia/Krasnoyarsk", 25200
         )
     }
-*/
 }
 
 

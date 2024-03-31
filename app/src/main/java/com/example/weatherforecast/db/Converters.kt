@@ -121,12 +121,12 @@ class Converters {
         }
 
     @TypeConverter
-    fun fromDailyWeather(dailyWeather: DailyWeather): String {
-        return Gson().toJson(dailyWeather)
+    fun fromDailyWeather(dailyWeatherEntity: DailyWeatherEntity): String {
+        return Gson().toJson(dailyWeatherEntity)
     }
     @TypeConverter
-    fun toDailyWeather(dailyWeatherString: String): DailyWeather {
-        return Gson().fromJson(dailyWeatherString, DailyWeather::class.java)
+    fun toDailyWeather(dailyWeatherString: String): DailyWeatherEntity {
+        return Gson().fromJson(dailyWeatherString, DailyWeatherEntity::class.java)
     }
 
 }
