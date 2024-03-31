@@ -274,7 +274,8 @@ class UIUtils {
             LazyRow(
                 modifier = Modifier.fillMaxWidth()
                     .padding(all=20.dp),
-                contentPadding = PaddingValues(horizontal = 1.dp, vertical = 1.dp)
+                contentPadding = PaddingValues(horizontal = 1.dp, vertical = 1.dp),
+
             ) {
                 items(hourlyForecast) { hourly ->
                     HourlyWeatherItem(hourly = hourly)
@@ -284,15 +285,6 @@ class UIUtils {
 
         @Composable
         fun HourlyWeatherItem(hourly: Hourly) {
-            //  val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth() // Define your desired width
-                    .padding(horizontal =1.dp, vertical = 1.dp).background(Color.Transparent),
-                shape = RoundedCornerShape(16.dp)
-
-            )
-            {
                 Column(modifier = Modifier.padding(3.dp)
                     .background(Color(0x34c0eb)) //#
                 ) {
@@ -329,7 +321,7 @@ class UIUtils {
         }
 
     }
-}
+
 
 
 
