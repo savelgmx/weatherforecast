@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -30,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -46,13 +44,12 @@ class UIUtils {
         @Composable
         fun ForecastUI(forecastState: Resource<ForecastResponse>) {
             Log.d("Forecast2 response", forecastState.data.toString())
-
             // Assuming forecastState contains the list of daily forecast data
             val dailyForecast = forecastState.data?.daily
             val count = dailyForecast?.size ?: 0
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(all=16.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 items(count) { index ->
@@ -78,6 +75,8 @@ class UIUtils {
                     .clickable {
                         // Handle click action, you can navigate to detailed info screen here
                         // or show detailed info in a bottom sheet or dialog
+
+                               Log.d("dailyItemClick",daily.toString())
                     },
                 shape = RoundedCornerShape(16.dp),
 
@@ -104,7 +103,6 @@ class UIUtils {
                             modifier = Modifier
                                 .size(50.dp) // Define your desired width and height
                                 .padding(all = 3.dp)
-
                         )
                         Text(
                             text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
@@ -115,8 +113,6 @@ class UIUtils {
                         )
 
                     }
-
-
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -130,22 +126,15 @@ class UIUtils {
                             text = daily.weather[0].description,
                             modifier = Modifier.padding(bottom = 3.dp)
                         )
-
                     }
-
-
-
                 }
             }
         }
-
-
         @Composable
         fun WeatherUI(
             weatherState: Resource<WeatherResponse>,
             forecastState: Resource<ForecastResponse>?
         ) {
-            //  val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -181,8 +170,6 @@ class UIUtils {
                         }
 
                         val icon = weatherState.data?.weather?.get(0)?.icon
-
-
                         // Row 1: Name and Day with Blue Background
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -224,6 +211,7 @@ class UIUtils {
                                 contentDescription = "Weather icon",
                                 modifier = Modifier
                                     .size(50.dp) // Define your desired width and height
+                                    .padding(all = 3.dp)
                             )
                         }
 
