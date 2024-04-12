@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph.xml">
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/forecastWeatherFragment">
 
+    <fragment
+        android:id="@+id/forecastWeatherFragment"
+        android:name="com.example.weatherforecast.ui.ForecastWeatherFragment"
+        android:label="ForecastWeatherFragment" />
+    <fragment
+        android:id="@+id/forecastDetailFragment"
+        android:name="com.example.weatherforecast.ui.ForecastDetailFragment"
+        android:label="ForecastDetailFragment" >
+        <action
+            android:id="@+id/action_forecastDetailFragment_to_forecastWeatherFragment"
+            app:destination="@id/forecastWeatherFragment" />
+    </fragment>
 </navigation>
