@@ -1,11 +1,9 @@
 package com.example.weatherforecast.components
 
-import android.icu.text.ListFormatter.Width
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,13 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +40,6 @@ import com.example.weatherforecast.utils.WeatherUtils
 fun CurrentWeatherCard(
     weatherState: Resource<WeatherResponse>
 ){
-    val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
 
     Box(
         modifier = Modifier
@@ -78,8 +73,6 @@ fun CurrentWeatherCard(
                         it.toInt(),
                         localContext
                     )
-
-                    val icon = weatherState.data?.weather?.get(0)?.icon
                 }
 
                 Row(
@@ -88,16 +81,19 @@ fun CurrentWeatherCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(text = name!!, color= Color.DarkGray)
-                    Text(text =day!!, color= Color.DarkGray)
+                    Text(text = name!!, color= Color.DarkGray,
+                        fontSize = 15.sp,modifier = Modifier.padding(start = 16.dp))
+
+                    Text(text =day!!, color= Color.DarkGray,fontSize = 15.sp)
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
                 // Row 2: Temperature with Weather Icon
 
                 val icon = weatherState.data?.weather?.get(0)?.icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -106,14 +102,16 @@ fun CurrentWeatherCard(
                         fontSize = 35.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
-                    Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
+
                     AsyncImage(
                         model = "${UIUtils.iconurl}$icon.png",
                         contentDescription = "Weather icon",
                         modifier = Modifier
-                            .size(25.dp) // Define your desired width and height
-                            .padding(all = 3.dp)
+                            .size(70.dp) // Define your desired width and height
+                            .padding(all = 6.dp)
                     )
+
+                    Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
                 }
 
 
