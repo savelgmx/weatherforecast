@@ -39,78 +39,19 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.weatherforecast.utils.UIUtils
 import android.Manifest
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            WeatherforecastTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // Use the viewModel composition local to get an instance of OpenWeatherMapViewModel
-                    val openWeatherMapViewModel: OpenWeatherMapViewModel = viewModel()
-                    val openWeatherForecastViewModel: OpenWeatherForecastViewModel = viewModel()
+        setContentView(R.layout.activity_main)
 
-                    // Collect the LiveData state in a Compose State
-                    var weatherState by remember {
-                        mutableStateOf<Resource<WeatherResponse>>(
-                            Resource.Loading()
-                        )
-                    }
-                    //Collect LiveData state of Forecast in Compose state
-                    var forecastState by remember {
-                        mutableStateOf<Resource<ForecastResponse>>(
-                            Resource.Loading()
-                        )
-                    }
-
-                    // Check and request permission if not granted
-                    if (ContextCompat.checkSelfPermission(
-                            this@MainActivity,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        ActivityCompat.requestPermissions(
-                            this@MainActivity,
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            PERMISSION_REQUEST_CODE
-                        )
-                    } else {
-                        // Permission already granted, proceed with location-related operations
-                        // Call getCurrentWeather with the desired city
-                        openWeatherMapViewModel.getCurrentWeather()
-                        //Call getForecastWeather
-                        openWeatherForecastViewModel.getForecastWeather()
-                    }
-
-                    // Observe the LiveData and update the weatherState
-                    LaunchedEffect(openWeatherMapViewModel.weatherLiveData) {
-                        openWeatherMapViewModel.weatherLiveData.observe(this@MainActivity) { resource ->
-                            weatherState = resource
-                        }
-                    }
-
-                    //Observe LiveData and update the forecastState
-                    LaunchedEffect(openWeatherForecastViewModel.forecastLiveData) {
-                        openWeatherForecastViewModel.forecastLiveData.observe(this@MainActivity) { resource ->
-                            forecastState = resource
-                        }
-                    }
-
-                    // Display a structured UI based on the state
-                    UIUtils.WeatherUI(weatherState, forecastState)
-                }
-            }
-        }
-
-    }
+}
 
     // Handle permission request result
     override fun onRequestPermissionsResult(

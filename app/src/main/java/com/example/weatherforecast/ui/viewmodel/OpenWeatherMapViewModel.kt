@@ -1,5 +1,6 @@
 package com.example.weatherforecast.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,8 @@ class OpenWeatherMapViewModel @Inject constructor(
                 _weatherLiveData.value = Resource.Loading()
                 try {
                     val result = repository.getCurrentWeather()
+
+                    Log.d("Map view model response",result.toString())
                     _weatherLiveData.value = result
                     isWeatherLoaded = true // Set flag to true after successful loading
                 } catch (e: Exception) {

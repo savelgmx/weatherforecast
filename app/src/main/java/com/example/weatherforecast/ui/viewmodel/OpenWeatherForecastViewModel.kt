@@ -1,7 +1,8 @@
 package com.example.weatherforecast.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.api.OpenWeatherMapRepository
@@ -15,11 +16,9 @@ import javax.inject.Inject
 class OpenWeatherForecastViewModel @Inject constructor(
     private val repository: OpenWeatherMapRepository
 ):ViewModel(){
-    private val _forecastLiveData = MutableLiveData<Resource<ForecastResponse>>()
-    val forecastLiveData: LiveData<Resource<ForecastResponse>> get()=_forecastLiveData
 
-    private var isForecastLoaded = false //flag to track is forecast loaded or jet not
-
+    val forecastLiveData: MutableState<Resource<ForecastResponse>> = mutableStateOf(Resource.Loading())
+    private var isForecastLoaded = false // Flag to track if forecast data is already loaded
     init {
         getForecastWeather()
         isForecastLoaded = true
@@ -27,18 +26,17 @@ class OpenWeatherForecastViewModel @Inject constructor(
     fun getForecastWeather(){
         if(!isForecastLoaded){
             viewModelScope.launch {
-                _forecastLiveData.value = Resource.Loading()
+                forecastLiveData.value = Resource.Loading()
                 try {
                     val result = repository.getForecastWeather()
-                    _forecastLiveData.value=result
+                    forecastLiveData.value = result
+                    Log.d("ViewModel result response",result.toString())
 
                 }catch (e:Exception){
-                    _forecastLiveData.value = Resource.Error(null,"An error occured: ${e.message}")
+                    forecastLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
                 }
-
             }
-
-
         }
     }
 }
+
