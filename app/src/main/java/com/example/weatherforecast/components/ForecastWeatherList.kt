@@ -66,6 +66,7 @@ fun ClickableDayForecastItem(daily: Daily) {
             .background(Color.Transparent)
             .padding(vertical = 3.dp)
             .clickable {
+                       Log.d("daily clickable",daily.toString())
             },
         shape = RoundedCornerShape(8.dp),
 
