@@ -47,6 +47,18 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
             longitude=AppConstants.CITY_LON
             cityName=AppConstants.CITY_FORECAST
         }
+
+        // Call fetchForecastWeather() in the init block
+        repositoryScope.launch {
+            val result = fetchForecastWeather()
+            // Handle the result if needed, e.g., logging
+            when (result) {
+                is Resource.Success -> Log.d("FetchForecast", "Success: ${result.data}")
+                is Resource.Error -> Log.d("FetchForecast", "Error: ${result.msg}")
+
+                else -> {}
+            }
+        }
     }
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
@@ -106,6 +118,9 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun fetchForecastWeather(): Resource<ForecastResponse> {
+        return getForecastWeather()
+    }
 
     override suspend fun getWeatherForecastFromDB(): LiveData<List<CurrentWeatherEntity>> {
 

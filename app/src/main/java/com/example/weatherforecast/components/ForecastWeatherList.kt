@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults.shape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +34,11 @@ import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Temp
 import com.example.weatherforecast.response.Weather
+import com.example.weatherforecast.theme.AppShapes
+import com.example.weatherforecast.theme.Blue400
+import com.example.weatherforecast.theme.Blue700
+import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.theme.White2
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
@@ -63,42 +70,47 @@ fun ClickableDayForecastItem(daily: Daily) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent)
-            .padding(vertical = 3.dp)
+            .padding(all = 1.dp)
             .clickable {
                        Log.d("daily clickable",daily.toString())
             },
-        shape = RoundedCornerShape(8.dp),
+        shape = AppShapes.large
 
         ) {
         Column(modifier = Modifier
-            .padding(16.dp)
-            .background(Color(0x3498eb))) {
+            .padding(all=1.dp)
+            .background(Blue700)
+        )
+        {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
 
             ) {
                 Text(
 
                     text = WeatherUtils.updateDateToToday(daily.dt),
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 3.dp)
+                    color = Color.White,
+                    style = QuickSandTypography.body1,
+                    modifier = Modifier
+                        .padding(all = 8.dp)
                 )
                 AsyncImage(
                     model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
                     contentDescription = "Weather icon",
                     modifier = Modifier
-                        .size(50.dp) // Define your desired width and height
-                        .padding(all = 3.dp)
+                        .size(70.dp)// Define your desired width and height
+                        .padding(all = 8.dp)
                 )
                 Text(
                     text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
                             WeatherUtils.updateTemperature(daily.temp.night.toInt()),
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold, color = Color.White,
+                    style = QuickSandTypography.body1,
                     //  fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 3.dp)
+                    modifier = Modifier.padding(all = 8.dp)
                 )
 
             }
@@ -109,11 +121,15 @@ fun ClickableDayForecastItem(daily: Daily) {
             ) {
                 Text(
                     text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C ",
-                    modifier = Modifier.padding(all = 3.dp)
+                    color = Color.White,
+                    style = QuickSandTypography.subtitle2,
+                    modifier = Modifier.padding(all = 8.dp)
                 )
                 Text(
                     text = daily.weather[0].description,
-                    modifier = Modifier.padding(all = 3.dp)
+                    color = Color.White,
+                    style = QuickSandTypography.subtitle1,
+                    modifier = Modifier.padding(all = 8.dp)
                 )
             }
         }

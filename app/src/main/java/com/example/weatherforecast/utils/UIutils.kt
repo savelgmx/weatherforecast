@@ -80,7 +80,7 @@ class UIUtils {
                     },
                 shape = RoundedCornerShape(16.dp),
 
-                ) {
+                )  {
                 Column(modifier = Modifier
                     .padding(1.dp)
                     .background(Color(0x3498eb))) {

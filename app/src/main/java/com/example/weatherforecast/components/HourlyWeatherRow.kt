@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults.shape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,10 @@ import coil.compose.AsyncImage
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Weather
+import com.example.weatherforecast.theme.AppShapes
+import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue700
+import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -36,18 +42,21 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
 
     Box (
         modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background
-                ,shape = RoundedCornerShape(6.dp))
+            .background(
+                Blue300
+                ,shape = AppShapes.large)
             .fillMaxWidth()
-            .padding(2.dp),
+            .padding(all=20.dp),
         )
     {
 
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(Blue700, shape= AppShapes.large
+                )
                 .padding(all = 20.dp),
-            contentPadding = PaddingValues(horizontal = 3.dp, vertical = 3.dp),
+            contentPadding = PaddingValues(all = 8.dp),
 
             ) {
             items(hourlyForecast) { hourly ->
@@ -62,15 +71,15 @@ fun HourlyWeatherItem(hourly: Hourly) {
     var iconurl=AppConstants.WEATHER_API_IMAGE_ENDPOINT
     Column(modifier = Modifier
         .padding(3.dp)
-        .background(Color(0x34c0eb)) //#
-    ) {
+        .background(Blue700),
+         )
+
+    {
         Text(
             text = WeatherUtils.updateTime(hourly.dt),
-            style = TextStyle(
-                color = Color.Gray,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            ),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            style = QuickSandTypography.h5,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(all = 3.dp)
         )
@@ -83,12 +92,9 @@ fun HourlyWeatherItem(hourly: Hourly) {
         )
         Text(
             text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
-
-            style = TextStyle(
-                color = Color.Gray,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Black
-            ),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            style = QuickSandTypography.h5,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(all = 1.dp)
         )

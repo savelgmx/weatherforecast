@@ -31,6 +31,10 @@ import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
+import com.example.weatherforecast.theme.AppShapes
+import com.example.weatherforecast.theme.Blue700
+import com.example.weatherforecast.theme.Blue800
+import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
@@ -43,11 +47,13 @@ fun CurrentWeatherCard(
 
     Box(
         modifier = Modifier
-            .background(color = Color.LightGray, shape = RoundedCornerShape(6.dp))
+            .background(Blue800,
+                shape = AppShapes.large)
             .fillMaxWidth()
+            .height(70.dp)
             .padding(6.dp),
-       // verticalArrangement = Arrangement.Top,
-       // horizontalAlignment = Alignment.Start
+        // verticalArrangement = Arrangement.Top,
+        // horizontalAlignment = Alignment.Start
     ){
         when (weatherState){
             is Resource.Success->{
@@ -81,10 +87,14 @@ fun CurrentWeatherCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(text = name!!, color= Color.DarkGray,
-                        fontSize = 15.sp,modifier = Modifier.padding(start = 16.dp))
+                    Text(text = name!!, color= Color.White,
+                        style= QuickSandTypography.h5,
+                        modifier = Modifier.padding(start = 8.dp))
 
-                    Text(text =day!!, color= Color.DarkGray,fontSize = 15.sp)
+                    Text(text =day!!, color= Color.White,
+                        style = QuickSandTypography.h5,
+                        modifier = Modifier.padding(end=8.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -98,8 +108,9 @@ fun CurrentWeatherCard(
                 ) {
                     Text(
                         text = " $temperature",
+                        color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 35.sp,
+                        style = QuickSandTypography.h3,
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
@@ -111,7 +122,10 @@ fun CurrentWeatherCard(
                             .padding(all = 6.dp)
                     )
 
-                    Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
+                    Text(text = " $feels_like",
+                        color = Color.White,
+                        style = QuickSandTypography.h5,
+                        modifier = Modifier.padding(8.dp))
                 }
 
 
