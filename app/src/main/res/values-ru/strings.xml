@@ -8,6 +8,7 @@
     <string name="night">Ночь</string>
     <string name="sunrise">Восход</string>
     <string name="sunset">Закат</string>
+    <string name="humidity">Влажность</string>
 
     <string name="direction_north">Север</string>
     <string name="direction_north_north_east">Северо-северо-восток</string>

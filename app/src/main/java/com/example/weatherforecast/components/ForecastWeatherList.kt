@@ -2,6 +2,7 @@ package com.example.weatherforecast.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,8 +52,11 @@ fun ForecastWeatherList(
     val count = dailyForecast?.size ?: 0
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+        modifier = Modifier.fillMaxSize()
+            .padding(all=16.dp)
+            .border(width=3.dp, color = Color.Transparent,
+                shape=AppShapes.large),
+       // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
     ) {
         items(count) { index ->
             dailyForecast?.getOrNull(index)?.let { daily ->
@@ -71,15 +75,17 @@ fun ClickableDayForecastItem(daily: Daily) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(all = 1.dp)
+
             .clickable {
                        Log.d("daily clickable",daily.toString())
             },
-        shape = AppShapes.large
+       // shape = AppShapes.large
 
         ) {
         Column(modifier = Modifier
             .padding(all=1.dp)
             .background(Blue700)
+
         )
         {
 
@@ -109,8 +115,7 @@ fun ClickableDayForecastItem(daily: Daily) {
                             WeatherUtils.updateTemperature(daily.temp.night.toInt()),
                     fontWeight = FontWeight.Bold, color = Color.White,
                     style = QuickSandTypography.body1,
-                    //  fontSize = 12.sp,
-                    modifier = Modifier.padding(all = 8.dp)
+                     modifier = Modifier.padding(all = 8.dp)
                 )
 
             }
@@ -139,38 +144,6 @@ fun ClickableDayForecastItem(daily: Daily) {
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
 fun ForecastUISuccessPreview() {
-    val successState = Resource.Success(getMockForecastlist())
+    val successState = Resource.Success(UIUtils.getMockForecastlist())
     ForecastWeatherList( successState)
-}
-
-fun getMockForecastlist(): ForecastResponse {
-    return ForecastResponse(
-
-        Current(
-            100, -18.32, 1708774497, -17.78, 95, 1037,
-            1708736117, 1708772966, -17.78, 0.0, 10000,
-            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-            228, 0.6, 6.0
-        ),
-        listOf(
-            Daily(
-                100, -18.32, 1708754400,
-                FeelsLike(-19.14, -16.77, -27.53, -19.14),
-                73, 0.5, 1708862520, 1708824420, 1036,
-                1708736117, 1708772966,
-                Temp(-19.14, -16.77, -27.53, -19.14, -20.0, -24.4),
-                0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                224, 1.37, 2.40
-            )
-        ),
-        listOf(
-            Hourly(
-                99, -18.32, 1708774497, -17.78, 95,
-                1037, -21.2, 0.0, 10000,
-                listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                223, 2.2, 1.8
-            )
-        ),
-        56.0097, 92.79, "Asia/Krasnoyarsk", 25200
-    )
 }

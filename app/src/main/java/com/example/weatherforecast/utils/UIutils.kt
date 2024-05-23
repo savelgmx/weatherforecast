@@ -33,282 +33,88 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
+import com.example.weatherforecast.response.Clouds
+import com.example.weatherforecast.response.Coord
+import com.example.weatherforecast.response.Current
 import com.example.weatherforecast.response.Daily
+import com.example.weatherforecast.response.FeelsLike
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Hourly
+import com.example.weatherforecast.response.Main
+import com.example.weatherforecast.response.Sys
+import com.example.weatherforecast.response.Temp
+import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.response.Wind
 
 class UIUtils {
     companion object {
         val iconurl = AppConstants.WEATHER_API_IMAGE_ENDPOINT
-        @Composable
-        fun ForecastUI(forecastState: Resource<ForecastResponse>) {
-            Log.d("Forecast2 response", forecastState.data.toString())
-            // Assuming forecastState contains the list of daily forecast data
-            val dailyForecast = forecastState.data?.daily
-            val count = dailyForecast?.size ?: 0
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                items(count) { index ->
-                    dailyForecast?.getOrNull(index)?.let { daily ->
-                        ClickableDayForecastItem(daily = daily)
-                    }
-                }
-            }
+        fun getMockWeatherCard(): WeatherResponse {
+            return WeatherResponse(
+                Coord(92.7917, 56.0097),
+                listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                "stations",
+                Main(-21.77, -28.77, -22.78, -21.77, 1040, 85),
+                10000,
+                Wind(2.73, 228),
+                Clouds(100),
+                1708170884,
+                Sys(2, 2088371, "RU", 1708132314, 1708167250),
+                25200,
+                1502026,
+                "Красноярск",
+                200
+            )
         }
 
+        fun getMockForecastlist(): ForecastResponse {
+            return ForecastResponse(
 
-        @Composable
-        fun ClickableDayForecastItem(daily: Daily) {
-            val localContext =
-                LocalContext.current //To access the context within a Composable function,
-            // use the LocalContext provided by Jetpack Compose
-            //we need this context to load  string values form strings.xml
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(vertical = 3.dp)
-                    .clickable {
-                        // Handle click action, you can navigate to detailed info screen here
-                        // or show detailed info in a bottom sheet or dialog
-
-                               Log.d("dailyItemClick",daily.toString())
-                    },
-                shape = RoundedCornerShape(16.dp),
-
-                )  {
-                Column(modifier = Modifier
-                    .padding(1.dp)
-                    .background(Color(0x3498eb))) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().height(40.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-
-                    ) {
-                        Text(
-
-                            text = WeatherUtils.updateDateToToday(daily.dt),
-                            fontWeight = FontWeight.Bold,
-                            //  fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 3.dp)
-                        )
-                        AsyncImage(
-                            model = "$iconurl${daily.weather[0].icon}.png",
-                            contentDescription = "Weather icon",
-                            modifier = Modifier
-                                .size(50.dp) // Define your desired width and height
-                                .padding(all = 3.dp)
-                        )
-                        Text(
-                            text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
-                                    WeatherUtils.updateTemperature(daily.temp.night.toInt()),
-                            fontWeight = FontWeight.Bold,
-                            //  fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 3.dp)
-                        )
-
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C ",
-                            modifier = Modifier.padding(bottom = 3.dp)
-                        )
-                        Text(
-                            text = daily.weather[0].description,
-                            modifier = Modifier.padding(bottom = 3.dp)
-                        )
-                    }
-                }
-            }
-        }
-        @Composable
-        fun WeatherUI(
-            weatherState: Resource<WeatherResponse>,
-            forecastState: Resource<ForecastResponse>?
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                when (weatherState) {
-                    is Resource.Success -> {
-                        val localContext =
-                            LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-
-                        val temperature = weatherState.data?.main?.temp?.let {
-                            WeatherUtils.updateTemperature(it.toInt())
-                        }
-                        val name = weatherState.data?.name
-                        val day =
-                            weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-                        val pressure =
-                            localContext.getString(R.string.pressure) + ":" + weatherState.data?.main?.pressure?.let {
-                                WeatherUtils.updatePressure(it)
-                            }
-                        val feels_like =
-                            localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
-                                WeatherUtils.updateTemperature(it.toInt())
-                            }
-                        val wind = weatherState.data?.wind?.speed?.let {
-                            WeatherUtils.updateWind(
-                                weatherState.data?.wind?.deg.toString(),
-                                it.toInt(),
-                                localContext
-                            )
-                        }
-
-                        val icon = weatherState.data?.weather?.get(0)?.icon
-                        // Row 1: Name and Day with Blue Background
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(Color.Blue)
-                                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                            ) {
-                                Text(text = name!!, color = Color.White)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(Color.Blue)
-                                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                            ) {
-                                Text(text = day!!, color = Color.White)
-                            }
-                        }
-
-                        // Row 2: Temperature with Weather Icon
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = " $temperature",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 35.sp,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-                            Text(text = " $feels_like", modifier = Modifier.padding(8.dp))
-                            AsyncImage(
-                                model = "$iconurl$icon.png",
-                                contentDescription = "Weather icon",
-                                modifier = Modifier
-                                    .size(50.dp) // Define your desired width and height
-                                    .padding(all = 3.dp)
-                            )
-                        }
-
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "$wind", Modifier.padding(8.dp))
-                            Text(text = " $pressure", modifier = Modifier.padding(1.dp))
-
-                        }
-
-                        Spacer(modifier = Modifier.height(1.dp))
-                        Text(localContext.resources.getString(R.string.weather_24_hour),//"Погода на сутки",
-                            fontWeight = FontWeight.Bold)
-                        //And now include hourly UI here
-                        forecastState?.data?.hourly.let {
-                            if (it != null) {
-                                HourlyWeatherRow(it)
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(1.dp))
-                        Text(localContext.resources.getString(R.string.weather_7_days),//"Погода на 7 дней"
-                            fontWeight = FontWeight.Bold)
-
-
-                        // Include ForecastUI here
-                        forecastState?.let { ForecastUI(it) }
-                    }
-
-                    is Resource.Loading -> {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Loading...")
-                    }
-
-                    is Resource.Error -> {
-                        Text("Error: ${weatherState.msg}")
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-        @Composable
-        fun HourlyWeatherRow(hourlyForecast: List<Hourly>) {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(all=20.dp),
-                contentPadding = PaddingValues(horizontal = 1.dp, vertical = 1.dp),
-
-            ) {
-                items(hourlyForecast) { hourly ->
-                    HourlyWeatherItem(hourly = hourly)
-                }
-            }
-        }
-
-        @Composable
-        fun HourlyWeatherItem(hourly: Hourly) {
-                Column(modifier = Modifier.padding(3.dp)
-                    .background(Color(0x34c0eb)) //#
-                ) {
-                    Text(
-                        text = WeatherUtils.updateTime(hourly.dt),
-                        style = TextStyle(
-                            color = Color.Gray,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(all = 3.dp)
+                Current(
+                    100, -18.32, 1708774497, -17.78, 95, 1037,
+                    1708736117, 1708772966, -17.78, 0.0, 10000,
+                    listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                    228, 0.6, 6.0
+                ),
+                listOf(
+                    Daily(
+                        100, -18.32, 1708754400,
+                        FeelsLike(-19.14, -16.77, -27.53, -19.14),
+                        73, 0.5, 1708862520, 1708824420, 1036,
+                        1708736117, 1708772966,
+                        Temp(-19.14, -16.77, -27.53, -19.14, -20.0, -24.4),
+                        0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                        224, 1.37, 2.40
                     )
-                    AsyncImage(
-                        model = "$iconurl${hourly.weather[0].icon}.png",
-                        contentDescription = "Weather icon",
-                        modifier = Modifier
-                            .size(50.dp) // Define your desired width and height
-                            .padding(all = 1.dp)
+                ),
+                listOf(
+                    Hourly(
+                        99, -18.32, 1708774497, -17.78, 95,
+                        1037, -21.2, 0.0, 10000,
+                        listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                        223, 2.2, 1.8
                     )
-                    Text(
-                        text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
+                ),
+                56.0097, 92.79, "Asia/Krasnoyarsk", 25200
+            )
+        }
 
-                        style = TextStyle(
-                            color = Color.Gray,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Black
-                        ),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(all = 1.dp)
-                    )
-                }
-            }
+        fun getMockDailyWeather():Daily{
+            return Daily(
+                100, -18.32, 1708754400,
+                FeelsLike(-19.14, -16.77, -27.53, -19.14),
+                73, 0.5, 1708862520, 1708824420, 1036,
+                1708736117, 1708772966,
+                Temp(-19.14, -16.77, -27.53, -19.14, -20.0, -24.4),
+                0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")),
+                224, 1.37, 2.40
+            )
+
         }
 
     }
+}
 
 
 

@@ -8,7 +8,7 @@
     <string name="night">Nacht</string>
     <string name="sunrise">Sonnenaufgang</string>
     <string name="sunset">Sonnenuntergang</string>
-
+    <string name="humidity">Luftfeuchtigkeit</string>
 
     <string name="direction_north">Nord</string>
     <string name="direction_north_north_east">Nordnordost</string>

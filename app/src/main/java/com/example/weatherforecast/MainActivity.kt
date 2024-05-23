@@ -50,7 +50,6 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 }
 
     // Handle permission request result
@@ -70,66 +69,6 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-
-    @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
-    @Composable
-    fun WeatherUISuccessPreview() {
-        val successState = Resource.Success(getMockWeatherResponse())
-        val successForecastState = Resource.Success(getMockForecastResponse())
-
-        UIUtils.WeatherUI(successState, successForecastState)
-        UIUtils.ForecastUI(successForecastState)
-    }
-
-    fun getMockWeatherResponse(): WeatherResponse {
-        return WeatherResponse(
-            Coord(92.7917, 56.0097),
-            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-            "stations",
-            Main(-21.77, -28.77, -22.78, -21.77, 1040, 85),
-            10000,
-            Wind(2.73, 228),
-            Clouds(100),
-            1708170884,
-            Sys(2, 2088371, "RU", 1708132314, 1708167250),
-            25200,
-            1502026,
-            "Красноярск",
-            200
-        )
-    }
-
-    fun getMockForecastResponse(): ForecastResponse {
-        return ForecastResponse(
-
-            Current(
-                100, -18.32, 1708774497, -17.78, 95, 1037,
-                1708736117, 1708772966, -17.78, 0.0, 10000,
-                listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                228, 0.6, 6.0
-            ),
-            listOf(
-                Daily(
-                    100, -18.32, 1708754400,
-                    FeelsLike(-19.14, -16.77, -27.53, -19.14),
-                    73, 0.5, 1708862520, 1708824420, 1036,
-                    1708736117, 1708772966,
-                    Temp(-19.14, -16.77, -27.53, -19.14, -20.0, -24.4),
-                    0.5, listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                    224, 1.37, 2.40
-                )
-            ),
-            listOf(
-                Hourly(
-                    99, -18.32, 1708774497, -17.78, 95,
-                    1037, -21.2, 0.0, 10000,
-                    listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-                    223, 2.2, 1.8
-                )
-            ),
-            56.0097, 92.79, "Asia/Krasnoyarsk", 25200
-        )
-    }
 }
 
 
