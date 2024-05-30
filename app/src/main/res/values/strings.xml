@@ -27,6 +27,8 @@
     <string name="direction_north_west">North West</string>
     <string name="direction_north_north_west">North North West</string>
 
+    <string name="wrong_value">wrong value</string>
+
     <string name="pref_use_device_location_title">Use device location</string>
     <string name="pref_use_device_location_summary">Allow the app to get your location</string>
     <string name="pref_custom_location_title">Location</string>
@@ -36,6 +38,16 @@
     <string name="weather_location_title">Settings</string>
     <string name="weather_24_hour">24 Hour Weather</string>
     <string name="weather_7_days">Weather for a week</string>
+    <string name="new_moon">New Moon</string>
+    <string name="waxing_crescent">Waxing crescent</string>
+    <string name="first_quarter">First quarter</string>
+    <string name="waxing_gibbous">Waxing gibbous</string>
+    <string name="full_moon">Fullmoon</string>
+    <string name="waning_gibbous">waning gibbous</string>
+    <string name="last_quarter">Last quarter</string>
+    <string name="waning_crescent">Waning crescent</string>
+    <string name="moonrise">Moonrise</string>
+    <string name="moonset">Moonset</string>
 
 
 </resources>

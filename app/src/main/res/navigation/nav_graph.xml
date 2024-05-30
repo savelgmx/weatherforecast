@@ -7,7 +7,17 @@
     <fragment
         android:id="@+id/forecastWeatherFragment"
         android:name="com.example.weatherforecast.ui.ForecastWeatherFragment"
-        android:label="ForecastWeatherFragment" />
+        android:label="ForecastWeatherFragment">
+        <action
+            android:id="@+id/action_forecastWeatherFragment_to_forecastDetailFragment"
+            app:destination="@id/forecastDetailFragment">
+            <argument
+               android:name="daily"
+                app:argType="com.example.weatherforecast.response.Daily"
+                app:nullable="false" />
+        </action>
+    </fragment>
+
     <fragment
         android:id="@+id/forecastDetailFragment"
         android:name="com.example.weatherforecast.ui.ForecastDetailFragment"

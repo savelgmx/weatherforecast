@@ -37,4 +37,17 @@
     <string name="weather_24_hour">Погода на сутки</string>
     <string name="weather_7_days">Погода на неделю</string>
 
+    <string name="wrong_value">wrong value</string>
+
+    <string name="new_moon">Новолуние</string>
+    <string name="waxing_crescent">Растущий серп</string>
+    <string name="first_quarter">Первая четверть</string>
+    <string name="waxing_gibbous">Прибывающая луна</string>
+    <string name="full_moon">Полнолуние</string>
+    <string name="waning_gibbous">Убывающая луна</string>
+    <string name="last_quarter">Последняя четверть</string>
+    <string name="waning_crescent">Убывающий серп</string>
+    <string name="moonrise">Восход луны</string>
+    <string name="moonset">Закат луны</string>
+
 </resources>

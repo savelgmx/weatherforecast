@@ -1,11 +1,8 @@
 package com.example.weatherforecast.response
 
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.example.weatherforecast.db.Converters
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class ForecastResponse(
     @SerializedName("current")
@@ -91,7 +88,7 @@ data class Daily(
     val windGust: Double,
     @SerializedName("wind_speed")
     val windSpeed: Double
-)
+): Serializable
 
 data class FeelsLike(
     @SerializedName("day")
