@@ -55,8 +55,8 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
                 .fillMaxWidth()
                 .background(Blue700, shape= AppShapes.large
                 )
-                .padding(all = 20.dp),
-            contentPadding = PaddingValues(all = 8.dp),
+                .padding(all = 2.dp),
+            contentPadding = PaddingValues(all = 1.dp),
 
             ) {
             items(hourlyForecast) { hourly ->
@@ -79,7 +79,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
             text = WeatherUtils.updateTime(hourly.dt),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
-            style = QuickSandTypography.h5,
+            style = QuickSandTypography.h6,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(all = 3.dp)
         )
@@ -87,16 +87,16 @@ fun HourlyWeatherItem(hourly: Hourly) {
             model = "${iconurl}${hourly.weather[0].icon}.png",
             contentDescription = "Weather icon",
             modifier = Modifier
-                .size(50.dp) // Define your desired width and height
-                .padding(all = 1.dp)
+                .size(40.dp) // Define your desired width and height
+                .padding(all = 3.dp)
         )
         Text(
             text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
-            style = QuickSandTypography.h5,
+            style = QuickSandTypography.h6,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(all = 1.dp)
+            modifier = Modifier.padding(all =3.dp)
         )
     }
 }

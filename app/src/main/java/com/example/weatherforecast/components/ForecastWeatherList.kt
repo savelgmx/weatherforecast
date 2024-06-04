@@ -101,42 +101,25 @@ fun ClickableDayForecastItem(daily: Daily) {
                     color = Color.White,
                     style = QuickSandTypography.body1,
                     modifier = Modifier
-                        .padding(all = 8.dp)
+                        .padding(all = 3.dp)
                 )
                 AsyncImage(
                     model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
                     contentDescription = "Weather icon",
                     modifier = Modifier
-                        .size(70.dp)// Define your desired width and height
-                        .padding(all = 8.dp)
+                        .size(40.dp)// Define your desired width and height
+                        .padding(all = 3.dp)
                 )
                 Text(
                     text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
                             WeatherUtils.updateTemperature(daily.temp.night.toInt()),
                     fontWeight = FontWeight.Bold, color = Color.White,
                     style = QuickSandTypography.body1,
-                     modifier = Modifier.padding(all = 8.dp)
+                     modifier = Modifier.padding(all =3.dp)
                 )
 
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = localContext.getString(R.string.feels_like) + ": ${daily.feelsLike.day.toInt()} °C ",
-                    color = Color.White,
-                    style = QuickSandTypography.subtitle2,
-                    modifier = Modifier.padding(all = 8.dp)
-                )
-                Text(
-                    text = daily.weather[0].description,
-                    color = Color.White,
-                    style = QuickSandTypography.subtitle1,
-                    modifier = Modifier.padding(all = 8.dp)
-                )
-            }
         }
     }
 }

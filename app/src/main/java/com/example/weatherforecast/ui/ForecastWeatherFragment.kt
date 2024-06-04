@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
@@ -62,18 +63,20 @@ class ForecastWeatherFragment : Fragment() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(all=16.dp)
                         .background(Blue300)
                 )
                 {
                     if (currentState != null) {
                         CurrentWeatherCard(weatherState = currentState)
                     }
-                    Spacer(modifier = Modifier.height(3.dp))
+                    Spacer(modifier = Modifier.height(3.dp)
+                        .fillMaxWidth()
+                    )
                     Text(context.resources.getString(R.string.weather_24_hour),//"Погода на сутки",
                         fontWeight = FontWeight.Bold,
                         style= QuickSandTypography.subtitle1,
-                        color = Color.White
+                        color = Color.White,
+                        modifier = Modifier.padding(start=20.dp)
 
                     )
                     //And now include hourly UI here
@@ -83,14 +86,18 @@ class ForecastWeatherFragment : Fragment() {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(1.dp))
+                    Spacer(modifier = Modifier.height(3.dp)
+                        .fillMaxWidth()
+
+                    )
                     Text(context.resources.getString(R.string.weather_7_days),//"Погода на 7 дней"
                         fontWeight = FontWeight.Bold,
                         style = QuickSandTypography.subtitle1,
-                        color=Color.White
+                        color=Color.White, modifier = Modifier.padding(start=20.dp)
                      )
 
-                    ForecastWeatherList(forecastState = forecastState)
+                    ForecastWeatherList(
+                        forecastState = forecastState)
                 }
 
             }

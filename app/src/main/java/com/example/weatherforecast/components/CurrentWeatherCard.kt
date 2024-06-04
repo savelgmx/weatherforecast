@@ -42,136 +42,142 @@ fun CurrentWeatherCard(
 ){
 
     Box(
-            modifier =(Modifier.background(Blue300,
+        modifier =(Modifier.background(Blue300,
             shape = AppShapes.large)
-        )
-        .fillMaxWidth()
-        .padding(all = 20.dp)) {
+                )
+            .fillMaxWidth()
+            .padding(all = 20.dp)) {
 
-            Column(
-                modifier =(Modifier.background(Blue700,
-                    shape = AppShapes.large)
-                        )
-                    .fillMaxWidth()
-                    .padding(all = 20.dp)
-            ) {
-                when (weatherState) {
-                    is Resource.Success -> {
-                        val localContext =
-                            LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-                        val temperature = weatherState.data?.main?.temp?.let {
+        Column(
+            modifier =(Modifier.background(Blue700,
+                shape = AppShapes.large)
+                    )
+                .fillMaxWidth()
+                .padding(all = 2.dp)
+        ) {
+            when (weatherState) {
+                is Resource.Success -> {
+                    val localContext =
+                        LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
+                    val temperature = weatherState.data?.main?.temp?.let {
+                        WeatherUtils.updateTemperature(it.toInt())
+                    }
+                    val name = weatherState.data?.name
+                    val day =
+                        weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
+                    val pressure =
+                        localContext.getString(R.string.pressure) + ":" + weatherState.data?.main?.pressure?.let {
+                            WeatherUtils.updatePressure(it)
+                        }
+                    val feels_like =
+                        localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
                             WeatherUtils.updateTemperature(it.toInt())
                         }
-                        val name = weatherState.data?.name
-                        val day =
-                            weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-                        val pressure =
-                            localContext.getString(R.string.pressure) + ":" + weatherState.data?.main?.pressure?.let {
-                                WeatherUtils.updatePressure(it)
-                            }
-                        val feels_like =
-                            localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
-                                WeatherUtils.updateTemperature(it.toInt())
-                            }
-                        val wind = weatherState.data?.wind?.speed?.let {
-                            WeatherUtils.updateWind(
-                                weatherState.data?.wind?.deg.toString(),
-                                it.toInt(),
-                                localContext
-                            )
-                        }
+                    val wind = weatherState.data?.wind?.speed?.let {
+                        WeatherUtils.updateWind(
+                            weatherState.data?.wind?.deg.toString(),
+                            it.toInt(),
+                            localContext
+                        )
+                    }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                            Text(
-                                text = name!!, color = Color.White,
-                                style = QuickSandTypography.h5,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
+                        Text(
+                            text = name!!, color = Color.White,
+                            style = QuickSandTypography.h5,
+                            modifier = Modifier.padding(start = 1.dp)
+                        )
 
-                            Text(
-                                text = day!!, color = Color.White,
-                                style = QuickSandTypography.h5,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                        }
+                        Text(
+                            text = day!!, color = Color.White,
+                            style = QuickSandTypography.h5,
+                            modifier = Modifier.padding(end = 1.dp)
+                        )
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-                        // Row 2: Temperature with Weather Icon
+                    // Row 2: Temperature with Weather Icon
 
-                        val icon = weatherState.data?.weather?.get(0)?.icon
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = " $temperature",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                style = QuickSandTypography.h3,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
+                    val icon = weatherState.data?.weather?.get(0)?.icon
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = " $temperature",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            style = QuickSandTypography.h3,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
 
-                            AsyncImage(
-                                model = "${UIUtils.iconurl}$icon.png",
-                                contentDescription = "Weather icon",
-                                modifier = Modifier
-                                    .size(50.dp) // Define your desired width and height
-                                    .padding(all = 6.dp)
-                            )
+                        AsyncImage(
+                            model = "${UIUtils.iconurl}$icon.png",
+                            contentDescription = "Weather icon",
+                            modifier = Modifier
+                                .size(40.dp) // Define your desired width and height
+                                .padding(all = 1.dp)
+                        )
 
-                            Text(
-                                text = " $feels_like",
-                                color = Color.White,
-                                style = QuickSandTypography.h5,
-                                modifier = Modifier.padding(8.dp)
-                            )
-                        }
+                        Text(
+                            text = " $feels_like",
+                            color = Color.White,
+                            style = QuickSandTypography.h5,
+                            modifier = Modifier.padding(1.dp)
+                        )
+                    }
 
-                        Spacer(modifier = Modifier.height(1.dp))
 
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "$wind",
-                                color = Color.White,
-                                style = QuickSandTypography.h6,
-                                modifier = Modifier.padding(1.dp)
-                            )
-                            Text(
-                                text = " $pressure",
-                                color = Color.White,
-                                style = QuickSandTypography.h6,
-                                modifier = Modifier.padding(1.dp)
-                            )
 
-                        }
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "$wind",
+                            color = Color.White,
+                            style = QuickSandTypography.h6,
+                            modifier = Modifier.padding(1.dp)
+                        )
+
+                    }
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = " $pressure",
+                            color = Color.White,
+                            style = QuickSandTypography.h6,
+                            modifier = Modifier.padding(1.dp)
+                        )
 
                     }
 
-                    is Resource.Loading -> {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Loading...")
-                    }
-
-                    is Resource.Error -> {
-                        Text("Error: ${weatherState.msg}")
-                    }
-
-                    else -> {}
                 }
 
-            } //colum
-        }
+                is Resource.Loading -> {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Loading...")
+                }
+
+                is Resource.Error -> {
+                    Text("Error: ${weatherState.msg}")
+                }
+
+                else -> {}
+            }
+
+        } //colum
+    }
 }
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
