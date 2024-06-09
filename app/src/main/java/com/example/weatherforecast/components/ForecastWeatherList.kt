@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.shape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,7 @@ import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Temp
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.theme.AppShapes
+import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue400
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
@@ -54,7 +56,7 @@ fun ForecastWeatherList(
     LazyColumn(
         modifier = Modifier.fillMaxSize()
             .padding(all=16.dp)
-            .border(width=3.dp, color = Color.Transparent,
+            .border(width=3.dp, color = Blue300,
                 shape=AppShapes.large),
        // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
     ) {
@@ -91,7 +93,8 @@ fun ClickableDayForecastItem(daily: Daily) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
 
             ) {
                 Text(
@@ -117,7 +120,6 @@ fun ClickableDayForecastItem(daily: Daily) {
                     style = QuickSandTypography.body1,
                      modifier = Modifier.padding(all =3.dp)
                 )
-
             }
 
         }
