@@ -12,11 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -28,13 +24,10 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.components.CurrentWeatherCard
 import com.example.weatherforecast.components.ForecastWeatherList
 import com.example.weatherforecast.components.HourlyWeatherRow
-import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherForecastViewModel
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherMapViewModel
-import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.UIUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -64,37 +57,29 @@ class ForecastWeatherFragment : Fragment() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Blue300)
-                )
-                {
-                    if (currentState != null) {
-                        CurrentWeatherCard(weatherState = currentState)
+                ) {
+                    currentState?.let {
+                        CurrentWeatherCard(weatherState = it)
                     }
-                    Spacer(modifier = Modifier.height(3.dp)
-                        .fillMaxWidth()
-                    )
-                    Text(context.resources.getString(R.string.weather_24_hour),//"Погода на сутки",
+                    Spacer(modifier = Modifier.height(3.dp).fillMaxWidth())
+                    Text(
+                        context.resources.getString(R.string.weather_24_hour),
                         fontWeight = FontWeight.Bold,
                         style= QuickSandTypography.subtitle1,
                         color = Color.White,
                         modifier = Modifier.padding(start=20.dp)
 
                     )
-                    //And now include hourly UI here
-                    forecastState?.data?.hourly.let {
-                        if (it != null) {
-                            HourlyWeatherRow(it)
-                        }
+                    forecastState?.data?.hourly?.let {
+                        HourlyWeatherRow(it)
                     }
-
-                    Spacer(modifier = Modifier.height(3.dp)
-                        .fillMaxWidth()
-
-                    )
-                    Text(context.resources.getString(R.string.weather_7_days),//"Погода на 7 дней"
+                    Spacer(modifier = Modifier.height(3.dp).fillMaxWidth())
+                    Text(
+                        context.resources.getString(R.string.weather_7_days),
                         fontWeight = FontWeight.Bold,
                         style = QuickSandTypography.subtitle1,
                         color=Color.White, modifier = Modifier.padding(start=20.dp)
-                     )
+                    )
 
                     ForecastWeatherList(
                         forecastState = forecastState)
