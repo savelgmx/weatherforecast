@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.CurrentWeatherCard
 import com.example.weatherforecast.components.ForecastWeatherList
@@ -43,6 +44,7 @@ class ForecastWeatherFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
+                val navController = findNavController()
 
                 val currentState=currentViewModel.weatherLiveData.value
                 Log.d("current weather fragment response",currentState.toString())
@@ -82,10 +84,12 @@ class ForecastWeatherFragment : Fragment() {
                     )
 
                     ForecastWeatherList(
-                        forecastState = forecastState)
+                        forecastState = forecastState,
+                        navController = navController
+                    )
                 }
-
             }
         }
     }
+
 }
