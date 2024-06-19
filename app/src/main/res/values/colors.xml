@@ -8,8 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#FF64B5F6</color>
+    <color name="colorPrimaryDark">#FF1976D2</color>
     <color name="colorAccent">#D81B60</color>
-
+    val Blue300 = Color(0x)
 </resources>

@@ -33,6 +33,9 @@ import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
+
+import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
+
 @Composable
 fun ForecastWeatherList(
     forecastState: Resource<ForecastResponse>,
@@ -46,7 +49,7 @@ fun ForecastWeatherList(
             .padding(all=16.dp)
             .border(width=3.dp, color = Blue300,
                 shape=AppShapes.large),
-       // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+        // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
     ) {
         items(count) { index ->
             dailyForecast?.getOrNull(index)?.let { daily ->
@@ -67,11 +70,11 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
             .padding(all = 1.dp)
 
             .clickable {
-              //  navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(daily))
+                navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(daily))
             },
-       // shape = AppShapes.large
+        // shape = AppShapes.large
 
-        ) {
+    ) {
         Column(modifier = Modifier
             .padding(all=1.dp)
             .background(Blue700)
@@ -102,11 +105,11 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                         .padding(all = 3.dp)
                 )
                 Text(
-                    text = WeatherUtils.updateTemperature(daily.temp.day.toInt()) +"/"+
-                            WeatherUtils.updateTemperature(daily.temp.night.toInt()),
-                    fontWeight = FontWeight.Bold, color = Color.White,
+                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt())}/${WeatherUtils.updateTemperature(daily.temp.night.toInt())}",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
                     style = QuickSandTypography.body1,
-                     modifier = Modifier.padding(all =3.dp)
+                    modifier = Modifier.padding(all =3.dp)
                 )
             }
 
@@ -118,5 +121,5 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
 @Composable
 fun ForecastUISuccessPreview() {
     val successState = Resource.Success(UIUtils.getMockForecastlist())
-  //  ForecastWeatherList( successState)
+    //  ForecastWeatherList( successState)
 }
