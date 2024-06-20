@@ -3,18 +3,13 @@ package com.example.weatherforecast
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.StrictMode
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.fragment.app.FragmentActivity
 
-
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
-import androidx.navigation.findNavController
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 

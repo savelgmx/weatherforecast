@@ -1,8 +1,8 @@
 package com.example.weatherforecast.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.api.OpenWeatherMapRepository
@@ -17,9 +17,7 @@ class OpenWeatherMapViewModel @Inject constructor(
     private val repository: OpenWeatherMapRepository
 ) : ViewModel() {
 
-    private val _weatherLiveData = MutableLiveData<Resource<WeatherResponse>>()
-    val weatherLiveData: LiveData<Resource<WeatherResponse>> get() = _weatherLiveData
-
+    val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
     private var isWeatherLoaded = false // Flag to track if weather data is already loaded
 
     init {
@@ -31,15 +29,15 @@ class OpenWeatherMapViewModel @Inject constructor(
     fun getCurrentWeather() {
         if (!isWeatherLoaded) { // Check if weather data is already loaded
             viewModelScope.launch {
-                _weatherLiveData.value = Resource.Loading()
+                weatherLiveData.value = Resource.Loading()
                 try {
                     val result = repository.getCurrentWeather()
 
                     Log.d("Map view model response",result.toString())
-                    _weatherLiveData.value = result
+                    weatherLiveData.value = result
                     isWeatherLoaded = true // Set flag to true after successful loading
                 } catch (e: Exception) {
-                    _weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
+                    weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
                 }
             }
         }

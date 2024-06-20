@@ -10,7 +10,6 @@ import androidx.navigation.fragment.navArgs
 import com.example.weatherforecast.components.DailyWeatherForecast
 import dagger.hilt.android.AndroidEntryPoint
 
-import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
 @AndroidEntryPoint
 class ForecastDetailFragment : Fragment() {
 
