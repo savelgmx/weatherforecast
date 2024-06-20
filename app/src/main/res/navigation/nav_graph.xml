@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph.xml"
+    android:id="@+id/nav_graph"
     app:startDestination="@id/forecastWeatherFragment">
 
     <fragment
@@ -22,6 +22,10 @@
         android:id="@+id/forecastDetailFragment"
         android:name="com.example.weatherforecast.ui.ForecastDetailFragment"
         android:label="ForecastDetailFragment" >
+        <argument
+            android:name="daily"
+            app:argType="com.example.weatherforecast.response.Daily"
+            app:nullable="false" />
         <action
             android:id="@+id/action_forecastDetailFragment_to_forecastWeatherFragment"
             app:destination="@id/forecastWeatherFragment" />

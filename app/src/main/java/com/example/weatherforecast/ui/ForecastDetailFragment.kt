@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.example.weatherforecast.components.DailyWeatherForecast
 import dagger.hilt.android.AndroidEntryPoint
 
+import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
 @AndroidEntryPoint
 class ForecastDetailFragment : Fragment() {
 
-  //  private val args: ForecastDetailFragmentArgs by navArgs()
+    private val args: ForecastDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -21,9 +23,8 @@ class ForecastDetailFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-           //     val day = args.day
-                // Fetch detailed forecast data for the selected day from ViewModel
-                // Display the detailed forecast UI
+                val daily = args.daily
+                DailyWeatherForecast(daily)
             }
         }
     }

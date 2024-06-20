@@ -30,7 +30,6 @@ import com.example.weatherforecast.utils.WeatherUtils
 @Composable
 fun DailyWeatherForecast(
     daily: Daily,
-    onNavigateToWeatherDetailScreen: Daily,
 ){
     val localContext = LocalContext.current //To access the context within a Composable function,
     // use the LocalContext provided by Jetpack Compose
@@ -224,5 +223,5 @@ fun DailyWeatherForecast(
 @Composable
 fun DailyWeatherPreview(){
     val dailyData = UIUtils.getMockDailyWeather()
-    DailyWeatherForecast(daily = dailyData,dailyData)
+    DailyWeatherForecast(daily = dailyData)
 }
