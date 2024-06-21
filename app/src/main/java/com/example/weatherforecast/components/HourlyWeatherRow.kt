@@ -34,6 +34,7 @@ import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
@@ -104,33 +105,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
 fun HourlyUISuccessPreview() {
-    val successState = getMockHourlylist()
+    val successState = UIUtils.getMockHourlylist()
     HourlyWeatherRow(successState)
 }
 
-fun getMockHourlylist(): List<Hourly> {
-    return listOf(
-        Hourly(
-            99, -18.32, 1708774497, -17.78, 95,
-            1037, -21.2, 0.0, 10000,
-            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-            223, 2.2, 1.8
-        ),
-        Hourly(
-            99, -18.32, 1708774497, -17.78, 95,
-            1037, -21.2, 0.0, 10000,
-            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-            223, 2.2, 1.8
-        ),
-        Hourly(
-            99, -18.32, 1708774497, -17.78, 95,
-            1037, -21.2, 0.0, 10000,
-            listOf(Weather(804, "Clouds", "пасмурно", "04n")),
-            223, 2.2, 1.8
-        )
-
-
-    )
-
-
-}

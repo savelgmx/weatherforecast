@@ -4,10 +4,13 @@ package com.example.weatherforecast
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.weatherforecast.theme.White1
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,6 +26,18 @@ class MainActivity : AppCompatActivity() {
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        // Inflate the menu
+        toolbar.inflateMenu(R.menu.menu_toolbar)
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_settings -> {
+                    // Handle settings action
+                    true
+                }
+                else -> false
+            }
+        }
+
         // Set up NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
@@ -30,6 +45,12 @@ class MainActivity : AppCompatActivity() {
         // Set up ActionBar with NavController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+    }
+
+    // Function to update toolbar title from fragment
+    fun updateToolbarTitle(title: String) {
+
+        supportActionBar?.title = title
     }
 
     // Handle permission request result
