@@ -3,15 +3,19 @@ package com.example.weatherforecast
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.TypedValue
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.weatherforecast.theme.White1
 import dagger.hilt.android.AndroidEntryPoint
+
+import android.graphics.Color
+import android.graphics.Typeface
+import android.view.Menu
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -23,8 +27,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Set up the toolbar
-        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        // Remove default title
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Inflate the menu
         toolbar.inflateMenu(R.menu.menu_toolbar)
@@ -45,12 +52,25 @@ class MainActivity : AppCompatActivity() {
         // Set up ActionBar with NavController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        // Add destination change listener to update toolbar title manually
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            updateToolbarTitle("")
+        }
     }
 
     // Function to update toolbar title from fragment
     fun updateToolbarTitle(title: String) {
+        val toolbarTitle: TextView = findViewById(R.id.toolbar_title)
+        toolbarTitle.text = title
+        toolbarTitle.setTextColor(Color.WHITE)
+        toolbarTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+        toolbarTitle.setTypeface(toolbarTitle.typeface, Typeface.BOLD)
+    }
 
-        supportActionBar?.title = title
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar, menu)
+        return true
     }
 
     // Handle permission request result
