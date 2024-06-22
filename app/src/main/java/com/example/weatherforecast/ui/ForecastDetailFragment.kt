@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.weatherforecast.MainActivity
 import com.example.weatherforecast.components.DailyWeatherForecast
+import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,8 +25,7 @@ class ForecastDetailFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 // Update the toolbar title
-                (activity as MainActivity).updateToolbarTitle("<-zuruck")
-
+                (activity as MainActivity).updateToolbarTitle("${WeatherUtils.updateDateToToday(args.daily.dt)}")
                 val daily = args.daily
                 DailyWeatherForecast(daily)
             }
