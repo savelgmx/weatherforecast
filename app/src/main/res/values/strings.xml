@@ -50,4 +50,26 @@
     <string name="moonset">Moonset</string>
 
 
+
+        <string-array name="temperature_units">
+            <item>Celsius (C°)</item>
+            <item>Fahrenheit (°F)</item>
+        </string-array>
+        <string-array name="temperature_units_values">
+            <item>C</item>
+            <item>F</item>
+        </string-array>
+
+        <string-array name="distance_units">
+            <item>Metric</item>
+            <item>Imperial</item>
+        </string-array>
+        <string-array name="distance_units_values">
+            <item>metric</item>
+            <item>imperial</item>
+        </string-array>
+
+
+
+
 </resources>

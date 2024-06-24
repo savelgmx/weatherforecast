@@ -1,6 +1,7 @@
 package com.example.weatherforecast
 
 
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
@@ -16,6 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.Menu
+import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
+import com.example.weatherforecast.ui.settings.SettingsFragment
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -38,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_settings -> {
-                    // Handle settings action
+                    openSettingsFragment()
                     true
                 }
                 else -> false
@@ -57,7 +61,18 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, _, _ ->
             updateToolbarTitle("")
         }
+
+        // Access the preferences
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val temperatureUnits = sharedPreferences.getString("temperature_units", "C")
+        val distanceUnits = sharedPreferences.getString("distance_units", "metric")
+
+        // Apply the preferences
+        // For example:
+        applySettings(temperatureUnits, distanceUnits)
     }
+
+
 
     // Function to update toolbar title from fragment
     fun updateToolbarTitle(title: String) {
@@ -95,7 +110,15 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-
+    private fun applySettings(temperatureUnits: String?, distanceUnits: String?) {
+        //TODO  Implement your logic to apply the settings
+    }
+    private fun openSettingsFragment() {
+        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.nav_host_fragment, SettingsFragment())
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
 }
 
 
