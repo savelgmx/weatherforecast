@@ -25,10 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun WeatherScreen() {
@@ -43,7 +47,7 @@ fun WeatherScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            WindSpeedCard(speed = 11, direction = "Юго-восточный")
+            WindSpeedCard(speed = 11, windDegree = 135)
             HumidityCard(humidity = 35, dewPoint = 12)
         }
 
@@ -61,7 +65,7 @@ fun WeatherScreen() {
 }
 
 @Composable
-fun WindSpeedCard(speed: Int, direction: String) {
+fun WindSpeedCard(speed: Int, windDegree: Int) {
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -75,22 +79,52 @@ fun WindSpeedCard(speed: Int, direction: String) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Скорость ветра", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            WindDirectionShape(direction)
+            WindDirectionShape(windDegree = windDegree)
             Text("$speed км/ч", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-            Text(direction, fontSize = 14.sp)
+            Text("Юго-восточный", fontSize = 14.sp)
         }
     }
 }
 
 @Composable
-fun WindDirectionShape(direction: String) {
+fun WindDirectionShape(windDegree: Int) {
     Canvas(modifier = Modifier.size(64.dp)) {
-        val path = Path().apply {
-            moveTo(32f, 0f)
-            cubicTo(0f, 32f, 0f, 64f, 32f, 64f)
-            cubicTo(64f, 64f, 64f, 32f, 32f, 0f)
+        // Draw compass circle
+        drawCircle(
+            color = Color.Black,
+            radius = size.minDimension / 2,
+            style = Stroke(width = 4f)
+        )
+
+        // Draw N, E, S, W labels
+        drawContext.canvas.nativeCanvas.apply {
+            drawText("North", size.width / 2, 20f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER })
+            drawText("East", size.width - 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT })
+            drawText("South", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER })
+            drawText("West", 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT })
         }
-        drawPath(path, color = Color.Cyan, style = Stroke(width = 4f))
+
+        // Draw wind direction arrow
+        val arrowPath = Path().apply {
+            moveTo(size.width / 2, size.height / 4)
+            lineTo(size.width / 2 + 10, size.height / 2)
+            lineTo(size.width / 2, size.height * 3 / 4)
+            lineTo(size.width / 2 - 10, size.height / 2)
+            close()
+        }
+
+        rotate(degrees = windDegree.toFloat(), pivot = Offset(size.width / 2, size.height / 2)) {
+        drawPath(
+            path = arrowPath,
+            color = Color.Blue,
+            style = Stroke(width = 1f)
+        )
+            drawPath(
+                path = arrowPath,
+                color = Color.Red,
+                alpha = 0.5f
+            )
+        }
     }
 }
 
