@@ -76,7 +76,8 @@ fun WindSpeedCard(speed: Int, windDegree: Int) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Скорость ветра", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             WindDirectionShape(windDegree = windDegree)
@@ -92,16 +93,16 @@ fun WindDirectionShape(windDegree: Int) {
         // Draw compass circle
         drawCircle(
             color = Color.Black,
-            radius = size.minDimension / 2,
+            radius = size.minDimension*0.6f,
             style = Stroke(width = 4f)
         )
 
         // Draw N, E, S, W labels
         drawContext.canvas.nativeCanvas.apply {
-            drawText("North", size.width / 2, 20f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER })
-            drawText("East", size.width - 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT })
-            drawText("South", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER })
-            drawText("West", 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT })
+            drawText("N", size.width / 2, 30f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=36f})
+            drawText("E", size.width - 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT;textSize=36f })
+            drawText("S", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=36f })
+            drawText("W", 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT;textSize=36f })
         }
 
         // Draw wind direction arrow
