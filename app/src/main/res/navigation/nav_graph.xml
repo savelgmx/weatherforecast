@@ -16,6 +16,9 @@
                 app:argType="com.example.weatherforecast.response.Daily"
                 app:nullable="false" />
         </action>
+        <action
+            android:id="@+id/action_forecastWeatherFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 
     <fragment
@@ -30,4 +33,9 @@
             android:id="@+id/action_forecastDetailFragment_to_forecastWeatherFragment"
             app:destination="@id/forecastWeatherFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.weatherforecast.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

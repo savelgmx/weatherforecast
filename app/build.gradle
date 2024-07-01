@@ -137,4 +137,9 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.1.1'
 
+    // Jetpack Compose and Accompanist dependencies
+    def accompanist="0.24.13-rc"
+    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist"
+    implementation "com.google.accompanist:accompanist-insets:$accompanist"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist"
 }
