@@ -1,5 +1,7 @@
 package com.example.weatherforecast.response
 
+import java.io.Serializable
+
 
 data class WeatherResponse(
     val coord: Coord,
@@ -27,7 +29,7 @@ data class Weather(
     val main: String,
     val description: String,
     val icon: String
-)
+): Serializable
 
 data class Main(
     val temp: Double,

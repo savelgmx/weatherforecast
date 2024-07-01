@@ -99,7 +99,7 @@ data class FeelsLike(
     val morn: Double,
     @SerializedName("night")
     val night: Double
-)
+): Serializable
 
 data class Hourly(
     @SerializedName("clouds")
@@ -143,4 +143,4 @@ data class Temp(
     val morn: Double,
     @SerializedName("night")
     val night: Double
-)
+): Serializable
