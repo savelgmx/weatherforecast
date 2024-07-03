@@ -83,10 +83,12 @@ fun MainScreen(
                 )
             }
             item {
+/*
                 ForecastWeatherList(
                     forecastState = forecastState,
                     navController = navController
                 )
+*/
             }
         }
     }
