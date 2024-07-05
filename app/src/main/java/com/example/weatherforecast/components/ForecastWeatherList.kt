@@ -1,5 +1,6 @@
 package com.example.weatherforecast.components
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +29,10 @@ import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
-
-
-import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
 
 @Composable
 fun ForecastWeatherList(
@@ -44,14 +42,12 @@ fun ForecastWeatherList(
     val dailyForecast = forecastState.data?.daily
     val count = dailyForecast?.size ?: 0
 
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize()
             .padding(all=16.dp)
-            .border(width=3.dp, color = Blue300,
-                shape=AppShapes.large),
-        // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+            .border(width = 3.dp, color = Blue300, shape = AppShapes.large),
     ) {
-        items(count) { index ->
+        for (index in 0 until count) {
             dailyForecast?.getOrNull(index)?.let { daily ->
                 ClickableDayForecastItem(daily = daily, navController = navController)
             }
@@ -60,25 +56,19 @@ fun ForecastWeatherList(
 }
 @Composable
 fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
-    val localContext =
-        LocalContext.current //To access the context within a Composable function,
-    // use the LocalContext provided by Jetpack Compose
-    //we need this context to load  string values form strings.xml
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 1.dp)
-
+           // .padding(all = 1.dp)
             .clickable {
                 navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(daily))
             },
-        // shape = AppShapes.large
+         shape = AppShapes.large
 
     ) {
         Column(modifier = Modifier
             .padding(all=1.dp)
             .background(Blue700)
-
         )
         {
 
