@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.weatherforecast.MainActivity
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.CurrentWeatherCard
 import com.example.weatherforecast.components.ForecastWeatherList
@@ -30,6 +31,7 @@ import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherForecastViewModel
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherMapViewModel
+import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -49,6 +51,13 @@ class ForecastWeatherFragment : Fragment() {
 
                 val currentState = currentViewModel.weatherLiveData.value
                 val forecastState = viewModel.forecastLiveData.value
+
+                val date = currentViewModel.weatherLiveData.value?.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
+                val cityName = currentViewModel.weatherLiveData.value?.data?.name
+
+                // Update the toolbar title
+                (activity as MainActivity).updateToolbarTitle("$date $cityName")
+
                 val scrollState = rememberScrollState()
                 val context = LocalContext.current
 

@@ -1,6 +1,6 @@
 package com.example.weatherforecast.components
 
-// SettingsScreen.kt
+// SettingsScreen.kt navController: NavController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen() {
     var offsetX by remember { mutableStateOf(0f) }
     val screenWidth = LocalDensity.current.run { LocalConfiguration.current.screenWidthDp.dp.toPx() }
 
@@ -34,7 +34,7 @@ fun SettingsScreen(navController: NavController) {
                     offsetX += dragAmount
                     if (offsetX > screenWidth / 2) {
                         scope.launch {
-                            navController.popBackStack()
+                         //   navController.popBackStack()
                         }
                     }
                 }
