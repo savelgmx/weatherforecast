@@ -1,20 +1,31 @@
 package com.example.weatherforecast.ui.settings
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateView(
@@ -45,51 +56,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         return frameLayout
     }
-}
 
-/*
-@Composable
-fun SettingsScreen() {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val screenWidth = LocalConfiguration.current.screenWidthDp
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "temperature_units" || key == "distance_units") {
+            val preference = findPreference<ListPreference>(key)
+            preference?.let {
+                // Trigger a function call or handle the change
+                handlePreferenceChange(key, it.value)
+            }
+        }
 
-    ModalDrawer(
-        drawerContent = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width((screenWidth / 2).dp),
-                elevation = 8.dp,
-                color = MaterialTheme.colors.surface
-            ) {
-                // Your settings UI implementation here
-                Text("Settings", modifier = Modifier.padding(16.dp))
+    }
+
+
+
+    private fun handlePreferenceChange(key: String, value: String) {
+        // Handle the preference change
+        // For example, update a global setting or notify other components
+        when (key) {
+            "temperature_units" -> {
+                // Handle temperature units change
             }
-        },
-        drawerState = drawerState,
-        gesturesEnabled = drawerState.isOpen
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Settings") },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                        }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
-                // Your main settings content here
+
+            "distance_units" -> {
+                // Handle distance units change
             }
         }
     }
+
 }
-*/

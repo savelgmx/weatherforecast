@@ -43,5 +43,17 @@
         <item>🌑</item>
     </string-array>
 
+    <string-array name="temperature_unit_values">
+        <item>Celsius</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="temperature_units_values">
+        <item>C</item>
+        <item>F</item>
+    </string-array>
+    <string-array name="distance_units_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
 
 </resources>
