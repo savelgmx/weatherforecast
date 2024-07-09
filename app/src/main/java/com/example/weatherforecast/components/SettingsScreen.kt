@@ -33,7 +33,12 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    temperatureUnits: String,
+    distanceUnits: String,
+    onTemperatureUnitsChange: (String) -> Unit,
+    onDistanceUnitsChange: (String) -> Unit
+) {
     var offsetX by remember { mutableStateOf(0f) }
     val screenWidth = LocalDensity.current.run { LocalConfiguration.current.screenWidthDp.dp.toPx() }
 
@@ -63,27 +68,26 @@ fun SettingsScreen() {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Settings", style = MaterialTheme.typography.h5)
                 Spacer(modifier = Modifier.height(16.dp))
-                SettingsOption("Temperature Units")
-                SettingsOption("Distance Units")
+                SettingsOption("Temperature Units", temperatureUnits, onTemperatureUnitsChange)
+                SettingsOption("Distance Units", distanceUnits, onDistanceUnitsChange)
             }
         }
     }
 }
 
 @Composable
-fun SettingsOption(title: String) {
-    var selectedOption by remember { mutableStateOf("Celsius") }
+fun SettingsOption(title: String, selectedOption: String, onOptionSelected: (String) -> Unit) {
     Column {
         Text(text = title, style = MaterialTheme.typography.h6)
         Spacer(modifier = Modifier.height(8.dp))
-        DropdownMenu(selectedOption, onOptionSelected = { selectedOption = it })
+        DropdownMenu(selectedOption, onOptionSelected)
     }
 }
 
 @Composable
 fun DropdownMenu(selectedOption: String, onOptionSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Celsius", "Fahrenheit", "Metric", "Imperial")
+    val options = listOf("C", "F", "metric", "imperial")
 
     Box {
         Text(

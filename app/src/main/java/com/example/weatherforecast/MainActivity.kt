@@ -3,28 +3,28 @@ package com.example.weatherforecast
 
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.Menu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import dagger.hilt.android.AndroidEntryPoint
-
-import android.graphics.Color
-import android.graphics.Typeface
-import android.view.Menu
-import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.weatherforecast.ui.settings.SettingsFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity() {
             updateToolbarTitle("")
         }
 
+        // Initialize shared preferences
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
         // Access the preferences
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val temperatureUnits = sharedPreferences.getString("temperature_units", "C")
@@ -70,6 +73,11 @@ class MainActivity : AppCompatActivity() {
         // Apply the preferences
         // For example:
         applySettings(temperatureUnits, distanceUnits)
+
+        // Register preference change listener
+        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+
+
     }
 
 
@@ -119,11 +127,19 @@ class MainActivity : AppCompatActivity() {
         transaction.addToBackStack(null)
         transaction.commit()
     }
+
+    // Preference change listener
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        if (key == "temperature_units" || key == "distance_units") {
+            val temperatureUnits = prefs.getString("temperature_units", "Celsius")
+            val distanceUnits = prefs.getString("distance_units", "Metric")
+            applySettings(temperatureUnits, distanceUnits)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the preference change listener
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
+    }
 }
-
-
-
-
-
-
-

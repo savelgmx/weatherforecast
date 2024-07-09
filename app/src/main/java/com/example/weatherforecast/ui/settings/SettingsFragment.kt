@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
-import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
@@ -35,53 +33,24 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
-        // Wrap the PreferenceFragmentCompat view with a ComposeView
-        val composeView = ComposeView(requireContext()).apply {
+        // Only use ComposeView
+        return ComposeView(requireContext()).apply {
             setContent {
-                SettingsScreen()
+                SettingsScreen(
+                    temperatureUnits = preferenceScreen.sharedPreferences.getString("temperature_units", "C") ?: "C",
+                    distanceUnits = preferenceScreen.sharedPreferences.getString("distance_units", "metric") ?: "metric",
+                    onTemperatureUnitsChange = { newValue ->
+                        preferenceScreen.sharedPreferences.edit().putString("temperature_units", newValue).apply()
+                    },
+                    onDistanceUnitsChange = { newValue ->
+                        preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
+                    }
+                )
             }
         }
-
-        // Create a FrameLayout to hold the original PreferenceFragmentCompat view and the ComposeView
-        val frameLayout = FrameLayout(requireContext()).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        }
-
-        // Add the original view and the ComposeView to the FrameLayout
-        frameLayout.addView(view)
-        frameLayout.addView(composeView)
-
-        return frameLayout
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == "temperature_units" || key == "distance_units") {
-            val preference = findPreference<ListPreference>(key)
-            preference?.let {
-                // Trigger a function call or handle the change
-                handlePreferenceChange(key, it.value)
-            }
-        }
-
+        // Handle preference changes if necessary
     }
-
-
-
-    private fun handlePreferenceChange(key: String, value: String) {
-        // Handle the preference change
-        // For example, update a global setting or notify other components
-        when (key) {
-            "temperature_units" -> {
-                // Handle temperature units change
-            }
-
-            "distance_units" -> {
-                // Handle distance units change
-            }
-        }
-    }
-
 }
