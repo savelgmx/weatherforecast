@@ -44,7 +44,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     },
                     onDistanceUnitsChange = { newValue ->
                         preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
-                    }
+                    },
+                    onDismiss = { requireActivity().onBackPressed() } // Handle dismiss
                 )
             }
         }

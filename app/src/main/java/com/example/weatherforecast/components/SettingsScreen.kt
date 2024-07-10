@@ -5,6 +5,7 @@ package com.example.weatherforecast.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +38,8 @@ fun SettingsScreen(
     temperatureUnits: String,
     distanceUnits: String,
     onTemperatureUnitsChange: (String) -> Unit,
-    onDistanceUnitsChange: (String) -> Unit
+    onDistanceUnitsChange: (String) -> Unit,
+    onDismiss: () -> Unit
 ) {
     var offsetX by remember { mutableStateOf(0f) }
     val screenWidth = LocalDensity.current.run { LocalConfiguration.current.screenWidthDp.dp.toPx() }
@@ -52,17 +54,25 @@ fun SettingsScreen(
                     offsetX += dragAmount
                     if (offsetX > screenWidth / 2) {
                         scope.launch {
-                            // Handle navigation or close the menu here
+                            // Handle swipe to close the menu
+                            onDismiss()
                         }
+                    } else if (offsetX < -screenWidth / 2) {
+                        // Handle swipe left to dismiss
+                        onDismiss()
                     }
                 }
             }
+            .clickable { onDismiss() } // Handle outside taps
     ) {
         Surface(
             modifier = Modifier
                 .wrapContentSize() // Adjusts to fit content
                 .offset(x = offsetX.dp)
-                .background(MaterialTheme.colors.surface),
+                .background(MaterialTheme.colors.surface)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { /* Handle internal taps to prevent dismiss */ })
+                },
             elevation = 8.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
