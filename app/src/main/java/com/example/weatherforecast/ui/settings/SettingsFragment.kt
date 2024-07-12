@@ -6,12 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
+import com.example.weatherforecast.ui.viewmodel.SharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     private lateinit var temperatureUnitsLiveData: MutableLiveData<String>
     private lateinit var distanceUnitsLiveData: MutableLiveData<String>
@@ -45,15 +52,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         return ComposeView(requireContext()).apply {
             setContent {
                 SettingsScreen(
-                    temperatureUnits = preferenceScreen.sharedPreferences.getString("temperature_units", "C") ?: "C",
-                    distanceUnits = preferenceScreen.sharedPreferences.getString("distance_units", "metric") ?: "metric",
+                    temperatureUnits = sharedViewModel.temperatureUnitsLiveData.value ?: "Celsius",
+                    distanceUnits = sharedViewModel.distanceUnitsLiveData.value ?: "Metric",
                     onTemperatureUnitsChange = { newValue ->
                         preferenceScreen.sharedPreferences.edit().putString("temperature_units", newValue).apply()
-                        temperatureUnitsLiveData.value = newValue
+                        sharedViewModel.temperatureUnitsLiveData.value = newValue
                     },
                     onDistanceUnitsChange = { newValue ->
                         preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
-                        distanceUnitsLiveData.value = newValue
+                        sharedViewModel.distanceUnitsLiveData.value = newValue
                     },
                     onDismiss = { requireActivity().onBackPressed() } // Handle dismiss
                 )
@@ -65,10 +72,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         if (sharedPreferences != null) {
             when (key) {
                 "temperature_units" -> {
-                    temperatureUnitsLiveData.value = sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius"
+                    sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius"
                 }
                 "distance_units" -> {
-                    distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "Metric") ?: "Metric"
+                    sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "Metric") ?: "Metric"
                 }
             }
         }

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
@@ -19,12 +20,19 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.example.weatherforecast.ui.settings.SettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.example.weatherforecast.ui.viewmodel.SharedViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
     private lateinit var sharedPreferences: SharedPreferences
+
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,14 +73,20 @@ class MainActivity : AppCompatActivity() {
         // Initialize shared preferences
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        // Access the preferences
-        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val temperatureUnits = sharedPreferences.getString("temperature_units", "C")
-        val distanceUnits = sharedPreferences.getString("distance_units", "metric")
+        // Observe changes in preferences
+        sharedViewModel.temperatureUnitsLiveData.observe(this, Observer { newUnit ->
+            // Update the temperature display unit in the main screen
+                updateTemperatureUnit(newUnit)
+        })
 
-        // Apply the preferences
-        // For example:
-        applySettings(temperatureUnits, distanceUnits)
+        sharedViewModel.distanceUnitsLiveData.observe(this, Observer { newUnit ->
+            // Update the distance display unit in the main screen
+                updateDistanceUnit(newUnit)
+        })
+
+        // Initialize LiveData with current preferences
+        sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius"
+        sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "Metric") ?: "Metric"
 
         // Register preference change listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
@@ -119,8 +133,10 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
     private fun applySettings(temperatureUnits: String?, distanceUnits: String?) {
-        //TODO  Implement your logic to apply the settings
+        sharedViewModel.temperatureUnitsLiveData.value = temperatureUnits ?: "Celsius"
+        sharedViewModel.distanceUnitsLiveData.value = distanceUnits ?: "Metric"
     }
+
     private fun openSettingsFragment() {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_fragment, SettingsFragment())
@@ -141,5 +157,15 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         // Unregister the preference change listener
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
+    }
+
+    private fun updateTemperatureUnit(newUnit: String) {
+        // Logic to update temperature unit in the main screen
+        // For example, you might update the temperature display here
+    }
+
+    private fun updateDistanceUnit(newUnit: String) {
+        // Logic to update distance unit in the main screen
+        // For example, you might update the distance display here
     }
 }

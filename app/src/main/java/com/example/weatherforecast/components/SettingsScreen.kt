@@ -5,16 +5,18 @@ package com.example.weatherforecast.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.DropdownMenu
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -25,7 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -54,7 +58,6 @@ fun SettingsScreen(
                     offsetX += dragAmount
                     if (offsetX > screenWidth / 2) {
                         scope.launch {
-                            // Handle swipe to close the menu
                             onDismiss()
                         }
                     } else if (offsetX < -screenWidth / 2) {
@@ -63,26 +66,60 @@ fun SettingsScreen(
                     }
                 }
             }
-            .clickable { onDismiss() } // Handle outside taps
+            .background(Color.Transparent)
+            .clickable(onClick = { onDismiss() })
     ) {
         Surface(
             modifier = Modifier
                 .wrapContentSize() // Adjusts to fit content
                 .offset(x = offsetX.dp)
                 .background(MaterialTheme.colors.surface)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = { /* Handle internal taps to prevent dismiss */ })
-                },
+                .clickable(onClick = { /* Consume clicks inside the surface */ }),
             elevation = 8.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Settings", style = MaterialTheme.typography.h5)
+                Text("Настройки", style = MaterialTheme.typography.h5)
+                Spacer(modifier = Modifier.height(16.dp))
+                TemperatureUnitToggle(temperatureUnits, onTemperatureUnitsChange)
                 Spacer(modifier = Modifier.height(16.dp))
                 SettingsOption("Temperature Units", temperatureUnits, onTemperatureUnitsChange)
                 SettingsOption("Distance Units", distanceUnits, onDistanceUnitsChange)
             }
         }
     }
+}
+
+@Composable
+fun TemperatureUnitToggle(selectedOption: String, onOptionSelected: (String) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text("Temperature", style = MaterialTheme.typography.h6)
+        Spacer(modifier = Modifier.width(8.dp))
+        ToggleButton(selectedOption == "Celsius", "C") { onOptionSelected("Celsius") }
+        Spacer(modifier = Modifier.width(4.dp))
+        ToggleButton(selectedOption == "Fahrenheit", "F") { onOptionSelected("Fahrenheit") }
+    }
+}
+
+@Composable
+fun ToggleButton(isSelected: Boolean, text: String, onClick: () -> Unit) {
+    Text(
+        text = text,
+        modifier = Modifier
+            .padding(4.dp)
+            .background(
+                if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(8.dp),
+        color = if (isSelected) Color.White else MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.button
+    )
 }
 
 @Composable
@@ -97,7 +134,7 @@ fun SettingsOption(title: String, selectedOption: String, onOptionSelected: (Str
 @Composable
 fun DropdownMenu(selectedOption: String, onOptionSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val options = listOf("C", "F", "metric", "imperial")
+    val options = listOf("Metric", "Imperial")
 
     Box {
         Text(
@@ -107,7 +144,7 @@ fun DropdownMenu(selectedOption: String, onOptionSelected: (String) -> Unit) {
                 .background(MaterialTheme.colors.surface)
                 .padding(8.dp)
         )
-        DropdownMenu(
+        androidx.compose.material.DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
