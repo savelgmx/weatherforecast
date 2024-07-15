@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor() : ViewModel() {
-    val temperatureUnitsLiveData = MutableLiveData<String>()
+    val temperatureUnitsLiveData = MutableLiveData<Boolean>()
     val distanceUnitsLiveData = MutableLiveData<String>()
 }
 

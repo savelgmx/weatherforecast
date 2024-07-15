@@ -85,8 +85,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Initialize LiveData with current preferences
-        sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius"
-        sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "Metric") ?: "Metric"
+        sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getBoolean("temperature_units", true)
+        sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "metric") ?: "metric"
 
         // Register preference change listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
@@ -132,9 +132,10 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-    private fun applySettings(temperatureUnits: String?, distanceUnits: String?) {
-        sharedViewModel.temperatureUnitsLiveData.value = temperatureUnits ?: "Celsius"
-        sharedViewModel.distanceUnitsLiveData.value = distanceUnits ?: "Metric"
+
+    private fun applySettings(temperatureUnits: Boolean, distanceUnits: String?) {
+        sharedViewModel.temperatureUnitsLiveData.value = temperatureUnits
+        sharedViewModel.distanceUnitsLiveData.value = distanceUnits ?: "metric"
     }
 
     private fun openSettingsFragment() {
@@ -147,8 +148,8 @@ class MainActivity : AppCompatActivity() {
     // Preference change listener
     private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         if (key == "temperature_units" || key == "distance_units") {
-            val temperatureUnits = prefs.getString("temperature_units", "Celsius")
-            val distanceUnits = prefs.getString("distance_units", "Metric")
+            val temperatureUnits = prefs.getBoolean("temperature_units", true)
+            val distanceUnits = prefs.getString("distance_units", "metric")
             applySettings(temperatureUnits, distanceUnits)
         }
     }
@@ -159,9 +160,12 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
-    private fun updateTemperatureUnit(newUnit: String) {
+    private fun updateTemperatureUnit(newUnit: Boolean) {
         // Logic to update temperature unit in the main screen
         // For example, you might update the temperature display here
+        // newUnit: true = Celsius, false = Fahrenheit
+        val unit = if (newUnit) "Celsius" else "Fahrenheit"
+        // Update the display according to unit
     }
 
     private fun updateDistanceUnit(newUnit: String) {

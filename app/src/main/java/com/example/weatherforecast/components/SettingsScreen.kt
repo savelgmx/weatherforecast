@@ -17,10 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +44,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
-    temperatureUnits: String,
+    temperatureUnits: Boolean, // Changed to Boolean
     distanceUnits: String,
-    onTemperatureUnitsChange: (String) -> Unit,
+    onTemperatureUnitsChange: (Boolean) -> Unit, // Changed to Boolean
     onDistanceUnitsChange: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -61,7 +66,6 @@ fun SettingsScreen(
                             onDismiss()
                         }
                     } else if (offsetX < -screenWidth / 2) {
-                        // Handle swipe left to dismiss
                         onDismiss()
                     }
                 }
@@ -71,26 +75,36 @@ fun SettingsScreen(
     ) {
         Surface(
             modifier = Modifier
-                .wrapContentSize() // Adjusts to fit content
+                .width( (LocalConfiguration.current.screenWidthDp.dp)* 3 / 4) // 3/4 of screen width
                 .offset(x = offsetX.dp)
                 .background(MaterialTheme.colors.surface)
                 .clickable(onClick = { /* Consume clicks inside the surface */ }),
             elevation = 8.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
                 Text("Настройки", style = MaterialTheme.typography.h5)
+                }
+                Divider()
                 Spacer(modifier = Modifier.height(16.dp))
                 TemperatureUnitToggle(temperatureUnits, onTemperatureUnitsChange)
+                Divider()
                 Spacer(modifier = Modifier.height(16.dp))
-                SettingsOption("Temperature Units", temperatureUnits, onTemperatureUnitsChange)
                 SettingsOption("Distance Units", distanceUnits, onDistanceUnitsChange)
+                Divider()
             }
         }
     }
 }
 
 @Composable
-fun TemperatureUnitToggle(selectedOption: String, onOptionSelected: (String) -> Unit) {
+fun TemperatureUnitToggle(selectedOption: Boolean, onOptionSelected: (Boolean) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -99,27 +113,31 @@ fun TemperatureUnitToggle(selectedOption: String, onOptionSelected: (String) -> 
     ) {
         Text("Temperature", style = MaterialTheme.typography.h6)
         Spacer(modifier = Modifier.width(8.dp))
-        ToggleButton(selectedOption == "Celsius", "C") { onOptionSelected("Celsius") }
+        ToggleButton(selectedOption, "C") { onOptionSelected(true) }
         Spacer(modifier = Modifier.width(4.dp))
-        ToggleButton(selectedOption == "Fahrenheit", "F") { onOptionSelected("Fahrenheit") }
+        ToggleButton(!selectedOption, "F") { onOptionSelected(false) }
     }
 }
 
 @Composable
 fun ToggleButton(isSelected: Boolean, text: String, onClick: () -> Unit) {
-    Text(
-        text = text,
+    Box(
         modifier = Modifier
             .padding(4.dp)
             .background(
                 if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(16.dp) // Rounded edges
             )
             .clickable(onClick = onClick)
             .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
         color = if (isSelected) Color.White else MaterialTheme.colors.onSurface,
         style = MaterialTheme.typography.button
     )
+}
 }
 
 @Composable

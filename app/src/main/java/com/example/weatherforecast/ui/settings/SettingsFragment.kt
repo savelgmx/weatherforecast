@@ -20,7 +20,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private val sharedViewModel: SharedViewModel by viewModels()
 
-    private lateinit var temperatureUnitsLiveData: MutableLiveData<String>
+    private lateinit var temperatureUnitsLiveData: MutableLiveData<Boolean>
     private lateinit var distanceUnitsLiveData: MutableLiveData<String>
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -32,8 +32,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val sharedPreferences = preferenceScreen.sharedPreferences
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        temperatureUnitsLiveData = MutableLiveData(sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius")
-        distanceUnitsLiveData = MutableLiveData(sharedPreferences.getString("distance_units", "Metric") ?: "Metric")
+        temperatureUnitsLiveData = MutableLiveData(sharedPreferences.getBoolean("temperature_units", true))
+        distanceUnitsLiveData = MutableLiveData(sharedPreferences.getString("distance_units", "metric") ?: "metric")
     }
 
     override fun onPause() {
@@ -52,10 +52,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         return ComposeView(requireContext()).apply {
             setContent {
                 SettingsScreen(
-                    temperatureUnits = sharedViewModel.temperatureUnitsLiveData.value ?: "Celsius",
-                    distanceUnits = sharedViewModel.distanceUnitsLiveData.value ?: "Metric",
+                    temperatureUnits = sharedViewModel.temperatureUnitsLiveData.value ?: true,
+                    distanceUnits = sharedViewModel.distanceUnitsLiveData.value ?: "metric",
                     onTemperatureUnitsChange = { newValue ->
-                        preferenceScreen.sharedPreferences.edit().putString("temperature_units", newValue).apply()
+                        preferenceScreen.sharedPreferences.edit().putBoolean("temperature_units", newValue).apply()
                         sharedViewModel.temperatureUnitsLiveData.value = newValue
                     },
                     onDistanceUnitsChange = { newValue ->
@@ -72,10 +72,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         if (sharedPreferences != null) {
             when (key) {
                 "temperature_units" -> {
-                    sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getString("temperature_units", "Celsius") ?: "Celsius"
+                    sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getBoolean("temperature_units", true)
                 }
                 "distance_units" -> {
-                    sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "Metric") ?: "Metric"
+                    sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "metric") ?: "metric"
                 }
             }
         }
