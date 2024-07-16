@@ -20,11 +20,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.example.weatherforecast.ui.settings.SettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.example.weatherforecast.ui.viewmodel.SharedViewModel
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {

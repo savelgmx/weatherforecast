@@ -8,24 +8,17 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,94 +77,38 @@ fun SettingsScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                Text("Настройки", style = MaterialTheme.typography.h5)
+                    Text("Temperature Units", modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = temperatureUnits,
+                        onCheckedChange = { onTemperatureUnitsChange(it) }
+                    )
+                    Text(if (temperatureUnits) "Celsius" else "Fahrenheit")
                 }
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-                TemperatureUnitToggle(temperatureUnits, onTemperatureUnitsChange)
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-                SettingsOption("Distance Units", distanceUnits, onDistanceUnitsChange)
-                Divider()
-            }
-        }
-    }
-}
 
-@Composable
-fun TemperatureUnitToggle(selectedOption: Boolean, onOptionSelected: (Boolean) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Text("Temperature", style = MaterialTheme.typography.h6)
-        Spacer(modifier = Modifier.width(8.dp))
-        ToggleButton(selectedOption, "C") { onOptionSelected(true) }
-        Spacer(modifier = Modifier.width(4.dp))
-        ToggleButton(!selectedOption, "F") { onOptionSelected(false) }
-    }
-}
-
-@Composable
-fun ToggleButton(isSelected: Boolean, text: String, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-                shape = RoundedCornerShape(16.dp) // Rounded edges
-            )
-            .clickable(onClick = onClick)
-            .padding(8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-        color = if (isSelected) Color.White else MaterialTheme.colors.onSurface,
-        style = MaterialTheme.typography.button
-    )
-}
-}
-
-@Composable
-fun SettingsOption(title: String, selectedOption: String, onOptionSelected: (String) -> Unit) {
-    Column {
-        Text(text = title, style = MaterialTheme.typography.h6)
-        Spacer(modifier = Modifier.height(8.dp))
-        DropdownMenu(selectedOption, onOptionSelected)
-    }
-}
-
-@Composable
-fun DropdownMenu(selectedOption: String, onOptionSelected: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Metric", "Imperial")
-
-    Box {
-        Text(
-            text = selectedOption,
-            modifier = Modifier
-                .clickable { expanded = true }
-                .background(MaterialTheme.colors.surface)
-                .padding(8.dp)
-        )
-        androidx.compose.material.DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(onClick = {
-                    onOptionSelected(option)
-                    expanded = false
-                }) {
-                    Text(option)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Distance Units", modifier = Modifier.weight(1f))
+                    DropdownMenu(
+                        expanded = true, // Always show dropdown in this example
+                        onDismissRequest = { /* No-op */ }
+                    ) {
+                        DropdownMenuItem(onClick = { onDistanceUnitsChange("metric") }) {
+                            Text("Metric")
+                        }
+                        DropdownMenuItem(onClick = { onDistanceUnitsChange("imperial") }) {
+                            Text("Imperial")
+                        }
+                    }
+                    Text(distanceUnits)
                 }
             }
         }

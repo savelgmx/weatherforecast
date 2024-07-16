@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
-import com.example.weatherforecast.ui.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import com.example.weatherforecast.ui.viewmodel.SharedViewModel
 
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -55,12 +54,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     temperatureUnits = sharedViewModel.temperatureUnitsLiveData.value ?: true,
                     distanceUnits = sharedViewModel.distanceUnitsLiveData.value ?: "metric",
                     onTemperatureUnitsChange = { newValue ->
-                        preferenceScreen.sharedPreferences.edit().putBoolean("temperature_units", newValue).apply()
-                        sharedViewModel.temperatureUnitsLiveData.value = newValue
+                        sharedViewModel.setTemperatureUnits(newValue)
                     },
                     onDistanceUnitsChange = { newValue ->
-                        preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
-                        sharedViewModel.distanceUnitsLiveData.value = newValue
+                        sharedViewModel.setDistanceUnits(newValue)
                     },
                     onDismiss = { requireActivity().onBackPressed() } // Handle dismiss
                 )
