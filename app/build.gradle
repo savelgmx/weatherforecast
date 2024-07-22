@@ -73,6 +73,8 @@ dependencies {
     implementation "androidx.compose.material:material-icons-core:1.0.2"
     implementation "androidx.compose.material:material-icons-extended:1.0.2"
 
+    implementation "androidx.compose.runtime:runtime-livedata:1.4.3" // Use the latest version
+
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
 

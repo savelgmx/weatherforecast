@@ -47,6 +47,9 @@ fun SettingsScreen(
     val screenWidth = LocalDensity.current.run { LocalConfiguration.current.screenWidthDp.dp.toPx() }
 
     val scope = rememberCoroutineScope()
+    val dragAmountThreshold = screenWidth / 4
+
+    var dropdownExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -54,12 +57,10 @@ fun SettingsScreen(
             .pointerInput(Unit) {
                 detectHorizontalDragGestures { _, dragAmount ->
                     offsetX += dragAmount
-                    if (offsetX > screenWidth / 2) {
-                        scope.launch {
-                            onDismiss()
-                        }
-                    } else if (offsetX < -screenWidth / 2) {
-                        onDismiss()
+                    if (offsetX > dragAmountThreshold) {
+                        scope.launch { onDismiss() }
+                    } else if (offsetX < -dragAmountThreshold) {
+                        scope.launch { onDismiss() }
                     }
                 }
             }
@@ -68,7 +69,7 @@ fun SettingsScreen(
     ) {
         Surface(
             modifier = Modifier
-                .width( (LocalConfiguration.current.screenWidthDp.dp)* 3 / 4) // 3/4 of screen width
+                .width((LocalConfiguration.current.screenWidthDp.dp) * 3 / 4)
                 .offset(x = offsetX.dp)
                 .background(MaterialTheme.colors.surface)
                 .clickable(onClick = { /* Consume clicks inside the surface */ }),
@@ -80,12 +81,13 @@ fun SettingsScreen(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .fillMaxWidth()
-                        .padding(8.dp)
                 ) {
                     Text("Temperature Units", modifier = Modifier.weight(1f))
                     Switch(
                         checked = temperatureUnits,
-                        onCheckedChange = { onTemperatureUnitsChange(it) }
+                        onCheckedChange = { isChecked ->
+                            onTemperatureUnitsChange(isChecked)
+                        }
                     )
                     Text(if (temperatureUnits) "Celsius" else "Fahrenheit")
                 }
@@ -95,20 +97,28 @@ fun SettingsScreen(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .fillMaxWidth()
+                        .clickable { dropdownExpanded = !dropdownExpanded }
                 ) {
                     Text("Distance Units", modifier = Modifier.weight(1f))
-                    DropdownMenu(
-                        expanded = true, // Always show dropdown in this example
-                        onDismissRequest = { /* No-op */ }
-                    ) {
-                        DropdownMenuItem(onClick = { onDistanceUnitsChange("metric") }) {
-                            Text("Metric")
-                        }
-                        DropdownMenuItem(onClick = { onDistanceUnitsChange("imperial") }) {
-                            Text("Imperial")
-                        }
-                    }
                     Text(distanceUnits)
+                }
+
+                DropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false }
+                ) {
+                    DropdownMenuItem(onClick = {
+                        onDistanceUnitsChange("metric")
+                        dropdownExpanded = false
+                    }) {
+                        Text("Metric")
+                    }
+                    DropdownMenuItem(onClick = {
+                        onDistanceUnitsChange("imperial")
+                        dropdownExpanded = false
+                    }) {
+                        Text("Imperial")
+                    }
                 }
             }
         }

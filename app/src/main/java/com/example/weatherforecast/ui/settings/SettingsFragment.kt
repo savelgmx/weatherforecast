@@ -5,14 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
-import dagger.hilt.android.AndroidEntryPoint
 import com.example.weatherforecast.ui.viewmodel.SharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -50,16 +53,20 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         // Only use ComposeView
         return ComposeView(requireContext()).apply {
             setContent {
+
+                val temperatureUnits by sharedViewModel.temperatureUnitsLiveData.observeAsState(true)
+                val distanceUnits by sharedViewModel.distanceUnitsLiveData.observeAsState("metric")
+
                 SettingsScreen(
-                    temperatureUnits = sharedViewModel.temperatureUnitsLiveData.value ?: true,
-                    distanceUnits = sharedViewModel.distanceUnitsLiveData.value ?: "metric",
+                    temperatureUnits = temperatureUnits,
+                    distanceUnits = distanceUnits,
                     onTemperatureUnitsChange = { newValue ->
                         sharedViewModel.setTemperatureUnits(newValue)
                     },
                     onDistanceUnitsChange = { newValue ->
                         sharedViewModel.setDistanceUnits(newValue)
                     },
-                    onDismiss = { requireActivity().onBackPressed() } // Handle dismiss
+                    onDismiss = { requireActivity().onBackPressed() }
                 )
             }
         }
