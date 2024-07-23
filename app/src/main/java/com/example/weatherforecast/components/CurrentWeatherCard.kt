@@ -21,17 +21,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.WeatherResponse
-import com.example.weatherforecast.response.Wind
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue700
-
 import com.example.weatherforecast.theme.QuickSandTypography
-
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils

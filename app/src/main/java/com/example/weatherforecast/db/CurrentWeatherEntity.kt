@@ -9,7 +9,6 @@ import com.example.weatherforecast.response.Clouds
 import com.example.weatherforecast.response.Coord
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
-import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.Wind
 
 @Entity(tableName = "weather")

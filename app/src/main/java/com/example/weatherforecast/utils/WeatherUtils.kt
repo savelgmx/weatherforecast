@@ -2,38 +2,59 @@ package com.example.weatherforecast.utils
 
 
 import android.content.Context
-import android.util.Log
 import com.example.weatherforecast.R
+import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class WeatherUtils {
 
     companion object {
 
-        private var latitude: Double = 0.0
-        private var longitude: Double = 0.0
-        private fun chooseLocalizedUnitAbbreviation(metric: String, imperial: String): String {
-            // return if (viewModel.isMetricUnit) metric else imperial
-            return metric
+        private var isMetric: Boolean = true
+
+        init {
+            SharedViewModelHolder.sharedViewModel.temperatureUnitsLiveData.observeForever { isCelsius ->
+                isMetric = isCelsius
+            }
+            SharedViewModelHolder.sharedViewModel.distanceUnitsLiveData.observeForever { units ->
+                isMetric = units == "metric"
+            }
         }
 
-        // Implement other common update functions here
-        // updateTemperatures, updateCondition, updatePressure, updateWind, updateVisibility, degToCompass, etc.
+        fun chooseLocalizedUnitAbbreviation(metric: String, imperial: String): String {
+            return if (isMetric) metric else imperial
+        }
+
         fun updateTemperature(temperature: Int): String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("°C", "°F")
-            val temp = "$temperature$unitAbbreviation"
+            val temp = if (isMetric) {
+                "$temperature$unitAbbreviation"
+            } else {
+                val fahrenheitTemp = (temperature * 9 / 5) + 32
+                "$fahrenheitTemp$unitAbbreviation"
+            }
             return temp
         }
 
         fun updatePressure(pressureValue: Int): String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("mm", "in")
-            val pressure = "$pressureValue $unitAbbreviation"
+            val pressure = if (isMetric) {
+                "$pressureValue $unitAbbreviation"
+            } else {
+                val pressureInInches = pressureValue / 25.4
+                "${"%.2f".format(pressureInInches)} $unitAbbreviation"
+            }
             return pressure
         }
 
         fun updateWind(windDirection: String, windSpeed: Int, context: Context): String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("m/sec.", "mph")
+            val windSpeedValue = if (isMetric) {
+                windSpeed
+            } else {
+                (windSpeed * 2.237).toInt()
+            }
             val wind = degToCompass((windDirection).toInt(), context)
             val windstring = "$wind , $windSpeed $unitAbbreviation"
             return windstring

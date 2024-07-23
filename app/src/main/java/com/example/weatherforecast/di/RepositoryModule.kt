@@ -1,18 +1,15 @@
 package com.example.weatherforecast.di;
 
 
-import com.example.weatherforecast.api.OpenWeatherMapAPI;
+import com.example.weatherforecast.api.OpenWeatherMapAPI
 import com.example.weatherforecast.api.OpenWeatherMapRepository
-import com.example.weatherforecast.api.OpenWeatherMapRepositoryImpl;
+import com.example.weatherforecast.api.OpenWeatherMapRepositoryImpl
 import com.example.weatherforecast.db.OpenWeatherMapDao
-
-
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
 @Module

@@ -8,19 +8,20 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
 import com.example.weatherforecast.ui.viewmodel.SharedViewModel
+import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val sharedViewModel: SharedViewModel by viewModels()
+    private val sharedViewModel: SharedViewModel
+        get() = SharedViewModelHolder.sharedViewModel
 
     private lateinit var temperatureUnitsLiveData: MutableLiveData<Boolean>
     private lateinit var distanceUnitsLiveData: MutableLiveData<String>

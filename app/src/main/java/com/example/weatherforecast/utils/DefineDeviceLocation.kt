@@ -4,7 +4,7 @@ import android.content.Context
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
-import java.util.*
+import java.util.Locale
 
 class DefineDeviceLocation(private val context: Context) {
 

@@ -9,31 +9,35 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.example.weatherforecast.ui.settings.SettingsFragment
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.lifecycle.Observer
 import com.example.weatherforecast.ui.viewmodel.SharedViewModel
+import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
     private lateinit var sharedPreferences: SharedPreferences
-
-    private val sharedViewModel: SharedViewModel by viewModels()
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //initialize sharedViewModel singleton object,which tracks preferences changes
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        SharedViewModelHolder.initialize(sharedViewModel)
+
 
         // Set up the toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
