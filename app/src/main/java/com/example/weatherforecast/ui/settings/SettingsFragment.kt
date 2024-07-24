@@ -62,10 +62,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     temperatureUnits = temperatureUnits,
                     distanceUnits = distanceUnits,
                     onTemperatureUnitsChange = { newValue ->
-                        sharedViewModel.setTemperatureUnits(newValue)
+                        preferenceScreen.sharedPreferences.edit().putBoolean("temperature_units", newValue).apply()
+                        sharedViewModel.temperatureUnitsLiveData.value = newValue
                     },
                     onDistanceUnitsChange = { newValue ->
-                        sharedViewModel.setDistanceUnits(newValue)
+                        preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
+                        sharedViewModel.distanceUnitsLiveData.value = newValue
                     },
                     onDismiss = { requireActivity().onBackPressed() }
                 )
