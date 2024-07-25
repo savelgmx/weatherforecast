@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.SettingsScreen
@@ -65,9 +66,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                         preferenceScreen.sharedPreferences.edit().putBoolean("temperature_units", newValue).apply()
                         sharedViewModel.temperatureUnitsLiveData.value = newValue
                     },
-                    onDistanceUnitsChange = { newValue ->
-                        preferenceScreen.sharedPreferences.edit().putString("distance_units", newValue).apply()
-                        sharedViewModel.distanceUnitsLiveData.value = newValue
+                    onNavigateToDistanceUnits = {
+                        findNavController().navigate(R.id.action_settingsFragment_to_distanceUnitsFragment)
                     },
                     onDismiss = { requireActivity().onBackPressed() }
                 )

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
@@ -40,7 +41,7 @@ fun SettingsScreen(
     temperatureUnits: Boolean, // Changed to Boolean
     distanceUnits: String,
     onTemperatureUnitsChange: (Boolean) -> Unit, // Changed to Boolean
-    onDistanceUnitsChange: (String) -> Unit,
+    onNavigateToDistanceUnits: () -> Unit, // Updated parameter to trigger navigation
     onDismiss: () -> Unit
 ) {
     var offsetX by remember { mutableStateOf(0f) }
@@ -48,8 +49,6 @@ fun SettingsScreen(
 
     val scope = rememberCoroutineScope()
     val dragAmountThreshold = screenWidth / 4
-
-    var dropdownExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -97,28 +96,11 @@ fun SettingsScreen(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .fillMaxWidth()
-                        .clickable { dropdownExpanded = !dropdownExpanded }
                 ) {
                     Text("Distance Units", modifier = Modifier.weight(1f))
+                    Button(onClick = onNavigateToDistanceUnits) {
                     Text(distanceUnits)
                 }
-
-                DropdownMenu(
-                    expanded = dropdownExpanded,
-                    onDismissRequest = { dropdownExpanded = false }
-                ) {
-                    DropdownMenuItem(onClick = {
-                        onDistanceUnitsChange("metric")
-                        dropdownExpanded = false
-                    }) {
-                        Text("Metric")
-                    }
-                    DropdownMenuItem(onClick = {
-                        onDistanceUnitsChange("imperial")
-                        dropdownExpanded = false
-                    }) {
-                        Text("Imperial")
-                    }
                 }
             }
         }

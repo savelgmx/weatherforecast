@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(private val sharedPreferences: SharedPreferences) : ViewModel() {
+    val windSpeedLiveData=MutableLiveData<String>()
     val temperatureUnitsLiveData = MutableLiveData<Boolean>()
     val distanceUnitsLiveData = MutableLiveData<String>()
 
@@ -25,5 +26,9 @@ class SharedViewModel @Inject constructor(private val sharedPreferences: SharedP
     fun setDistanceUnits(units: String) {
         distanceUnitsLiveData.value = units
         sharedPreferences.edit().putString("distance_units", units).apply()
+    }
+    fun setWindSeedUnits(units: String){
+        windSpeedLiveData.value=units
+        sharedPreferences.edit().putString("windspeed_units",units).apply()
     }
 }
