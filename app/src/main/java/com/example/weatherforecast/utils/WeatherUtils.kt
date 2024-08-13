@@ -126,5 +126,37 @@ class WeatherUtils {
                 else -> wrongValue
             }
         }
+
+        fun SelectionWindSignature(selection:Int): String {
+            val selectedSignature: String = when (selection) {
+                0 -> "km/h"
+                1 -> "m/s"
+                2 -> "knots"
+                3 -> "ft/s"
+                else -> "Unknown" // Handle unexpected values
+            }
+            return selectedSignature
+        }
+
+        fun SelectionPressureSignature(selection:Int): String {
+            val selectedSignature: String = when (selection) {
+                0 -> "mm Hg"
+                1 ->  "inches Hg"
+                2 -> "hPa"
+                3 -> "mbar"
+                else -> "Unknown" // Handle unexpected values
+            }
+            return selectedSignature
+        }
+
+        fun SelectionPrecipeSignature(selection:Int): String {
+            val selectedSignature: String = when (selection) {
+                0 -> "mm."
+                1 ->  "inches"
+                else -> "Unknown" // Handle unexpected values
+            }
+            return selectedSignature
+        }
+
     }
 }
