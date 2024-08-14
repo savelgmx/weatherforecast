@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
+import com.example.weatherforecast.ui.settings.DrawerFragment
 import com.example.weatherforecast.ui.settings.SettingsFragment
 import com.example.weatherforecast.ui.viewmodel.SharedViewModel
 import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
@@ -142,6 +143,13 @@ class MainActivity : AppCompatActivity() {
     private fun openSettingsFragment() {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_fragment, SettingsFragment())
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    private fun openDrawerFragment(){
+        val transaction:FragmentTransaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.nav_host_fragment, DrawerFragment())
         transaction.addToBackStack(null)
         transaction.commit()
     }

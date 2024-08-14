@@ -26,6 +26,7 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.components.CurrentWeatherCard
 import com.example.weatherforecast.components.ForecastWeatherList
 import com.example.weatherforecast.components.HourlyWeatherRow
+import com.example.weatherforecast.components.MainScreen
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.ui.viewmodel.OpenWeatherForecastViewModel
@@ -56,58 +57,8 @@ class ForecastWeatherFragment : Fragment() {
 
                 // Update the toolbar title
                 (activity as MainActivity).updateToolbarTitle("$date $cityName")
+                MainScreen(navController = navController, currentState =currentState , forecastState = forecastState)
 
-                val scrollState = rememberScrollState()
-                val context = LocalContext.current
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                       // .padding(1.dp)
-                        .background(Blue300)
-                      //  .verticalScroll(scrollState) //vertical scroll exeption if uncommented
-                ) {
-                    item {
-                        currentState?.let { weatherState ->
-                            CurrentWeatherCard(weatherState = weatherState)
-                        }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = context.resources.getString(R.string.weather_24_hour),
-                            fontWeight = FontWeight.Bold,
-                            style = QuickSandTypography.subtitle1,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 20.dp)
-
-                        )
-                    }
-
-                    item {
-                        forecastState?.data?.hourly?.let { hourlyWeatherList ->
-                            HourlyWeatherRow(hourlyWeatherList)
-                        }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = context.resources.getString(R.string.weather_7_days),
-                            fontWeight = FontWeight.Bold,
-                            style = QuickSandTypography.subtitle1,
-                            color = Color.White, modifier = Modifier.padding(start = 20.dp)
-                        )
-                    }
-
-                    item {
-                        ForecastWeatherList(
-                            forecastState = forecastState,
-                            navController = navController
-                        )
-                    }
-                }
             }
         }
     }

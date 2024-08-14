@@ -56,7 +56,7 @@ fun CurrentWeatherCard(
                     val localContext =
                         LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
                     val temperature = weatherState.data?.main?.temp?.let {
-                        WeatherUtils.updateTemperature(it.toInt())
+                        WeatherUtils.updateTemperature(it.toInt(),localContext)
                     }
                     val name = weatherState.data?.name
                     val day =
@@ -67,7 +67,7 @@ fun CurrentWeatherCard(
                         }
                     val feels_like =
                         localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
-                            WeatherUtils.updateTemperature(it.toInt())
+                            WeatherUtils.updateTemperature(it.toInt(), localContext)
                         }
                     val wind = weatherState.data?.wind?.speed?.let {
                         WeatherUtils.updateWind(

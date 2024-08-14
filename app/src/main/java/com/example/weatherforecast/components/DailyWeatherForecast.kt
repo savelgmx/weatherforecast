@@ -33,8 +33,14 @@ fun DailyWeatherForecast(
     val localContext = LocalContext.current //To access the context within a Composable function,
     // use the LocalContext provided by Jetpack Compose
     //we need this context to load  string values form strings.xml
-    val feels_like =localContext.getString(R.string.feels_like) + ": "+ WeatherUtils.updateTemperature(daily.feelsLike.day.toInt())
-    val feels_like_night=localContext.getString(R.string.feels_like) + ": "+ WeatherUtils.updateTemperature(daily.feelsLike.night.toInt())
+    val feels_like =localContext.getString(R.string.feels_like) + ": "+ WeatherUtils.updateTemperature(
+        daily.feelsLike.day.toInt(),
+        localContext
+    )
+    val feels_like_night=localContext.getString(R.string.feels_like) + ": "+ WeatherUtils.updateTemperature(
+        daily.feelsLike.night.toInt(),
+        localContext
+    )
 
     val wind =localContext.getString(R.string.wind)+ ": "+
             WeatherUtils.updateWind(
@@ -99,7 +105,10 @@ fun DailyWeatherForecast(
                 modifier=Modifier.padding(all=1.dp)
             ) {
                 Text(
-                    text =localContext.getString(R.string.day)+": "+ WeatherUtils.updateTemperature(daily.temp.day.toInt()),
+                    text =localContext.getString(R.string.day)+": "+ WeatherUtils.updateTemperature(
+                        daily.temp.day.toInt(),
+                        localContext
+                    ),
                     fontWeight = FontWeight.Bold, color = Color.White,
                     style = QuickSandTypography.body2,
                     modifier = Modifier.padding(all = 3.dp)
@@ -125,7 +134,7 @@ fun DailyWeatherForecast(
             ){
                 Text(
                     text =localContext.getString(R.string.night)+": "
-                            +WeatherUtils.updateTemperature(daily.temp.night.toInt()),
+                            +WeatherUtils.updateTemperature(daily.temp.night.toInt(), localContext),
                     fontWeight = FontWeight.Bold, color = Color.White,
                     style = QuickSandTypography.body1,
                     modifier = Modifier.padding(all = 3.dp)

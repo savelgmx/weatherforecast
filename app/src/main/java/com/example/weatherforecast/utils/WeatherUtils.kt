@@ -13,6 +13,7 @@ class WeatherUtils {
 
         private var isMetric: Boolean = true
 
+
         init {
             SharedViewModelHolder.sharedViewModel.temperatureUnitsLiveData.observeForever { isCelsius ->
                 isMetric = isCelsius
@@ -20,13 +21,16 @@ class WeatherUtils {
             SharedViewModelHolder.sharedViewModel.distanceUnitsLiveData.observeForever { units ->
                 isMetric = units == "metric"
             }
+
+
+
         }
 
         fun chooseLocalizedUnitAbbreviation(metric: String, imperial: String): String {
             return if (isMetric) metric else imperial
         }
 
-        fun updateTemperature(temperature: Int): String {
+        fun updateTemperature(temperature: Int, localContext: Context): String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("°C", "°F")
             val temp = if (isMetric) {
                 "$temperature$unitAbbreviation"

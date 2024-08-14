@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.AppShapes
@@ -30,7 +31,6 @@ import com.example.weatherforecast.utils.WeatherUtils
 @Composable
 fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
 {
-
     Box (
         modifier = Modifier
             .background(
@@ -40,6 +40,7 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
             .padding(all=20.dp),
         )
     {
+
 
         LazyRow(
             modifier = Modifier
@@ -64,8 +65,10 @@ fun HourlyWeatherItem(hourly: Hourly) {
         .padding(3.dp)
         .background(Blue700),
          )
-
     {
+
+        val localContext= LocalContext.current
+
         Text(
             text = WeatherUtils.updateTime(hourly.dt),
             color = Color.White,
@@ -82,7 +85,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
                 .padding(all = 3.dp)
         )
         Text(
-            text = WeatherUtils.updateTemperature(hourly.temp.toInt()),
+            text = WeatherUtils.updateTemperature(hourly.temp.toInt(), localContext),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.h6,
