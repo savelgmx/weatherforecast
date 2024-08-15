@@ -48,7 +48,14 @@
     <string name="waning_crescent">Waning crescent</string>
     <string name="moonrise">Moonrise</string>
     <string name="moonset">Moonset</string>
+    <string name="km_h">\"km/h\"</string>
+    <string name="m_s">\"m/s\"</string>
+    <string name="knots">\"knots\"</string>
 
+    <string name="mmHg">\"mm Hg\"</string>
+    <string name="inchesHg">\"inches Hg\"</string>
+    <string name="hPa">\"hPa\"</string>
+    <string name="mbar">\"mbar\"</string>
 
 
     <string-array name="temperature_units">

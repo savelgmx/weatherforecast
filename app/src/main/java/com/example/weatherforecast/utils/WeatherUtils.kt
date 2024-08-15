@@ -2,7 +2,12 @@ package com.example.weatherforecast.utils
 
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import com.example.weatherforecast.R
+import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -12,6 +17,7 @@ class WeatherUtils {
     companion object {
 
         private var isMetric: Boolean = true
+
 
 
         init {
@@ -30,9 +36,10 @@ class WeatherUtils {
             return if (isMetric) metric else imperial
         }
 
-        fun updateTemperature(temperature: Int, localContext: Context): String {
-            val unitAbbreviation = chooseLocalizedUnitAbbreviation("°C", "°F")
-            val temp = if (isMetric) {
+        fun updateTemperature(temperature: Int, switchState: Boolean): String {
+            val unitAbbreviation = if(switchState) "C° " else "F° "
+
+            val temp = if (switchState) {
                 "$temperature$unitAbbreviation"
             } else {
                 val fahrenheitTemp = (temperature * 9 / 5) + 32
@@ -41,6 +48,7 @@ class WeatherUtils {
             return temp
         }
 
+/*
         fun updatePressure(pressureValue: Int): String {
             val unitAbbreviation = chooseLocalizedUnitAbbreviation("mm", "in")
             val pressure = if (isMetric) {
@@ -50,6 +58,37 @@ class WeatherUtils {
                 "${"%.2f".format(pressureInInches)} $unitAbbreviation"
             }
             return pressure
+        }
+*/
+
+        @Composable
+        fun updatePressure(pressureValue: Int): String {
+            val localcontext= LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
+            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+
+            // Check for a valid index
+            if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
+                return "Invalid unit index"
+            }
+
+            // Get the chosen unit
+            val chosenUnit = pressureUnitsToSelect[selectedPressureOption]
+
+            // Perform conversion based on the chosen unit
+            val convertedPressure = when (selectedPressureOption) {
+                0 -> pressureValue * 0.7500615613 // Conversion from mBar to mm Hg
+                1 -> pressureValue * 0.029529983071445 // Conversion from mBar to inches Hg
+                2 -> pressureValue.toDouble() // 1 mBar is equivalent to 1 hPa
+                3 -> pressureValue.toDouble() // mBar is already the default unit
+                else -> return "Invalid unit"
+            }
+
+            // Format the pressure value
+            val formattedPressure = "%.2f".format(convertedPressure)
+
+            // Return the result with unit
+            return "$formattedPressure $chosenUnit"
         }
 
         fun updateWind(windDirection: String, windSpeed: Int, context: Context): String {

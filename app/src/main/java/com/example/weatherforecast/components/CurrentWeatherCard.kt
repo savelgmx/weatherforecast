@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,8 +57,10 @@ fun CurrentWeatherCard(
                 is Resource.Success -> {
                     val localContext =
                         LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
+                    val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+
                     val temperature = weatherState.data?.main?.temp?.let {
-                        WeatherUtils.updateTemperature(it.toInt(),localContext)
+                        WeatherUtils.updateTemperature(it.toInt(),switchState)
                     }
                     val name = weatherState.data?.name
                     val day =
@@ -67,7 +71,7 @@ fun CurrentWeatherCard(
                         }
                     val feels_like =
                         localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
-                            WeatherUtils.updateTemperature(it.toInt(), localContext)
+                            WeatherUtils.updateTemperature(it.toInt(), switchState)
                         }
                     val wind = weatherState.data?.wind?.speed?.let {
                         WeatherUtils.updateWind(

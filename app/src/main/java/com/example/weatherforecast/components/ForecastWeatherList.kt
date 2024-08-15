@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,6 +73,8 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
     ) {
 
         val localContext = LocalContext.current
+        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+
 
         Column(modifier = Modifier
             .padding(all=1.dp)
@@ -103,9 +107,9 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                 )
 
                 Text(
-                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt(), localContext)}/${WeatherUtils.updateTemperature(
+                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt(), switchState)}/${WeatherUtils.updateTemperature(
                         daily.temp.night.toInt(),
-                        localContext
+                        switchState
                     )}",
                     fontWeight = FontWeight.Bold,
                     color = Color.White,

@@ -49,5 +49,13 @@
     <string name="waning_crescent">Abnehmender Mond</string>
     <string name="moonrise">Mondaufgang</string>
     <string name="moonset">Monduntergang  </string>
+    <string name="km_h">\"km/h\"</string>
+    <string name="m_s">\"m/s\"</string>
+    <string name="knots">\"Knoten\"</string>
+
+    <string name="mmHg">\"mm Hg\"</string>
+    <string name="inchesHg">\"inches Hg\"</string>
+    <string name="hPa">\"hPa\"</string>
+    <string name="mbar">\"mbar\"</string>
 
 </resources>

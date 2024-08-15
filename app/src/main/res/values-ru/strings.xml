@@ -49,5 +49,13 @@
     <string name="waning_crescent">Убывающий серп</string>
     <string name="moonrise">Восход луны</string>
     <string name="moonset">Закат луны</string>
+    <string name="km_h">\"км./ч.\"</string>
+    <string name="m_s">\"м./с.\"</string>
+    <string name="knots">\"узлы\"</string>
+
+    <string name="mmHg">\"мм рт.ст.\"</string>
+    <string name="inchesHg">\"дюймы рт.ст.\"</string>
+    <string name="hPa">\"гПа\"</string>
+    <string name="mbar">\"мбар\"</string>
 
 </resources>

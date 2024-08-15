@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -68,6 +70,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
     {
 
         val localContext= LocalContext.current
+        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
 
         Text(
             text = WeatherUtils.updateTime(hourly.dt),
@@ -85,7 +88,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
                 .padding(all = 3.dp)
         )
         Text(
-            text = WeatherUtils.updateTemperature(hourly.temp.toInt(), localContext),
+            text = WeatherUtils.updateTemperature(hourly.temp.toInt(), switchState),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.h6,
