@@ -94,7 +94,7 @@ fun DrawerContent(navController: NavController) {
                     )
                 }
             }
-            Column { Text(" "+WeatherUtils.SelectionWindSignature(selectedWindOption)) }
+            Column { Text(" "+WeatherUtils.selectionWindSignature(selectedWindOption)) }
         }
 
         HorizontalDivider()
@@ -135,7 +135,7 @@ fun DrawerContent(navController: NavController) {
 
             }
             Column{
-                Text(" "+ WeatherUtils.SelectionPressureSignature(selectedPressureOption))
+                Text(" "+ WeatherUtils.selectionPressureSignature(selectedPressureOption))
             }
         }
         HorizontalDivider()

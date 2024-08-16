@@ -60,7 +60,7 @@
         <item>@string/km_h</item>
         <item>@string/m_s</item>
         <item>@string/knots</item>
-        <item>"ft/s"</item>
+        <item>@string/ft_s</item>
     </string-array>
 
     <string-array name="pressure_units">
@@ -69,6 +69,5 @@
         <item>@string/hPa</item>
         <item>@string/mbar</item>
     </string-array>
-
 
 </resources>

@@ -15,27 +15,7 @@ import java.util.Locale
 class WeatherUtils {
 
     companion object {
-
-        private var isMetric: Boolean = true
-
-
-
-        init {
-            SharedViewModelHolder.sharedViewModel.temperatureUnitsLiveData.observeForever { isCelsius ->
-                isMetric = isCelsius
-            }
-            SharedViewModelHolder.sharedViewModel.distanceUnitsLiveData.observeForever { units ->
-                isMetric = units == "metric"
-            }
-
-
-
-        }
-
-        fun chooseLocalizedUnitAbbreviation(metric: String, imperial: String): String {
-            return if (isMetric) metric else imperial
-        }
-
+        
         fun updateTemperature(temperature: Int, switchState: Boolean): String {
             val unitAbbreviation = if(switchState) "C° " else "F° "
 
@@ -47,19 +27,6 @@ class WeatherUtils {
             }
             return temp
         }
-
-/*
-        fun updatePressure(pressureValue: Int): String {
-            val unitAbbreviation = chooseLocalizedUnitAbbreviation("mm", "in")
-            val pressure = if (isMetric) {
-                "$pressureValue $unitAbbreviation"
-            } else {
-                val pressureInInches = pressureValue / 25.4
-                "${"%.2f".format(pressureInInches)} $unitAbbreviation"
-            }
-            return pressure
-        }
-*/
 
         @Composable
         fun updatePressure(pressureValue: Int): String {
@@ -88,22 +55,37 @@ class WeatherUtils {
             val formattedPressure = "%.2f".format(convertedPressure)
 
             // Return the result with unit
-            return "$formattedPressure $chosenUnit"
+            return " $formattedPressure $chosenUnit"
         }
 
+        @Composable
         fun updateWind(windDirection: String, windSpeed: Int, context: Context): String {
-            val unitAbbreviation = chooseLocalizedUnitAbbreviation("m/sec.", "mph")
-            val windSpeedValue = if (isMetric) {
-                windSpeed
-            } else {
-                (windSpeed * 2.237).toInt()
+            // Obtain the selected wind speed unit from preferences
+            val selectedWindOptions by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
+            var windSpeedUnitsToSelect=context.resources.getStringArray(R.array.wind_speed_units)
+            // Ensure the selected index is valid
+            if (selectedWindOptions < 0 || selectedWindOptions >= windSpeedUnitsToSelect.size) {
+                return "Invalid unit index"
             }
-            val wind = degToCompass((windDirection).toInt(), context)
-            val windstring = "$wind , $windSpeed $unitAbbreviation"
-            return windstring
+            // Get the selected unit abbreviation
+            val unitAbbreviation = windSpeedUnitsToSelect[selectedWindOptions]
+            // Convert the wind speed to the selected unit using integer calculations
+            val convertedWindSpeed = when (selectedWindOptions) {
+                0 -> (windSpeed * 18) / 5 // Conversion from m/s to km/h
+                1 -> windSpeed // m/s is the default unit
+                2 -> (windSpeed * 194384) / 100000 // Conversion from m/s to knots
+                3 -> (windSpeed * 328084) / 100000 // Conversion from m/s to ft/s
+                else -> return "Invalid unit"
+            }
+            // Convert the wind direction to a compass direction
+            val wind = degToCompass(windDirection.toInt(), context)
+            // Create the wind string
+            val windString = "$wind, $convertedWindSpeed $unitAbbreviation"
+
+            return windString
         }
 
-
+        // Helper function to convert degrees to compass direction
         private fun degToCompass(num: Int, context: Context): String {
             val winDir = Math.floor((num / 22.5) + 0.5).toInt()
             val directions =
@@ -170,34 +152,20 @@ class WeatherUtils {
             }
         }
 
-        fun SelectionWindSignature(selection:Int): String {
-            val selectedSignature: String = when (selection) {
-                0 -> "km/h"
-                1 -> "m/s"
-                2 -> "knots"
-                3 -> "ft/s"
-                else -> "Unknown" // Handle unexpected values
-            }
+        @Composable
+        fun selectionWindSignature(selection:Int): String {
+            val context= LocalContext.current
+            var windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
+            // Get the chosen unit
+            val selectedSignature = windSpeedUnitsToSelect[selection]
             return selectedSignature
         }
 
-        fun SelectionPressureSignature(selection:Int): String {
-            val selectedSignature: String = when (selection) {
-                0 -> "mm Hg"
-                1 ->  "inches Hg"
-                2 -> "hPa"
-                3 -> "mbar"
-                else -> "Unknown" // Handle unexpected values
-            }
-            return selectedSignature
-        }
-
-        fun SelectionPrecipeSignature(selection:Int): String {
-            val selectedSignature: String = when (selection) {
-                0 -> "mm."
-                1 ->  "inches"
-                else -> "Unknown" // Handle unexpected values
-            }
+        @Composable
+        fun selectionPressureSignature(selection:Int): String {
+            val context= LocalContext.current
+            var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
+            val selectedSignature=pressureUnitsToSelect[selection]
             return selectedSignature
         }
 
