@@ -25,8 +25,6 @@ class ForecastDetailFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                // Update the toolbar title
-                (activity as MainActivity).updateToolbarTitle("${WeatherUtils.updateDateToToday(args.daily.dt)}")
                 val daily = args.daily
                 val navController = findNavController()
 
