@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
-import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import java.text.SimpleDateFormat
 import java.util.Locale
 

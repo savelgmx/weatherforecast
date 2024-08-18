@@ -4,11 +4,8 @@ package com.example.weatherforecast
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.example.weatherforecast.ui.viewmodel.SharedViewModel
-import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -16,14 +13,9 @@ class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
 
-    private lateinit var sharedViewModel: SharedViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //initialize sharedViewModel singleton object,which tracks preferences changes
-        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        SharedViewModelHolder.initialize(sharedViewModel)
 
         // Set up NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -58,4 +50,4 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
- }
+}
