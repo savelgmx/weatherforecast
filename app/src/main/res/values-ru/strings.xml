@@ -59,6 +59,7 @@
     <string name="inchesHg">\дюймы рт.ст.\</string>
     <string name="hPa">\гПа\</string>
     <string name="mbar">\мбар\</string>
+    <string name="daily_weather_forecast">Daily weather forecast</string>
 
 
 </resources>

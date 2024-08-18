@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.weatherforecast.MainActivity
 import com.example.weatherforecast.components.DailyWeatherForecast
@@ -27,7 +28,9 @@ class ForecastDetailFragment : Fragment() {
                 // Update the toolbar title
                 (activity as MainActivity).updateToolbarTitle("${WeatherUtils.updateDateToToday(args.daily.dt)}")
                 val daily = args.daily
-                DailyWeatherForecast(daily)
+                val navController = findNavController()
+
+                DailyWeatherForecast(navController = navController, daily = daily)
             }
         }
     }

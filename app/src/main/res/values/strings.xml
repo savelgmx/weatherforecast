@@ -57,7 +57,7 @@
     <string name="inchesHg">\inches Hg\</string>
     <string name="hPa">\hPa\</string>
     <string name="mbar">\mbar\</string>
-
+    <string name="daily_weather_forecast">Daily weather forecast</string>
 
 
     <string-array name="temperature_units">
