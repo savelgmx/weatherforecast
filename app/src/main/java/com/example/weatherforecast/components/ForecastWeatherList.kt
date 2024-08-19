@@ -19,10 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.weatherforecast.response.Daily
@@ -35,7 +35,7 @@ import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
-import androidx.compose.ui.platform.LocalContext
+
 @Composable
 fun ForecastWeatherList(
     forecastState: Resource<ForecastResponse>,

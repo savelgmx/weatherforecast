@@ -8,9 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.weatherforecast.MainActivity
 import com.example.weatherforecast.components.DailyWeatherForecast
-import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

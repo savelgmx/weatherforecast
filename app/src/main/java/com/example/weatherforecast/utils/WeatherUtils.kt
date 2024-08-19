@@ -45,14 +45,12 @@ class WeatherUtils {
             val convertedPressure = when (selectedPressureOption) {
                 0 -> pressureValue * 0.7500615613 // Conversion from mBar to mm Hg
                 1 -> pressureValue * 0.029529983071445 // Conversion from mBar to inches Hg
-                2 -> pressureValue.toDouble() // 1 mBar is equivalent to 1 hPa
-                3 -> pressureValue.toDouble() // mBar is already the default unit
+                2 -> pressureValue // 1 mBar is equivalent to 1 hPa
+                3 -> pressureValue // mBar is already the default unit
                 else -> return "Invalid unit"
             }
-
             // Format the pressure value
-            val formattedPressure = "%.2f".format(convertedPressure)
-
+            val formattedPressure = convertedPressure.toInt()
             // Return the result with unit
             return " $formattedPressure $chosenUnit"
         }

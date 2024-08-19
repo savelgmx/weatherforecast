@@ -23,14 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.launch
 
 @Composable
-fun DrawerContent(navController: NavController) {
+fun DrawerContent() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = false)

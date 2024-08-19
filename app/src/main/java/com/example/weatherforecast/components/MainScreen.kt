@@ -9,15 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -51,10 +49,6 @@ fun MainScreen(
 
     val date = currentState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
     val cityName = currentState.data?.name
-
-    // Update the toolbar title
-    //  (activity as MainActivity).updateToolbarTitle("$date $cityName")
-//                       findNavController().navigate(R.id.action_settingsFragment_to_distanceUnitsFragment)
     Scaffold(
         scaffoldState=scaffoldState,
         topBar = {
@@ -73,7 +67,7 @@ fun MainScreen(
             )
         },
         drawerContent = {
-            DrawerContent(navController)
+            DrawerContent()
         }    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -83,7 +77,7 @@ fun MainScreen(
         ) {
             item {
                 currentState.data?.let { weatherState ->
-                   CurrentWeatherCard(weatherState = currentState)
+                    CurrentWeatherCard(weatherState = currentState)
                 }
             }
             item {
@@ -92,9 +86,9 @@ fun MainScreen(
                     .fillMaxWidth())
             }
             item {
-                        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                            text = context.resources.getString(R.string.weather_24_hour),
+                    text = context.resources.getString(R.string.weather_24_hour),
                     fontWeight = FontWeight.Bold,
                     style = QuickSandTypography.subtitle1,
                     color = Color.White,
@@ -102,14 +96,14 @@ fun MainScreen(
                 )
             }
             item {
-                        forecastState?.data?.hourly?.let { hourlyWeatherList ->
-                            HourlyWeatherRow(hourlyWeatherList)
+                forecastState?.data?.hourly?.let { hourlyWeatherList ->
+                    HourlyWeatherRow(hourlyWeatherList)
                 }
             }
             item {
-                        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                            text = context.resources.getString(R.string.weather_7_days),
+                    text = context.resources.getString(R.string.weather_7_days),
                     fontWeight = FontWeight.Bold,
                     style = QuickSandTypography.subtitle1,
                     color = Color.White, modifier = Modifier.padding(start = 20.dp)
