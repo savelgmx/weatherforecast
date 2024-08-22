@@ -32,6 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.green
+import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue800
+import com.example.weatherforecast.theme.QuickSandTypography
 
 @Composable
 fun WeatherScreen() {
@@ -64,101 +68,49 @@ fun WeatherScreen() {
 }
 
 @Composable
-fun WindSpeedCard(speed: Int, windDegree: Int) {
-    Surface(
-        modifier = Modifier
-            .width(160.dp)
-            .height(160.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        elevation = 4.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Скорость ветра", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            WindDirectionShape(windDegree = windDegree)
-            Text("$speed км/ч", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-            Text("Юго-восточный", fontSize = 14.sp)
-        }
-    }
-}
-
-@Composable
-fun WindDirectionShape(windDegree: Int) {
-    Canvas(modifier = Modifier.size(64.dp)) {
-        // Draw compass circle
-        drawCircle(
-            color = Color.Black,
-            radius = size.minDimension*0.6f,
-            style = Stroke(width = 4f)
-        )
-
-        // Draw N, E, S, W labels
-        drawContext.canvas.nativeCanvas.apply {
-            drawText("N", size.width / 2, 30f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=36f})
-            drawText("E", size.width - 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT;textSize=36f })
-            drawText("S", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=36f })
-            drawText("W", 20f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT;textSize=36f })
-        }
-
-        // Draw wind direction arrow
-        val arrowPath = Path().apply {
-            moveTo(size.width / 2, size.height / 4)
-            lineTo(size.width / 2 + 10, size.height / 2)
-            lineTo(size.width / 2, size.height * 3 / 4)
-            lineTo(size.width / 2 - 10, size.height / 2)
-            close()
-        }
-
-        rotate(degrees = windDegree.toFloat(), pivot = Offset(size.width / 2, size.height / 2)) {
-        drawPath(
-            path = arrowPath,
-            color = Color.Blue,
-            style = Stroke(width = 1f)
-        )
-            drawPath(
-                path = arrowPath,
-                color = Color.Red,
-                alpha = 0.5f
-            )
-        }
-    }
-}
-
-@Composable
 fun HumidityCard(humidity: Int, dewPoint: Int) {
     Surface(
         modifier = Modifier
             .width(160.dp)
             .height(160.dp),
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        elevation = 4.dp
+        color = (Blue800),
+        elevation = 8.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Влажность", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text("Влажность",
+                fontWeight = FontWeight.Medium,
+                color = Color.White,
+                style= QuickSandTypography.subtitle1
+            )
             HumidityShape(humidity)
-            Text("$humidity%", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-            Text("Точка росы $dewPoint°", fontSize = 14.sp)
+            Text("$humidity%",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                style = QuickSandTypography.body2,
+                color = Color.White)
+            Text("Точка росы $dewPoint°",
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                style = QuickSandTypography.body2
+            )
         }
     }
 }
 
 @Composable
 fun HumidityShape(humidity: Int) {
-    Canvas(modifier = Modifier.size(64.dp)) {
+    Canvas(modifier = Modifier.size(64.dp).padding(all = 2.dp)
+    ) {
         val height = size.height * humidity / 100f
         drawRoundRect(
             color = Color.Yellow,
-            topLeft = Offset(0f, size.height - height),
+            topLeft = Offset(8f, size.height - height),
             size = Size(size.width, height),
-            cornerRadius = CornerRadius(8f)
+            cornerRadius = CornerRadius(20f)
         )
     }
 }
@@ -305,7 +257,7 @@ fun SunriseSunsetShape() {
         val sunsetOffset = width * 0.8f
 
         drawCircle(
-            color = Color.Yellow,
+            color = Color.Black,
             radius = sunSize / 2,
             center = Offset(sunriseOffset, sunY - sunSize)
         )

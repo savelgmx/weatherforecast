@@ -67,13 +67,14 @@ class WeatherUtils {
             // Get the selected unit abbreviation
             val unitAbbreviation = windSpeedUnitsToSelect[selectedWindOptions]
             // Convert the wind speed to the selected unit using integer calculations
-            val convertedWindSpeed = when (selectedWindOptions) {
+/*            val convertedWindSpeed = when (selectedWindOptions) {
                 0 -> (windSpeed * 18) / 5 // Conversion from m/s to km/h
                 1 -> windSpeed // m/s is the default unit
                 2 -> (windSpeed * 194384) / 100000 // Conversion from m/s to knots
                 3 -> (windSpeed * 328084) / 100000 // Conversion from m/s to ft/s
                 else -> return "Invalid unit"
-            }
+            }*/
+            val convertedWindSpeed=convertWindSpeed(windSpeed,selectedWindOptions)
             // Convert the wind direction to a compass direction
             val wind = degToCompass(windDirection.toInt(), context)
             // Create the wind string
@@ -81,6 +82,19 @@ class WeatherUtils {
 
             return windString
         }
+
+        fun convertWindSpeed(windSpeed:Int,selectedWindOptions:Int):String {
+            // Convert the wind speed to the selected unit using integer calculations
+            val convertedWindSpeed = when (selectedWindOptions) {
+                0 -> (windSpeed * 18) / 5 // Conversion from m/s to km/h
+                1 -> windSpeed // m/s is the default unit
+                2 -> (windSpeed * 194384) / 100000 // Conversion from m/s to knots
+                3 -> (windSpeed * 328084) / 100000 // Conversion from m/s to ft/s
+                else -> {}
+            }
+            return convertedWindSpeed.toString()
+        }
+
 
         // Helper function to convert degrees to compass direction
         private fun degToCompass(num: Int, context: Context): String {
@@ -167,4 +181,5 @@ class WeatherUtils {
         }
 
     }
+
 }

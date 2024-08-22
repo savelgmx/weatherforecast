@@ -3,6 +3,9 @@ package com.example.weatherforecast.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -49,6 +53,11 @@ fun MainScreen(
 
     val date = currentState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
     val cityName = currentState.data?.name
+    val humidity= currentState.data?.main?.humidity
+    val dewPoint = forecastState.data?.current?.dewPoint
+    val windSpeed = currentState.data?.wind?.speed?.toInt()
+    val windDegree= currentState.data?.wind?.deg?.toInt()
+
     Scaffold(
         scaffoldState=scaffoldState,
         topBar = {
@@ -114,6 +123,42 @@ fun MainScreen(
                     forecastState = forecastState,
                     navController = navController
                 )
+            }
+
+            item{
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Погода на сегодня",
+                    fontWeight = FontWeight.Bold,
+                    style = QuickSandTypography.subtitle1,
+                    color = Color.White, modifier = Modifier.padding(start = 20.dp)
+                )
+            }
+
+            item{
+
+
+                Column (
+                    Modifier.padding(start=20.dp, end = 20.dp )
+                ){
+
+                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
+                    {
+                        if (humidity != null) {
+                            if (dewPoint != null) {
+                                HumidityCard(humidity =humidity, dewPoint =dewPoint.toInt() )
+                            }
+                        }
+                        if (windSpeed != null) {
+                            if (windDegree != null) {
+                                WindSpeedCard(speed = windSpeed, windDegree =windDegree )
+                            }
+                        }
+
+                    }
+                }
+
             }
         }
     }
