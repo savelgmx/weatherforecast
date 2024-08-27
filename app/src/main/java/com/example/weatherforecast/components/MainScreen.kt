@@ -56,7 +56,9 @@ fun MainScreen(
     val humidity= currentState.data?.main?.humidity
     val dewPoint = forecastState.data?.current?.dewPoint
     val windSpeed = currentState.data?.wind?.speed?.toInt()
-    val windDegree= currentState.data?.wind?.deg?.toInt()
+    val windDegree= currentState.data?.wind?.deg
+    val timeOfSunrise = forecastState.data?.current?.sunrise.let { WeatherUtils.updateTime(it) }
+    val timeOfSunset = forecastState.data?.current?.sunset.let{WeatherUtils.updateTime(it)}
 
     Scaffold(
         scaffoldState=scaffoldState,
@@ -157,9 +159,24 @@ fun MainScreen(
                         }
 
                     }
+
+
                 }
 
             }
+
+            item{
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween){
+
+                    SunriseSunsetCard(sunrise = timeOfSunrise.toString(), sunset = timeOfSunset.toString(), dawn = timeOfSunrise.toString(), dusk = timeOfSunset.toString())
+                }
+            }
+
+
         }
     }
 }

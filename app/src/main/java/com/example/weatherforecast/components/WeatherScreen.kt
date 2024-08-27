@@ -26,14 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.green
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 
@@ -103,7 +99,9 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
 
 @Composable
 fun HumidityShape(humidity: Int) {
-    Canvas(modifier = Modifier.size(64.dp).padding(all = 2.dp)
+    Canvas(modifier = Modifier
+        .size(64.dp)
+        .padding(all = 2.dp)
     ) {
         val height = size.height * humidity / 100f
         drawRoundRect(
@@ -195,45 +193,56 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
         modifier = Modifier
             .fillMaxWidth()
             .height(160.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
+        shape = RoundedCornerShape(8.dp),
+        color = (Blue800),
         elevation = 4.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(all=16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start
         ) {
-            Text("Восход и закат", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            SunriseSunsetShape()
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Восход", fontSize = 14.sp)
-                    Text(sunrise, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Закат", fontSize = 14.sp)
-                    Text(sunset, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-                }
+            Text(
+                "Восход и закат",
+                fontWeight = FontWeight.Medium,
+                color = Color.White,
+                style = QuickSandTypography.subtitle2
+            )
+            //  Spacer(modifier = Modifier.height(4.dp))
+
+            Row {
+                Text("Восход: ",color =  Color.White, style = QuickSandTypography.h6)
+                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Рассвет", fontSize = 14.sp)
-                    Text(dawn, fontSize = 14.sp)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Закат", fontSize = 14.sp)
-                    Text(dusk, fontSize = 14.sp)
-                }
-            }
+            Spacer(modifier = Modifier.height(40.dp))
+
+        } //Column 1
+
+        Column(
+            modifier = Modifier.padding(all=16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.End
+        ) {
+            SinusoidalShape()
         }
-    }
+
+        Column(
+            modifier = Modifier.padding(all=16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.End
+        ) {
+            Row {
+                Text("Закат: ", color = Color.White)
+                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White)
+
+            }
+            Spacer(modifier = Modifier.height(27.dp))
+
+        }
+
+    }//surface
 }
+
 
 @Composable
 fun SunriseSunsetShape() {
