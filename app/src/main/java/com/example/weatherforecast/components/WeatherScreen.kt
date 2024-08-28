@@ -26,10 +26,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 
@@ -65,6 +67,7 @@ fun WeatherScreen() {
 
 @Composable
 fun HumidityCard(humidity: Int, dewPoint: Int) {
+    val context= LocalContext.current
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -75,9 +78,11 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Влажность",
+            Text(
+                context.getString(R.string.humidity),
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
                 style= QuickSandTypography.subtitle1
@@ -88,7 +93,7 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.body2,
                 color = Color.White)
-            Text("Точка росы $dewPoint°",
+            Text("${context.getString(R.string.dew_point)} $dewPoint°",
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 style = QuickSandTypography.body2
@@ -106,7 +111,7 @@ fun HumidityShape(humidity: Int) {
         val height = size.height * humidity / 100f
         drawRoundRect(
             color = Color.Yellow,
-            topLeft = Offset(8f, size.height - height),
+            topLeft = Offset(2f, size.height - height),
             size = Size(size.width, height),
             cornerRadius = CornerRadius(20f)
         )
@@ -189,6 +194,7 @@ fun PressureShape(pressure: Int) {
 
 @Composable
 fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: String) {
+    val context= LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,7 +209,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                "Восход и закат",
+                context.getString(R.string.sunrise) +" / "+ context.getString(R.string.sunset),
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
                 style = QuickSandTypography.subtitle2
@@ -211,7 +217,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             //  Spacer(modifier = Modifier.height(4.dp))
 
             Row {
-                Text("Восход: ",color =  Color.White, style = QuickSandTypography.h6)
+                Text(context.getString(R.string.sunrise)+": ",color =  Color.White, style = QuickSandTypography.h6)
                 Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
             }
             Spacer(modifier = Modifier.height(40.dp))
@@ -232,7 +238,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             horizontalAlignment = Alignment.End
         ) {
             Row {
-                Text("Закат: ", color = Color.White)
+                Text(context.getString(R.string.sunset)+": ", color = Color.White)
                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White)
 
             }

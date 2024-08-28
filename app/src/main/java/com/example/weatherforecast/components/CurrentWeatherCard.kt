@@ -40,15 +40,19 @@ fun CurrentWeatherCard(
 ){
 
     Box(
-        modifier =(Modifier.background(Blue300,
-            shape = AppShapes.large)
+        modifier = (Modifier.background(
+            Blue300,
+            shape = AppShapes.large
+        )
                 )
             .fillMaxWidth()
             .padding(all = 20.dp)) {
 
         Column(
-            modifier =(Modifier.background(Blue700,
-                shape = AppShapes.large)
+            modifier = (Modifier.background(
+                Blue700,
+                shape = AppShapes.large
+            )
                     )
                 .fillMaxWidth()
                 .padding(all = 2.dp)
@@ -57,11 +61,14 @@ fun CurrentWeatherCard(
                 is Resource.Success -> {
                     val localContext =
                         LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-                    val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+                    val switchState    by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+                    val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
 
                     val temperature = weatherState.data?.main?.temp?.let {
                         WeatherUtils.updateTemperature(it.toInt(),switchState)
                     }
+
+
                     val name = weatherState.data?.name
                     val day =
                         weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
@@ -79,7 +86,9 @@ fun CurrentWeatherCard(
                             it.toInt(),
                             localContext
                         )
-                    }
+                    } +": "+ weatherState.data?.wind?.speed.let {
+                        it?.let { it1 -> WeatherUtils.convertWindSpeed(it1.toInt(),windSpeedUnits) }
+                    }   + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),

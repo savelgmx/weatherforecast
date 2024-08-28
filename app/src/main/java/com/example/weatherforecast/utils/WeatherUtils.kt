@@ -78,7 +78,7 @@ class WeatherUtils {
             // Convert the wind direction to a compass direction
             val wind = degToCompass(windDirection.toInt(), context)
             // Create the wind string
-            val windString = "$wind, $convertedWindSpeed $unitAbbreviation"
+            val windString = "$wind" //$convertedWindSpeed, $unitAbbreviation
 
             return windString
         }

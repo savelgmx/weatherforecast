@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.WeatherUtils
@@ -42,11 +43,11 @@ fun WindSpeedCard(speed: Int, windDegree: Int) {
         elevation = 4.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(3.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Скорость ветра",
+            Text(" ${context.getText(R.string.wind_speed)}",
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
                 style= QuickSandTypography.subtitle2

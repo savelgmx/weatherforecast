@@ -131,11 +131,12 @@ fun MainScreen(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Погода на сегодня",
+                    text = context.getString(R.string.daily_weather_forecast),
                     fontWeight = FontWeight.Bold,
                     style = QuickSandTypography.subtitle1,
                     color = Color.White, modifier = Modifier.padding(start = 20.dp)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             item{
@@ -172,11 +173,9 @@ fun MainScreen(
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween){
 
-                    SunriseSunsetCard(sunrise = timeOfSunrise.toString(), sunset = timeOfSunset.toString(), dawn = timeOfSunrise.toString(), dusk = timeOfSunset.toString())
+                    SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
                 }
             }
-
-
         }
     }
 }

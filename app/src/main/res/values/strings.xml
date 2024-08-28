@@ -58,6 +58,8 @@
     <string name="hPa">\hPa\</string>
     <string name="mbar">\mbar\</string>
     <string name="daily_weather_forecast">Daily weather forecast</string>
+    <string name="wind_speed">Wind speed</string>
+    <string name="dew_point">Dew point</string>
 
 
     <string-array name="temperature_units">
