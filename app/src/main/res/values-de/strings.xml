@@ -62,6 +62,10 @@
     <string name="daily_weather_forecast">Wetter für heute</string>
     <string name="wind_speed">Windgeschwindigkeit</string>
     <string name="dew_point">Taupunkt</string>
+    <string name="measure_units_wind">Maßeinheiten für die Windgeschwindigkeit</string>
+    <string name="choose_option">Wählen Sie eine Option aus</string>
+    <string name="close">Schließen</string>
+    <string name="measure_units_pressure">Druckeinheiten messen</string>
 
 
 </resources>

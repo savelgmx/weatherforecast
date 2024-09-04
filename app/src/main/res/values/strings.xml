@@ -60,6 +60,10 @@
     <string name="daily_weather_forecast">Daily weather forecast</string>
     <string name="wind_speed">Wind speed</string>
     <string name="dew_point">Dew point</string>
+    <string name="measure_units_wind">Measure Units of Wind speed</string>
+    <string name="choose_option">Choose an option</string>
+    <string name="close">Close</string>
+    <string name="measure_units_pressure">Measure Units of Pressure</string>
 
 
     <string-array name="temperature_units">

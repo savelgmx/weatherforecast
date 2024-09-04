@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
@@ -42,11 +43,6 @@ fun DrawerContent() {
     var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
     var pressureUnitsPopup by remember { mutableStateOf(false) }
 
-    val selectedPrecipateOption by DataStoreManager.precipatePrefFlow(context).collectAsState(initial = 0)
-    var precipateUnitsToSelect= arrayOf("mm.", "inches")
-    var precipateUnitsPopup by remember { mutableStateOf(false) }
-
-
     Column {
         Row(
             Modifier
@@ -65,12 +61,12 @@ fun DrawerContent() {
         )
         {
             Column {
-                Text(text = "Measure Units of Wind speed")
+                Text(text = context.getString(R.string.measure_units_wind))
                 if (windSpeedUnitsPopup)
                 {
                     AlertDialog(
                         onDismissRequest = { windSpeedUnitsPopup = false },
-                        title = { Text("Choose an option") },
+                        title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {
                                 RadioButtonGroup(
@@ -87,7 +83,7 @@ fun DrawerContent() {
                         },
                         confirmButton = {
                             Button(onClick = { windSpeedUnitsPopup = false }) {
-                                Text("Close")
+                                Text(context.getString(R.string.close),color= Color.White)
                             }
                         }
                     )
@@ -104,12 +100,12 @@ fun DrawerContent() {
         )
         {
             Column{
-                Text(text = "Measure Units of Pressure")
+                Text(context.getString(R.string.measure_units_pressure))
                 if (pressureUnitsPopup)
                 {
                     AlertDialog(
                         onDismissRequest = { pressureUnitsPopup = false },
-                        title = { Text("Choose an option") },
+                        title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {
                                 RadioButtonGroup(
@@ -126,7 +122,7 @@ fun DrawerContent() {
                         },
                         confirmButton = {
                             Button(onClick = { pressureUnitsPopup = false }) {
-                                Text("Close")
+                                Text(context.getString(R.string.close),color= Color.White)
                             }
                         }
                     )
@@ -138,45 +134,6 @@ fun DrawerContent() {
             }
         }
         HorizontalDivider()
-        Row(
-
-            Modifier.padding(all = 8.dp)
-                .clickable(onClick = { precipateUnitsPopup = true }) ,
-
-            ) {
-
-            Text(text = "Measure Units of Precipate")
-
-            if (precipateUnitsPopup)
-            {
-                AlertDialog(
-                    onDismissRequest = { precipateUnitsPopup = false },
-                    title = { Text("Choose an option") },
-                    text = {
-                        Column {
-                            RadioButtonGroup(
-                                selectedOption = selectedPrecipateOption,
-                                optionsToSelect = precipateUnitsToSelect,
-                                onOptionSelected = { option ->
-                                    scope.launch {
-                                        DataStoreManager.updatePrecipatePref(context, option)
-                                        precipateUnitsPopup = false
-                                    }
-                                }
-                            )
-                        }
-                    },
-                    confirmButton = {
-                        Button(onClick = { precipateUnitsPopup = false }) {
-                            Text("Close")
-                        }
-                    }
-                )
-            }
-
-
-        }
-        HorizontalDivider()
 
         Row(modifier = Modifier
             .padding(8.dp)
@@ -185,7 +142,7 @@ fun DrawerContent() {
 
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(3.dp)
                     .align(Alignment.CenterVertically)
             ) {
                 Text("F")
@@ -193,10 +150,11 @@ fun DrawerContent() {
             }
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(3.dp)
                     .align(Alignment.CenterVertically)
             ) {
                 Switch(
+                    modifier = Modifier.padding(all = 3.dp).height(5.dp),
                     checked = switchState,
                     onCheckedChange = { isChecked ->
                         scope.launch {
@@ -208,8 +166,9 @@ fun DrawerContent() {
             }
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(3.dp)
                     .align(Alignment.CenterVertically)
+
             ) {
                 Text("C")
 

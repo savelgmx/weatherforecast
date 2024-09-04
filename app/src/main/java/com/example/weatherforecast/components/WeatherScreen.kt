@@ -77,7 +77,7 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
         elevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(3.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -93,7 +93,7 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.body2,
                 color = Color.White)
-            Text("${context.getString(R.string.dew_point)} $dewPoint°",
+            Text("${context.getString(R.string.dew_point)} $dewPoint °",
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 style = QuickSandTypography.body2
