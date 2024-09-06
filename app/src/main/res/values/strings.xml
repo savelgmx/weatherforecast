@@ -64,6 +64,7 @@
     <string name="choose_option">Choose an option</string>
     <string name="close">Close</string>
     <string name="measure_units_pressure">Measure Units of Pressure</string>
+    <string name="uv_index">UV index</string>
 
 
     <string-array name="temperature_units">

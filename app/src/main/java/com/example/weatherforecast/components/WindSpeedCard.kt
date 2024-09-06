@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -85,9 +86,9 @@ fun WindDirectionShape(windDegree: Int) {
         // Draw N, E, S, W labels
         drawContext.canvas.nativeCanvas.apply {
             drawText("N", size.width / 2, 15f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=26f;(Color.White)})
-            drawText("E", size.width - 2f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT;textSize=26f })
-            drawText("S", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=26f })
-            drawText("W", 10f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT;textSize=26f })
+            drawText("E", size.width - 2f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT;textSize=26f;(Color.White) })
+            drawText("S", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=26f;(Color.White) })
+            drawText("W", 10f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT;textSize=26f;(Color.White) })
         }
 
         // Draw wind direction arrow
@@ -108,7 +109,8 @@ fun WindDirectionShape(windDegree: Int) {
             drawPath(
                 path = arrowPath,
                 color = Color.Red,
-                alpha = 0.5f
+                alpha = 1.0f,
+                blendMode = BlendMode.Color
             )
         }
     }

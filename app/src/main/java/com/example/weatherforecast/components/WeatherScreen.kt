@@ -13,15 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
 fun WeatherScreen() {
@@ -68,6 +71,8 @@ fun WeatherScreen() {
 @Composable
 fun HumidityCard(humidity: Int, dewPoint: Int) {
     val context= LocalContext.current
+    val switchState    by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = false)
+    val dewPointValue= WeatherUtils.updateTemperature(dewPoint,switchState)
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -93,7 +98,7 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.body2,
                 color = Color.White)
-            Text("${context.getString(R.string.dew_point)} $dewPoint °",
+            Text("${context.getString(R.string.dew_point)} $dewPointValue",
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 style = QuickSandTypography.body2
@@ -110,10 +115,12 @@ fun HumidityShape(humidity: Int) {
     ) {
         val height = size.height * humidity / 100f
         drawRoundRect(
-            color = Color.Yellow,
+            brush = Brush.horizontalGradient(
+                colors = listOf(Color(0xFFFFFB07), Color(0xFFFF9800))
+            ),
             topLeft = Offset(2f, size.height - height),
             size = Size(size.width, height),
-            cornerRadius = CornerRadius(20f)
+            cornerRadius = CornerRadius(40f)
         )
     }
 }
@@ -125,17 +132,17 @@ fun UVIndexCard(index: Int) {
             .width(160.dp)
             .height(160.dp),
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        elevation = 4.dp
+        color = (Blue800),
+        elevation = 8.dp,
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("УФ-индекс", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(LocalContext.current.getString(R.string.uv_index), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             UVIndexShape(index)
-            Text("$index", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-            Text("Умеренный", fontSize = 14.sp)
+            Text("$index", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+          //  Text("Умеренный", fontSize = 14.sp)
         }
     }
 }
@@ -143,51 +150,54 @@ fun UVIndexCard(index: Int) {
 @Composable
 fun UVIndexShape(index: Int) {
     Canvas(modifier = Modifier.size(64.dp)) {
-        val sweepAngle = index * 30f
+        val sweepAngle = index * 20f
         drawArc(
             color = Color.Yellow,
-            startAngle = 0f,
+            startAngle = 10f,
             sweepAngle = sweepAngle,
-            useCenter = false,
-            style = Stroke(width = 8f, cap = StrokeCap.Round)
+            useCenter = true,
+            style = Stroke(width = 8f, cap = StrokeCap.Square)
         )
     }
 }
 
 @Composable
 fun PressureCard(pressure: Int) {
+    val context= LocalContext.current
+    val pressurevalue= WeatherUtils.updatePressure(pressureValue = pressure)
+
     Surface(
         modifier = Modifier
             .width(160.dp)
             .height(160.dp),
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        elevation = 4.dp
+        color = (Blue800),
+        elevation = 8.dp,
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Давление", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(context.getString(R.string.pressure), fontSize = 16.sp, fontWeight = FontWeight.Medium,color=Color.White)
             PressureShape(pressure)
-            Text("$pressure мбар", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.primary)
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Низкое", fontSize = 12.sp)
-                Text("Высокое", fontSize = 12.sp)
-            }
+            Text("$pressurevalue", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
 
 @Composable
 fun PressureShape(pressure: Int) {
-    Canvas(modifier = Modifier.size(64.dp)) {
+    Canvas(modifier = Modifier
+        .size(64.dp)
+        .padding(all = 2.dp)) {
         val position = (pressure - 900) / 200f * size.width
-        drawLine(
-            color = Color.Blue,
-            start = Offset(position, 0f),
-            end = Offset(position, size.height),
-            strokeWidth = 4f
+        drawRoundRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFFFFFB07), Color(0xFFFF9800))
+            ),
+            topLeft = Offset(2f, size.height -position),
+            size = Size(size.width, position),
+            cornerRadius = CornerRadius(60f)
         )
     }
 }

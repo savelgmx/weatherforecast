@@ -66,6 +66,7 @@
     <string name="choose_option">Выберите вариант</string>
     <string name="close">Закрыть</string>
     <string name="measure_units_pressure">Единицы измерения давления</string>
+    <string name="uv_index">UV index</string>
 
 
 </resources>

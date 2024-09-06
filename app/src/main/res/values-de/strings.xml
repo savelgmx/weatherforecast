@@ -66,6 +66,7 @@
     <string name="choose_option">Wählen Sie eine Option aus</string>
     <string name="close">Schließen</string>
     <string name="measure_units_pressure">Druckeinheiten messen</string>
+    <string name="uv_index">UV index</string>
 
 
 </resources>
