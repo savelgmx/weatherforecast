@@ -66,7 +66,12 @@
     <string name="choose_option">Выберите вариант</string>
     <string name="close">Закрыть</string>
     <string name="measure_units_pressure">Единицы измерения давления</string>
-    <string name="uv_index">UV index</string>
+    <string name="uv_index">UV индекс</string>
+    <string name="low">Низкий</string>
+    <string name="average">Средний</string>
+    <string name="high">Высокий</string>
+    <string name="very_high">Очень высокий</string>
+    <string name="extreme">Экстремальный</string>
 
 
 </resources>

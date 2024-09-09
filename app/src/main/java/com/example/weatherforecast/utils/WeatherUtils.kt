@@ -180,6 +180,22 @@ class WeatherUtils {
             return selectedSignature
         }
 
+        fun updateUVLevel(context: Context,uvLevel:Int):String{
+
+            val UVDescriptions= context.resources.getStringArray(R.array.uv_index_values)
+            // Check for a valid index
+            if (uvLevel < 0 ) { return "Invalid unit index"}
+            //now choose right uv value from array
+            return when{
+                uvLevel <=2             -> UVDescriptions[0] // low 2 or less
+                uvLevel in(3..5)  -> UVDescriptions[1]//average 3-5
+                uvLevel in(6..7)  -> UVDescriptions[2]//high 6-7
+                uvLevel in(8..10) -> UVDescriptions[3]//very high 8-10
+                uvLevel >=11            -> UVDescriptions[4]//extreme 11 and higher
+                else -> {context.resources.getString(R.string.wrong_value)}
+            }
+        }
+
     }
 
 }

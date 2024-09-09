@@ -59,6 +59,8 @@ fun MainScreen(
     val windDegree= currentState.data?.wind?.deg
     val timeOfSunrise = forecastState.data?.current?.sunrise.let { WeatherUtils.updateTime(it) }
     val timeOfSunset = forecastState.data?.current?.sunset.let{WeatherUtils.updateTime(it)}
+    val uvIndex = forecastState.data?.current?.uvi
+    val pressureValue = currentState.data?.main?.pressure
 
     Scaffold(
         scaffoldState=scaffoldState,
@@ -140,13 +142,13 @@ fun MainScreen(
             }
 
             item{
-
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Column (
                     Modifier.padding(start=20.dp, end = 20.dp )
                 ){
 
-                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
+                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly)
                     {
                         if (humidity != null) {
                             if (dewPoint != null) {
@@ -163,9 +165,26 @@ fun MainScreen(
 
 
                 }
+                Spacer(modifier = Modifier.height(8.dp))
 
             }
 
+
+            item {
+                Column(
+                    Modifier.padding(start = 20.dp, end = 20.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly)
+                    {
+                        if (uvIndex != null) {
+                            UVIndexCard(index = uvIndex.toInt())
+                        }
+                        if (pressureValue != null) {
+                            PressureCard(pressure =pressureValue )
+                        }
+                    }
+                }
+            }//uv pressure item
             item{
 
                 Spacer(modifier = Modifier.height(16.dp))

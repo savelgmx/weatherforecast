@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.theme.White1
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
@@ -58,7 +59,7 @@ fun WeatherScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            UVIndexCard(index = 5)
+            UVIndexCard(index = 1)
             PressureCard(pressure = 1010)
         }
 
@@ -136,13 +137,14 @@ fun UVIndexCard(index: Int) {
         elevation = 8.dp,
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(LocalContext.current.getString(R.string.uv_index), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             UVIndexShape(index)
-            Text("$index", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
-          //  Text("Умеренный", fontSize = 14.sp)
+            Text("$index", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.body2)
+            Text(WeatherUtils.updateUVLevel(LocalContext.current,index), color = Color.White, style = QuickSandTypography.h5)
         }
     }
 }
@@ -150,10 +152,10 @@ fun UVIndexCard(index: Int) {
 @Composable
 fun UVIndexShape(index: Int) {
     Canvas(modifier = Modifier.size(64.dp)) {
-        val sweepAngle = index * 20f
+        val sweepAngle = index * 45f
         drawArc(
             color = Color.Yellow,
-            startAngle = 10f,
+            startAngle = 0f,
             sweepAngle = sweepAngle,
             useCenter = true,
             style = Stroke(width = 8f, cap = StrokeCap.Square)

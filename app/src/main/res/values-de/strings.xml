@@ -66,7 +66,14 @@
     <string name="choose_option">Wählen Sie eine Option aus</string>
     <string name="close">Schließen</string>
     <string name="measure_units_pressure">Druckeinheiten messen</string>
+
     <string name="uv_index">UV index</string>
+
+    <string name="low">Niedrig</string>
+    <string name="average">Mittelmäßig</string>
+    <string name="high">Hoch</string>
+    <string name="very_high">Sehr hoch</string>
+    <string name="extreme">Extrem</string>
 
 
 </resources>
