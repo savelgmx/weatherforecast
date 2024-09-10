@@ -77,7 +77,7 @@ fun CurrentWeatherCard(
                             WeatherUtils.updatePressure(it)
                         }
                     val feels_like =
-                        localContext.getString(R.string.feels_like) + ":" + weatherState.data?.main?.feels_like?.let {
+                        localContext.getString(R.string.feels_like) + ": " + weatherState.data?.main?.feels_like?.let {
                             WeatherUtils.updateTemperature(it.toInt(), switchState)
                         }
                     val wind = weatherState.data?.wind?.speed?.let {
@@ -96,11 +96,13 @@ fun CurrentWeatherCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
+/*
                         Text(
                             text = name!!, color = Color.White,
                             style = QuickSandTypography.h5,
                             modifier = Modifier.padding(start = 1.dp)
                         )
+*/
 
                         Text(
                             text = day!!, color = Color.White,
@@ -109,64 +111,91 @@ fun CurrentWeatherCard(
                         )
                     }
 
-                    // Row 2: Temperature with Weather Icon
 
-                    val icon = weatherState.data?.weather?.get(0)?.icon
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = " $temperature",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            style = QuickSandTypography.h3,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                    )
+                    {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement =Arrangement.Top
+                        ) {
+                            Text(
+                                text = " $temperature",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                style = QuickSandTypography.h1,
+                                modifier = Modifier.padding(start = 3.dp)
+                            )
 
-                        AsyncImage(
-                            model = "${UIUtils.iconurl}$icon.png",
-                            contentDescription = "Weather icon",
-                            modifier = Modifier
-                                .size(40.dp) // Define your desired width and height
-                                .padding(all = 1.dp)
-                        )
+                        } //column#1 inside temperature
 
-                        Text(
-                            text = " $feels_like",
-                            color = Color.White,
-                            style = QuickSandTypography.h5,
-                            modifier = Modifier.padding(1.dp)
-                        )
-                    }
+                        Column {
+                            val icon = weatherState.data?.weather?.get(0)?.icon
+                            AsyncImage(
+                                model = "${UIUtils.iconurl}$icon.png",
+                                contentDescription = "Weather icon",
+                                modifier = Modifier
+                                    .size(70.dp) // Define your desired width and height
+                                    .padding(all = 1.dp)
+                            )
+
+                        } //column#2 weather icon
 
 
+                        Column {
 
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "$wind",
-                            color = Color.White,
-                            style = QuickSandTypography.h6,
-                            modifier = Modifier.padding(1.dp)
-                        )
+                            // Row 2: Temperature with Weather Icon
 
-                    }
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = " $pressure",
-                            color = Color.White,
-                            style = QuickSandTypography.h6,
-                            modifier = Modifier.padding(1.dp)
-                        )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+
+                                Text(
+                                    text = "$feels_like",
+                                    color = Color.White,
+                                    style = QuickSandTypography.h5,
+                                    modifier = Modifier.padding(1.dp)
+                                )
+                            }
+
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "$wind",
+                                    color = Color.White,
+                                    style = QuickSandTypography.h6,
+                                    modifier = Modifier.padding(1.dp)
+                                )
+
+                            }
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = " $pressure",
+                                    color = Color.White,
+                                    style = QuickSandTypography.h6,
+                                    modifier = Modifier.padding(1.dp)
+                                )
+
+                            }//Column#3
+
+                        }//row
+
+
+
 
                     }
 

@@ -72,6 +72,7 @@
     <string name="high">Высокий</string>
     <string name="very_high">Очень высокий</string>
     <string name="extreme">Экстремальный</string>
+    <string name="measurements_units">Единицы измерения</string>
 
 
 </resources>

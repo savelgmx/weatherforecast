@@ -66,7 +66,7 @@ fun MainScreen(
         scaffoldState=scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text("$date $cityName") },
+                title = { Text("$cityName") },
                 navigationIcon = {
                     IconButton(onClick = {
                         scope.launch {

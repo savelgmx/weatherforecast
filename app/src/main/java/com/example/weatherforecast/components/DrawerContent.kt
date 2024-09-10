@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.launch
 
@@ -47,16 +49,21 @@ fun DrawerContent() {
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(25.dp)
+                .height(35.dp)
                 .background(Blue300)
         ) {
-
+            Text(text=context.getString(R.string.measurements_units),
+                color=Color.White,
+                style = QuickSandTypography.h6,
+                modifier = Modifier.padding(all = 8.dp)
+            )
         }
         HorizontalDivider()
 
         Row(
 
-            Modifier.padding(all = 8.dp)
+            Modifier
+                .padding(all = 8.dp)
                 .clickable(onClick = { windSpeedUnitsPopup = true }) ,
         )
         {
@@ -95,7 +102,8 @@ fun DrawerContent() {
         HorizontalDivider()
 
         Row(
-            Modifier.padding(all = 8.dp)
+            Modifier
+                .padding(all = 8.dp)
                 .clickable(onClick = { pressureUnitsPopup = true }) ,
         )
         {
@@ -145,6 +153,16 @@ fun DrawerContent() {
                     .padding(3.dp)
                     .align(Alignment.CenterVertically)
             ) {
+                Text("Temperature")
+
+            }
+
+
+            Column(
+                modifier = Modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
                 Text("F")
 
             }
@@ -154,7 +172,9 @@ fun DrawerContent() {
                     .align(Alignment.CenterVertically)
             ) {
                 Switch(
-                    modifier = Modifier.padding(all = 3.dp).height(5.dp),
+                    modifier = Modifier
+                        .padding(all = 3.dp)
+                        .height(5.dp),
                     checked = switchState,
                     onCheckedChange = { isChecked ->
                         scope.launch {

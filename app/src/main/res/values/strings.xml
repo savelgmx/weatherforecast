@@ -70,5 +70,6 @@
     <string name="high">High</string>
     <string name="very_high">Very high</string>
     <string name="extreme">Extreme</string>
+    <string name="measurements_units">Measurements units</string>
 
 </resources>
