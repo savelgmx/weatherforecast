@@ -2,12 +2,20 @@ package com.example.weatherforecast.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -67,6 +75,10 @@ fun DrawerContent() {
                 .clickable(onClick = { windSpeedUnitsPopup = true }) ,
         )
         {
+            Column( verticalArrangement = Arrangement.Center) {
+                Icon(Icons.Outlined.Refresh, contentDescription = "wind speed Icon")
+            }
+
             Column {
                 Text(text = context.getString(R.string.measure_units_wind))
                 if (windSpeedUnitsPopup)
@@ -107,6 +119,10 @@ fun DrawerContent() {
                 .clickable(onClick = { pressureUnitsPopup = true }) ,
         )
         {
+            Column( verticalArrangement = Arrangement.Center) {
+                Icon(Icons.Outlined.Star, contentDescription = "pressure Icon")
+            }
+
             Column{
                 Text(context.getString(R.string.measure_units_pressure))
                 if (pressureUnitsPopup)
@@ -148,6 +164,10 @@ fun DrawerContent() {
 
         ) {
 
+            Column( verticalArrangement = Arrangement.Center) {
+                Icon(Icons.Outlined.Face, contentDescription = "temperature Icon")
+            }
+
             Column(
                 modifier = Modifier
                     .padding(3.dp)
@@ -156,7 +176,6 @@ fun DrawerContent() {
                 Text("Temperature")
 
             }
-
 
             Column(
                 modifier = Modifier
