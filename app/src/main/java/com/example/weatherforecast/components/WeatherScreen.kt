@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.theme.White1
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
@@ -65,7 +64,10 @@ fun WeatherScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SunriseSunsetCard(sunrise = "04:04", sunset = "21:39", dawn = "03:02", dusk = "22:41")
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            MoonriseMoonsetCard(moonrise = "Moonrise: 17:00", moonset = "Moonset: 7:02", moonPhase = 0.43)
+            SunriseSunsetCard(sunrise = "04:04", sunset = "21:39", dawn = "03:02", dusk = "22:41")
+        }
     }
 }
 
@@ -209,16 +211,16 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
     val context= LocalContext.current
     Surface(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(160.dp)
             .height(160.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = (Blue800),
-        elevation = 4.dp
+        elevation = 8.dp
     ) {
         Column(
             modifier = Modifier.padding(all=16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 context.getString(R.string.sunrise) +" / "+ context.getString(R.string.sunset),
@@ -229,77 +231,67 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             //  Spacer(modifier = Modifier.height(4.dp))
 
             Row {
+
+
                 Text(context.getString(R.string.sunrise)+": ",color =  Color.White, style = QuickSandTypography.h6)
                 Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
             }
-            Spacer(modifier = Modifier.height(40.dp))
 
-        } //Column 1
-
-        Column(
-            modifier = Modifier.padding(all=16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.End
-        ) {
-            SinusoidalShape()
-        }
-
-        Column(
-            modifier = Modifier.padding(all=16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.End
-        ) {
             Row {
                 Text(context.getString(R.string.sunset)+": ", color = Color.White)
                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White)
 
             }
-            Spacer(modifier = Modifier.height(27.dp))
 
-        }
+
+        } //Column 1
+
 
     }//surface
 }
 
-
 @Composable
-fun SunriseSunsetShape() {
-    Canvas(modifier = Modifier
-        .fillMaxWidth()
-        .height(64.dp)
-    ) {
-        val sunSize = 16.dp.toPx()
-        val width = size.width
-        val height = size.height
-        val sunY = height / 2
+fun MoonriseMoonsetCard(
+    moonrise:String,
+    moonset:String,
+    moonPhase:Double
+){
+    val localContext= LocalContext.current
+    Surface(
+        modifier = Modifier
+            .width(160.dp)
+            .height(160.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = (Blue800),
+        elevation = 8.dp)
 
-        drawLine(
-            color = Color.Gray,
-            start = Offset(0f, sunY),
-            end = Offset(width, sunY),
-            strokeWidth = 2f
-        )
+    {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceAround, horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            androidx.compose.material3.Text(
+                text = moonrise,
+                color = Color.White,
+                style = QuickSandTypography.subtitle2,
+                modifier = Modifier.padding(all = 3.dp)
+            )
+            androidx.compose.material3.Text(
+                text = moonset,
+                color = Color.White,
+                style = QuickSandTypography.subtitle2,
+                modifier = Modifier.padding(all = 3.dp)
+            )
+            androidx.compose.material3.Text(
+                text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),
+                color = Color.White,
+                style = QuickSandTypography.subtitle2,
+                modifier = Modifier.padding(all = 3.dp)
+            )
 
-        val sunriseOffset = width * 0.2f
-        val sunsetOffset = width * 0.8f
-
-        drawCircle(
-            color = Color.Black,
-            radius = sunSize / 2,
-            center = Offset(sunriseOffset, sunY - sunSize)
-        )
-        drawCircle(
-            color = Color.Yellow,
-            radius = sunSize / 2,
-            center = Offset(sunsetOffset, sunY - sunSize)
-        )
-
-        val path = Path().apply {
-            moveTo(sunriseOffset, sunY)
-            quadraticBezierTo(width / 2, sunY - sunSize * 2, sunsetOffset, sunY)
         }
-        drawPath(path, color = Color.Yellow, style = Stroke(width = 4f))
     }
+
 }
 
 @Preview(showBackground = true)

@@ -62,10 +62,10 @@
     <string name="daily_weather_forecast">Погода на сегодня</string>
     <string name="wind_speed">Скорость ветра</string>
     <string name="dew_point">Точка росы</string>
-    <string name="measure_units_wind">Единицы измерения скорости ветра</string>
+    <string name="measure_units_wind">Скорость ветра</string>
     <string name="choose_option">Выберите вариант</string>
     <string name="close">Закрыть</string>
-    <string name="measure_units_pressure">Единицы измерения давления</string>
+    <string name="measure_units_pressure">Давления</string>
     <string name="uv_index">UV индекс</string>
     <string name="low">Низкий</string>
     <string name="average">Средний</string>

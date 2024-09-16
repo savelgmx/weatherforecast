@@ -62,6 +62,10 @@ fun MainScreen(
     val uvIndex = forecastState.data?.current?.uvi
     val pressureValue = currentState.data?.main?.pressure
 
+    val moonPhase = forecastState.data?.daily?.get(0)?.moonPhase
+    val moonRise = forecastState.data?.daily?.get(0)?.moonrise.let { WeatherUtils.updateTime(it) }
+    val moonSet = forecastState.data?.daily?.get(0)?.moonset.let { WeatherUtils.updateTime(it) }
+
     Scaffold(
         scaffoldState=scaffoldState,
         topBar = {
@@ -188,12 +192,24 @@ fun MainScreen(
             item{
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween){
 
-                    SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
+                Column(
+                    Modifier.padding(start = 20.dp, end = 20.dp)
+                ) {
+                    Row (modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween){
+
+                        SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
+
+                        if (moonPhase != null) {
+                            MoonriseMoonsetCard(moonrise = moonRise, moonset = moonSet, moonPhase = moonPhase)
+                        }
+
+                    }
+
                 }
+
             }
         }
     }
