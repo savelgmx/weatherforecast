@@ -3,6 +3,7 @@ package com.example.weatherforecast.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,7 +34,9 @@ import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -51,7 +54,6 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val date = currentState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
     val cityName = currentState.data?.name
     val humidity= currentState.data?.main?.humidity
     val dewPoint = forecastState.data?.current?.dewPoint
@@ -142,17 +144,19 @@ fun MainScreen(
                     style = QuickSandTypography.subtitle1,
                     color = Color.White, modifier = Modifier.padding(start = 20.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+         //       Spacer(modifier = Modifier.height(8.dp))
             }
 
             item{
-                Spacer(modifier = Modifier.height(8.dp))
-
+            //    Spacer(modifier = Modifier.height(8.dp))
                 Column (
-                    Modifier.padding(start=20.dp, end = 20.dp )
+                    modifier = ( Modifier.fillMaxSize()
+                        .padding(all=20.dp )
+                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
+                            )
                 ){
 
-                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly)
+                    Row (modifier = Modifier.fillMaxWidth().padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly)
                     {
                         if (humidity != null) {
                             if (dewPoint != null) {
@@ -167,18 +171,21 @@ fun MainScreen(
 
                     }
 
+                }//column
 
-                }
-                Spacer(modifier = Modifier.height(8.dp))
+        //        Spacer(modifier = Modifier.height(8.dp))
 
             }
 
 
             item {
-                Column(
-                    Modifier.padding(start = 20.dp, end = 20.dp)
+                Column (
+                    modifier = ( Modifier.fillMaxSize()
+                        .padding(all = 20.dp)
+                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
+                            )
                 ) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly)
+                    Row(modifier = Modifier.fillMaxWidth().padding(all=8.dp), horizontalArrangement = Arrangement.SpaceEvenly)
                     {
                         if (uvIndex != null) {
                             UVIndexCard(index = uvIndex.toInt())
@@ -188,29 +195,31 @@ fun MainScreen(
                         }
                     }
                 }
-            }//uv pressure item
+            }//end uv pressure item
             item{
 
-                Spacer(modifier = Modifier.height(16.dp))
+        //        Spacer(modifier = Modifier.height(8.dp))
 
-                Column(
-                    Modifier.padding(start = 20.dp, end = 20.dp)
+                Column (
+                    modifier = ( Modifier.fillMaxSize()
+                        .padding(all = 20.dp)
+                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
+                            )
                 ) {
                     Row (modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween){
-
+                        .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly){
                         SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
 
                         if (moonPhase != null) {
-                            MoonriseMoonsetCard(moonrise = moonRise, moonset = moonSet, moonPhase = moonPhase)
+                            MoonriseMoonsetCard(moonrise =moonRise, moonset = moonSet, moonPhase = moonPhase )
                         }
 
                     }
 
                 }
 
-            }
+            }//end sunrise item
         }
     }
 }

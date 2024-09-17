@@ -65,7 +65,7 @@ fun WeatherScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MoonriseMoonsetCard(moonrise = "Moonrise: 17:00", moonset = "Moonset: 7:02", moonPhase = 0.43)
+            MoonriseMoonsetCard(moonrise = "17:00", moonset = "7:02", moonPhase = 0.43)
             SunriseSunsetCard(sunrise = "04:04", sunset = "21:39", dawn = "03:02", dusk = "22:41")
         }
     }
@@ -263,31 +263,61 @@ fun MoonriseMoonsetCard(
             .height(160.dp),
         shape = RoundedCornerShape(16.dp),
         color = (Blue800),
-        elevation = 8.dp)
+        elevation = 4.dp)
 
     {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceAround, horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(3.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            androidx.compose.material3.Text(
-                text = moonrise,
-                color = Color.White,
-                style = QuickSandTypography.subtitle2,
-                modifier = Modifier.padding(all = 3.dp)
-            )
-            androidx.compose.material3.Text(
-                text = moonset,
-                color = Color.White,
-                style = QuickSandTypography.subtitle2,
-                modifier = Modifier.padding(all = 3.dp)
-            )
-            androidx.compose.material3.Text(
-                text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),
-                color = Color.White,
-                style = QuickSandTypography.subtitle2,
-                modifier = Modifier.padding(all = 3.dp)
-            )
+            Row (modifier = Modifier.padding(1.dp)){
+                androidx.compose.material3.Text(
+                    text = localContext.getString(R.string.moonrise),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = QuickSandTypography.h6,
+                    modifier = Modifier.padding(all = 1.dp)
+                )
+            }
+            Row (modifier = Modifier.padding(1.dp)){
+                androidx.compose.material3.Text(
+                    text = moonrise,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = QuickSandTypography.h3,
+                    modifier = Modifier.padding(all = 1.dp)
+                )
+            }
+            Row (modifier = Modifier.padding(1.dp)){
+                androidx.compose.material3.Text(
+                    text = localContext.getString(R.string.moonset),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = QuickSandTypography.h6,
+                    modifier = Modifier.padding(all = 3.dp)
+                )
+            }
+            Row(modifier = Modifier.padding(1.dp)) {
+                androidx.compose.material3.Text(
+                    text = moonset,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = QuickSandTypography.h3,
+                    modifier = Modifier.padding(all = 1.dp)
+                )
+
+            }
+            Row(modifier = Modifier.padding(1.dp)){
+                androidx.compose.material3.Text(
+                    text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),
+                    color = Color.White,
+                    fontWeight = FontWeight.Light,
+                    style = QuickSandTypography.h6,
+                    modifier = Modifier.padding(all = 1.dp)
+                )
+
+            }
 
         }
     }
