@@ -28,6 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.testing.TestNavHostController
+
+
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Daily
@@ -188,7 +191,9 @@ fun DailyWeatherForecast(
 
             }
             Row(
-                modifier = Modifier.padding(all = 1.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(all = 1.dp)
+                    .fillMaxWidth()
             ) {
 
                 Text(
@@ -240,7 +245,9 @@ fun DailyWeatherForecast(
             }
             //sunset sun rise
             Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
@@ -260,11 +267,20 @@ fun DailyWeatherForecast(
         }
     }
 }
+
+@Composable
+fun getMockNavController(): NavController {
+    val context = LocalContext.current
+    return TestNavHostController(context)
+}
+
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp",
     apiLevel = 30, locale = "ru"
 )
+
 @Composable
 fun DailyWeatherPreview(){
     val dailyData = UIUtils.getMockDailyWeather()
-    // DailyWeatherForecast(daily = dailyData)
+    val navController= getMockNavController()
+     DailyWeatherForecast(daily = dailyData, navController = navController)
 }
