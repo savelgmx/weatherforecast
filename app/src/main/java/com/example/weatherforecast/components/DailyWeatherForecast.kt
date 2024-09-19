@@ -75,10 +75,6 @@ fun DailyWeatherForecast(
         topBar = {
             TopAppBar(
                 title = { Text(text = "${WeatherUtils.updateDateToToday(daily.dt)}") },
-
-                /*               backgroundColor = Blue500,
-                contentColor = Color.White,
-*/
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -96,37 +92,17 @@ fun DailyWeatherForecast(
                 .fillMaxSize()
                 .background(Blue500),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-
-            ) {
-                Text(
-                    text = WeatherUtils.updateDateToToday(daily.dt),
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                    style = QuickSandTypography.caption,
-                    modifier = Modifier.padding(all = 16.dp)
-                )
-                Text(
-                    text = WeatherUtils.updateTime(daily.dt),
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                    style = QuickSandTypography.caption,
-                    modifier = Modifier.padding(all = 16.dp)
-                )
-            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically
 
             ) {
                 AsyncImage(
                     model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
                     contentDescription = "Weather icon",
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(150.dp)
                         .padding(all = 3.dp)
                 )
 
