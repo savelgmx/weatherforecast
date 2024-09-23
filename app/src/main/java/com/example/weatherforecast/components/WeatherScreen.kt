@@ -218,7 +218,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
         elevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(all=16.dp),
+            modifier = Modifier.padding(all=8.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -230,16 +230,33 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             )
             //  Spacer(modifier = Modifier.height(4.dp))
 
-            Row {
+            Row    (modifier = Modifier.padding(all=3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)         {
 
+                Text(context.getString(R.string.sunrise)+": ",
+                    color =  Color.White, style = QuickSandTypography.h5)
 
-                Text(context.getString(R.string.sunrise)+": ",color =  Color.White, style = QuickSandTypography.h6)
-                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
             }
 
-            Row {
-                Text(context.getString(R.string.sunset)+": ", color = Color.White)
-                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White)
+            Row (modifier = Modifier.padding(all=3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+
+                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h3)
+            }
+
+            Row(modifier = Modifier.padding(all=3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)  {
+                Text(context.getString(R.string.sunset)+": ", color = Color.White,style = QuickSandTypography.h5)
+
+            }
+
+            Row(modifier = Modifier.padding(all=5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)  {
+                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.h3)
 
             }
 

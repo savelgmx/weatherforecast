@@ -67,14 +67,11 @@ fun DailyWeatherForecast(
 
     val wind = localContext.getString(R.string.wind) + ": " +
             WeatherUtils.updateWind(daily.windDeg.toString(), daily.windSpeed.toInt(), localContext)
-    val sunrise =
-        "${localContext.getString(R.string.sunrise)}: " + WeatherUtils.updateTime(daily.sunrise)
-    val sunset =
-        "${localContext.getString(R.string.sunset)}: " + WeatherUtils.updateTime(daily.sunset)
-    val moonrise =
-        "${localContext.getString(R.string.moonrise)}: " + WeatherUtils.updateTime(daily.moonrise)
-    val moonset =
-        "${localContext.getString(R.string.moonset)}: " + WeatherUtils.updateTime(daily.moonset)
+    val sunrise = WeatherUtils.updateTime(daily.sunrise)
+    val sunset = WeatherUtils.updateTime(daily.sunset)
+    val moonrise = WeatherUtils.updateTime(daily.moonrise)
+    val moonset = WeatherUtils.updateTime(daily.moonset)
+    val moonPhase = daily.moonPhase
 
     Scaffold(
         topBar = {
@@ -199,85 +196,50 @@ fun DailyWeatherForecast(
             }//item1
 
             item {
+
+
                 Row(
                     modifier = Modifier
-                        .padding(all = 1.dp)
-                        .fillMaxWidth()
+                        .padding(all = 3.dp)
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
                 ) {
 
-                    Text(
-                        text = localContext.getString(R.string.humidity) + ": "
-                                + daily.humidity + "%",
-                        color = Color.White,
-                        style = QuickSandTypography.subtitle2,
-                        modifier = Modifier.padding(all = 3.dp)
-                    )
+                    HumidityCard(humidity = daily.humidity, dewPoint =daily.dewPoint.toInt() )
+                    WindSpeedCard(speed = daily.windSpeed.toInt(), windDegree = daily.windDeg)
 
                 }
-
-            }//2
+            }// item 2
             item{
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 5.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Text(
-                        text = moonrise,
-                        color = Color.White,
-                        style = QuickSandTypography.subtitle2,
-                        modifier = Modifier.padding(all = 3.dp)
-                    )
-                    Text(
-                        text = moonset,
-                        color = Color.White,
-                        style = QuickSandTypography.subtitle2,
-                        modifier = Modifier.padding(all = 3.dp)
-                    )
-                    Text(
-                        text = WeatherUtils.calculateMoonPhase(localContext, daily.moonPhase),
-                        color = Color.White,
-                        style = QuickSandTypography.subtitle2,
-                        modifier = Modifier.padding(all = 3.dp)
-                    )
 
+                    UVIndexCard(index = daily.uvi.toInt())
+                    PressureCard(pressure = daily.pressure)
 
                 }
 
             }//item3
-//wind speed and directions
             item{
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = wind,
-                        color = Color.White,
-                        style = QuickSandTypography.subtitle1,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 1.dp)
-                    )
-                }
-                //sunset sun rise
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 12.dp),
-                    horizontalArrangement = Arrangement.Start
+                        .padding(all = 3.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Text(
-                        text = sunrise,
-                        color = Color.White,
-                        style = QuickSandTypography.h6,
-                        modifier = Modifier.padding(all = 1.dp)
-                    )
-                    Text(
-                        text = sunset,
-                        color = Color.White,
-                        style = QuickSandTypography.h6,
-                        modifier = Modifier.padding(all = 1.dp)
-                    )
+                    SunriseSunsetCard(
+                        sunrise =sunrise ,
+                        sunset = sunset,
+                        dawn = sunrise, dusk = sunset)
+
+                    MoonriseMoonsetCard(moonrise = moonrise, moonset =moonset , moonPhase =moonPhase )
 
                 }
+                //sunset sun rise
+
 
             }//4
         }
@@ -290,8 +252,8 @@ fun getMockNavController(): NavController {
     return TestNavHostController(context)
 }
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp",
-    apiLevel = 30, locale = "ru"
+@Preview(showBackground = true, device = "spec:width=720dp,height=1440dp",
+    apiLevel = 30, locale = "ru "
 )
 
 @Composable
