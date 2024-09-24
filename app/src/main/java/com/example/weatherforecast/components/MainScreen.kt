@@ -3,9 +3,7 @@ package com.example.weatherforecast.components
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,9 +32,7 @@ import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
-import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
-import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -144,77 +140,53 @@ fun MainScreen(
                     style = QuickSandTypography.subtitle1,
                     color = Color.White, modifier = Modifier.padding(start = 20.dp)
                 )
-         //       Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             item{
-            //    Spacer(modifier = Modifier.height(8.dp))
-                Column (
-                    modifier = ( Modifier.fillMaxSize()
-                        .padding(all=20.dp )
-                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
-                            )
-                ){
 
-                    Row (modifier = Modifier.fillMaxWidth().padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly)
-                    {
-                        if (humidity != null) {
-                            if (dewPoint != null) {
-                                HumidityCard(humidity =humidity, dewPoint =dewPoint.toInt() )
-                            }
+                Row (modifier = Modifier
+                    .fillMaxWidth().padding(all = 3.dp),
+                    horizontalArrangement = Arrangement.SpaceAround)
+                {
+                    if (humidity != null) {
+                        if (dewPoint != null) {
+                            HumidityCard(humidity =humidity, dewPoint =dewPoint.toInt() )
                         }
-                        if (windSpeed != null) {
-                            if (windDegree != null) {
-                                WindSpeedCard(speed = windSpeed, windDegree =windDegree )
-                            }
+                    }
+                    if (windSpeed != null) {
+                        if (windDegree != null) {
+                            WindSpeedCard(speed = windSpeed, windDegree =windDegree )
                         }
-
                     }
 
-                }//column
-
-        //        Spacer(modifier = Modifier.height(8.dp))
+                }
 
             }
 
-
             item {
-                Column (
-                    modifier = ( Modifier.fillMaxSize()
-                        .padding(all = 20.dp)
-                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
-                            )
-                ) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(all=8.dp), horizontalArrangement = Arrangement.SpaceEvenly)
-                    {
-                        if (uvIndex != null) {
-                            UVIndexCard(index = uvIndex.toInt())
-                        }
-                        if (pressureValue != null) {
-                            PressureCard(pressure =pressureValue )
-                        }
+                Row(modifier = Modifier.fillMaxWidth().padding(all=3.dp),
+                    horizontalArrangement = Arrangement.SpaceAround)
+                {
+                    if (uvIndex != null) {
+                        UVIndexCard(index = uvIndex.toInt())
+                    }
+                    if (pressureValue != null) {
+                        PressureCard(pressure =pressureValue )
                     }
                 }
             }//end uv pressure item
             item{
 
-        //        Spacer(modifier = Modifier.height(8.dp))
+                //        Spacer(modifier = Modifier.height(8.dp))
 
-                Column (
-                    modifier = ( Modifier.fillMaxSize()
-                        .padding(all = 20.dp)
-                        .border(width = 3.dp, color = Blue500, shape = AppShapes.large)
-                            )
-                ) {
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly){
-                        SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 3.dp), horizontalArrangement = Arrangement.SpaceAround){
+                    SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
 
-                        if (moonPhase != null) {
-                            MoonriseMoonsetCard(moonrise =moonRise, moonset = moonSet, moonPhase = moonPhase )
-                        }
-
+                    if (moonPhase != null) {
+                        MoonriseMoonsetCard(moonrise =moonRise, moonset = moonSet, moonPhase = moonPhase )
                     }
 
                 }
