@@ -3,13 +3,10 @@ package com.example.weatherforecast.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,25 +19,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.testing.TestNavHostController
-
-
-import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Daily
-import com.example.weatherforecast.theme.AppShapes
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue500
-import com.example.weatherforecast.theme.Blue700
-import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
@@ -96,102 +83,7 @@ fun DailyWeatherForecast(
         ) {
             item{
 
-                Box(
-                    modifier = (Modifier.background(
-                        Blue500,
-                        shape = AppShapes.large
-                    )
-                            )
-                        .fillMaxWidth()
-                        .padding(all = 20.dp)) {
-                    Column(
-                        modifier = (Modifier.background(
-                            Blue700,
-                            shape = AppShapes.large
-                        )
-                                )
-                            .fillMaxWidth()
-                            .padding(all = 2.dp)
-                    ){
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically
-
-                        ) {
-                            AsyncImage(
-                                model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
-                                contentDescription = "Weather icon",
-                                modifier = Modifier
-                                    .size(150.dp)
-                                    .padding(all = 3.dp)
-                            )
-
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.padding(all = 1.dp)
-                            ) {
-                                Text(
-                                    text = localContext.getString(R.string.day) + ": " + WeatherUtils.updateTemperature(
-                                        daily.temp.day.toInt(),
-                                        switchState
-                                    ),
-                                    fontWeight = FontWeight.Bold, color = Color.White,
-                                    style = QuickSandTypography.body2,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-                                Text(
-                                    text = feelsLike,
-                                    color = Color.White,
-                                    style = QuickSandTypography.subtitle2,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-                                Text(
-                                    text = daily.weather[0].description,
-                                    color = Color.White,
-                                    style = QuickSandTypography.subtitle2,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-
-                            }
-
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.padding(all = 1.dp)
-                            ) {
-                                Text(
-                                    text = localContext.getString(R.string.night) + ": "
-                                            + WeatherUtils.updateTemperature(
-                                        daily.temp.night.toInt(),
-                                        switchState
-                                    ),
-                                    fontWeight = FontWeight.Bold, color = Color.White,
-                                    style = QuickSandTypography.body1,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-                                Text(
-                                    text = feelsLikeNight,
-                                    color = Color.White,
-                                    style = QuickSandTypography.subtitle2,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-                                Text(
-
-                                    text = localContext.getString(R.string.pressure) + ": "
-                                            + daily.pressure.toString(),
-                                    color = Color.White,
-                                    style = QuickSandTypography.subtitle2,
-                                    modifier = Modifier.padding(all = 3.dp)
-                                )
-
-                            }
-
-                        }
-
-                    }//column
-
-
-                }//box
+                DailyWeatherCard(daily = daily)
 
             }//item1
 
