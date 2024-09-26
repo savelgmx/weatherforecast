@@ -50,4 +50,31 @@
     <string name="moonrise">Mondaufgang</string>
     <string name="moonset">Monduntergang  </string>
 
+    <string name="km_h">\km/h\</string>
+    <string name="m_s">\m/s\</string>
+    <string name="knots">\Knoten\</string>
+    <string name="ft_s">ft/s</string>
+
+    <string name="mmHg">\mm Hg\</string>
+    <string name="inchesHg">\inches Hg\</string>
+    <string name="hPa">\hPa\</string>
+    <string name="mbar">\mbar\</string>
+    <string name="daily_weather_forecast">Wetter für heute</string>
+    <string name="wind_speed">Windgeschwindigkeit</string>
+    <string name="dew_point">Taupunkt</string>
+    <string name="measure_units_wind">Windgeschwindigkeit</string>
+    <string name="choose_option">Wählen Sie eine Option aus</string>
+    <string name="close">Schließen</string>
+    <string name="measure_units_pressure">Druckeinheiten</string>
+
+    <string name="uv_index">UV index</string>
+
+    <string name="low">Niedrig</string>
+    <string name="average">Mittelmäßig</string>
+    <string name="high">Hoch</string>
+    <string name="very_high">Sehr hoch</string>
+    <string name="extreme">Extrem</string>
+    <string name="measurements_units">Maßeinheiten</string>
+
+
 </resources>

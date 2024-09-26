@@ -50,4 +50,29 @@
     <string name="moonrise">Восход луны</string>
     <string name="moonset">Закат луны</string>
 
+    <string name="km_h">\км./ч.\</string>
+    <string name="m_s">\м./с.\</string>
+    <string name="knots">\узлы\</string>
+    <string name="ft_s">фт./с.</string>
+
+    <string name="mmHg">\мм рт.ст.\</string>
+    <string name="inchesHg">\дюймы рт.ст.\</string>
+    <string name="hPa">\гПа\</string>
+    <string name="mbar">\мбар\</string>
+    <string name="daily_weather_forecast">Погода на сегодня</string>
+    <string name="wind_speed">Скорость ветра</string>
+    <string name="dew_point">Точка росы</string>
+    <string name="measure_units_wind">Скорость ветра</string>
+    <string name="choose_option">Выберите вариант</string>
+    <string name="close">Закрыть</string>
+    <string name="measure_units_pressure">Давления</string>
+    <string name="uv_index">UV индекс</string>
+    <string name="low">Низкий</string>
+    <string name="average">Средний</string>
+    <string name="high">Высокий</string>
+    <string name="very_high">Очень высокий</string>
+    <string name="extreme">Экстремальный</string>
+    <string name="measurements_units">Единицы измерения</string>
+
+
 </resources>

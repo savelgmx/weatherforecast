@@ -1,114 +1,22 @@
 package com.example.weatherforecast
 
 
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.Menu
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.preference.PreferenceManager
-import com.example.weatherforecast.ui.settings.SettingsFragment
-import com.example.weatherforecast.ui.viewmodel.SharedViewModel
-import com.example.weatherforecast.ui.viewmodel.SharedViewModelHolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 123
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //initialize sharedViewModel singleton object,which tracks preferences changes
-        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        SharedViewModelHolder.initialize(sharedViewModel)
-
-
-        // Set up the toolbar
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        // Remove default title
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        // Inflate the menu
-        toolbar.inflateMenu(R.menu.menu_toolbar)
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_settings -> {
-                    openSettingsFragment()
-                    true
-                }
-                else -> false
-            }
-        }
-
-        // Set up NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        // Set up ActionBar with NavController
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        // Add destination change listener to update toolbar title manually
-        navController.addOnDestinationChangedListener { _, _, _ ->
-            updateToolbarTitle("")
-        }
-
-        // Initialize shared preferences
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        // Observe changes in preferences
-        sharedViewModel.temperatureUnitsLiveData.observe(this, Observer { newUnit ->
-            // Update the temperature display unit in the main screen
-                updateTemperatureUnit(newUnit)
-        })
-
-        sharedViewModel.distanceUnitsLiveData.observe(this, Observer { newUnit ->
-            // Update the distance display unit in the main screen
-                updateDistanceUnit(newUnit)
-        })
-
-        // Initialize LiveData with current preferences
-        sharedViewModel.temperatureUnitsLiveData.value = sharedPreferences.getBoolean("temperature_units", true)
-        sharedViewModel.distanceUnitsLiveData.value = sharedPreferences.getString("distance_units", "metric") ?: "metric"
-
-        // Register preference change listener
-        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-
-
-    }
-
-
-
-    // Function to update toolbar title from fragment
-    fun updateToolbarTitle(title: String) {
-        val toolbarTitle: TextView = findViewById(R.id.toolbar_title)
-        toolbarTitle.text = title
-        toolbarTitle.setTextColor(Color.WHITE)
-        toolbarTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-        toolbarTitle.setTypeface(toolbarTitle.typeface, Typeface.BOLD)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-        return true
     }
 
     // Handle permission request result
@@ -134,43 +42,8 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-    private fun applySettings(temperatureUnits: Boolean, distanceUnits: String?) {
-        sharedViewModel.temperatureUnitsLiveData.value = temperatureUnits
-        sharedViewModel.distanceUnitsLiveData.value = distanceUnits ?: "metric"
-    }
-
-    private fun openSettingsFragment() {
-        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.nav_host_fragment, SettingsFragment())
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }
-
-    // Preference change listener
-    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-        if (key == "temperature_units" || key == "distance_units") {
-            val temperatureUnits = prefs.getBoolean("temperature_units", true)
-            val distanceUnits = prefs.getString("distance_units", "metric")
-            applySettings(temperatureUnits, distanceUnits)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        // Unregister the preference change listener
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
-    private fun updateTemperatureUnit(newUnit: Boolean) {
-        // Logic to update temperature unit in the main screen
-        // For example, you might update the temperature display here
-        // newUnit: true = Celsius, false = Fahrenheit
-        val unit = if (newUnit) "Celsius" else "Fahrenheit"
-        // Update the display according to unit
-    }
-
-    private fun updateDistanceUnit(newUnit: String) {
-        // Logic to update distance unit in the main screen
-        // For example, you might update the distance display here
-    }
 }

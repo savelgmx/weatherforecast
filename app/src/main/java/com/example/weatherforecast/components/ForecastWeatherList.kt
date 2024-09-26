@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,11 +44,14 @@ fun ForecastWeatherList(
     val dailyForecast = forecastState.data?.daily
     val count = dailyForecast?.size ?: 0
 
+
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(all=16.dp)
             .border(width = 3.dp, color = Blue300, shape = AppShapes.large),
     ) {
+
+
         for (index in 0 until count) {
             dailyForecast?.getOrNull(index)?.let { daily ->
                 ClickableDayForecastItem(daily = daily, navController = navController)
@@ -65,6 +71,11 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
          shape = AppShapes.large
 
     ) {
+
+        val localContext = LocalContext.current
+        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+
+
         Column(modifier = Modifier
             .padding(all=1.dp)
             .background(Blue700)
@@ -77,6 +88,7 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
 
             ) {
+
                 Text(
 
                     text = WeatherUtils.updateDateToToday(daily.dt),
@@ -93,8 +105,12 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                         .size(40.dp)// Define your desired width and height
                         .padding(all = 3.dp)
                 )
+
                 Text(
-                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt())}/${WeatherUtils.updateTemperature(daily.temp.night.toInt())}",
+                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt(), switchState)}/${WeatherUtils.updateTemperature(
+                        daily.temp.night.toInt(),
+                        switchState
+                    )}",
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     style = QuickSandTypography.body1,

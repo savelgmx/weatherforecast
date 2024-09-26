@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="unitSystemValues">
-        <item>METRIC</item>
-        <item>IMPERIAL</item>
-    </string-array>
-
-    <string-array name="unitSystemEntries">
-        <item>Metric</item>
-        <item>Imperial</item>
-    </string-array>
-
     <string-array name="directions_array">
         <item>@string/direction_north</item>
         <item>@string/direction_north_north_east</item>
@@ -54,6 +44,28 @@
     <string-array name="distance_units_values">
         <item>metric</item>
         <item>imperial</item>
+    </string-array>
+
+     <string-array name="wind_speed_units">
+        <item>@string/km_h</item>
+        <item>@string/m_s</item>
+        <item>@string/knots</item>
+        <item>@string/ft_s</item>
+    </string-array>
+
+    <string-array name="pressure_units">
+        <item>@string/mmHg</item>
+        <item>@string/inchesHg</item>
+        <item>@string/hPa</item>
+        <item>@string/mbar</item>
+    </string-array>
+
+    <string-array name="uv_index_values">
+        <item>@string/low</item>
+        <item>@string/average</item>
+        <item>@string/high</item>
+        <item>@string/very_high</item>
+        <item>@string/extreme</item>
     </string-array>
 
 </resources>
