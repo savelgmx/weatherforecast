@@ -69,7 +69,7 @@ fun CurrentWeatherCard(
                     }
 
 
-                    val name = weatherState.data?.name
+                    weatherState.data?.name
                     val day =
                         weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
                     val pressure =
@@ -157,7 +157,7 @@ fun CurrentWeatherCard(
 
 
                                 Text(
-                                    text = "$feels_like",
+                                    text = feels_like,
                                     color = Color.White,
                                     style = QuickSandTypography.h5,
                                     modifier = Modifier.padding(1.dp)
@@ -171,7 +171,7 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "$wind",
+                                    text = wind,
                                     color = Color.White,
                                     style = QuickSandTypography.h6,
                                     modifier = Modifier.padding(1.dp)

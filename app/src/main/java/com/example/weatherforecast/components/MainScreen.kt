@@ -91,7 +91,7 @@ fun MainScreen(
                 .background(Blue300)
         ) {
             item {
-                currentState.data?.let { weatherState ->
+                currentState.data?.let {
                     CurrentWeatherCard(weatherState = currentState)
                 }
             }
@@ -111,7 +111,7 @@ fun MainScreen(
                 )
             }
             item {
-                forecastState?.data?.hourly?.let { hourlyWeatherList ->
+                forecastState.data?.hourly?.let { hourlyWeatherList ->
                     HourlyWeatherRow(hourlyWeatherList)
                 }
             }

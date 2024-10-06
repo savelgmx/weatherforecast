@@ -43,16 +43,14 @@ fun DailyWeatherForecast(
     val switchState by DataStoreManager.tempSwitchPrefFlow(localContext)
         .collectAsState(initial = false)
 
-    val feelsLike =
-        localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
-            daily.feelsLike.day.toInt(), switchState
-        )
-    val feelsLikeNight =
-        localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
-            daily.feelsLike.night.toInt(), switchState
-        )
+    localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
+        daily.feelsLike.day.toInt(), switchState
+    )
+    localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
+        daily.feelsLike.night.toInt(), switchState
+    )
 
-    val wind = localContext.getString(R.string.wind) + ": " +
+    localContext.getString(R.string.wind) + ": " +
             WeatherUtils.updateWind(daily.windDeg.toString(), daily.windSpeed.toInt(), localContext)
     val sunrise = WeatherUtils.updateTime(daily.sunrise)
     val sunset = WeatherUtils.updateTime(daily.sunset)
@@ -63,7 +61,7 @@ fun DailyWeatherForecast(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "${WeatherUtils.updateDateToToday(daily.dt)}") },
+                title = { Text(text = WeatherUtils.updateDateToToday(daily.dt)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
