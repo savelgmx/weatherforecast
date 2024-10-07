@@ -82,7 +82,7 @@ fun CurrentWeatherCard(
                         }
                     val wind = weatherState.data?.wind?.speed?.let {
                         WeatherUtils.updateWind(
-                            weatherState.data?.wind?.deg.toString(),
+                            weatherState.data.wind.deg.toString(),
                             it.toInt(),
                             localContext
                         )
@@ -96,21 +96,12 @@ fun CurrentWeatherCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-/*
-                        Text(
-                            text = name!!, color = Color.White,
-                            style = QuickSandTypography.h5,
-                            modifier = Modifier.padding(start = 1.dp)
-                        )
-*/
-
                         Text(
                             text = day!!, color = Color.White,
                             style = QuickSandTypography.h5,
                             modifier = Modifier.padding(end = 1.dp)
                         )
                     }
-
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
