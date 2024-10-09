@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.ui.theme.orange
+import com.example.weatherforecast.ui.theme.white
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
@@ -94,36 +96,23 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
                 color = Color.White,
                 style= QuickSandTypography.subtitle1
             )
-            HumidityShape(humidity)
-            Text("$humidity%",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                style = QuickSandTypography.body2,
-                color = Color.White)
+            CustomCircularProgressIndicator(
+                modifier = Modifier
+                    .size(85.dp)
+                    .background(Blue800)
+                ,
+                initialValue = humidity,
+                primaryColor = orange,
+                secondaryColor = white,
+                circleRadius = 80f, valueName = "%"
+            )
+
             Text("${context.getString(R.string.dew_point)} $dewPointValue",
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 style = QuickSandTypography.body2
             )
         }
-    }
-}
-
-@Composable
-fun HumidityShape(humidity: Int) {
-    Canvas(modifier = Modifier
-        .size(64.dp)
-        .padding(all = 2.dp)
-    ) {
-        val height = size.height * humidity / 100f
-        drawRoundRect(
-            brush = Brush.horizontalGradient(
-                colors = listOf(Color(0xFFFFFB07), Color(0xFFFF9800))
-            ),
-            topLeft = Offset(2f, size.height - height),
-            size = Size(size.width, height),
-            cornerRadius = CornerRadius(40f)
-        )
     }
 }
 
@@ -143,24 +132,21 @@ fun UVIndexCard(index: Int) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(LocalContext.current.getString(R.string.uv_index), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-            UVIndexShape(index)
-            Text("$index", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.body2)
+
+            CustomCircularProgressIndicator(
+                modifier = Modifier
+                .size(85.dp)
+                .background(Blue800)
+                ,
+
+                initialValue = index,
+                primaryColor = orange,
+                secondaryColor = white ,
+                circleRadius = 80f, minValue = 0, maxValue = 13
+            )
+
             Text(WeatherUtils.updateUVLevel(LocalContext.current,index), color = Color.White, style = QuickSandTypography.h5)
         }
-    }
-}
-
-@Composable
-fun UVIndexShape(index: Int) {
-    Canvas(modifier = Modifier.size(64.dp)) {
-        val sweepAngle = index * 45f
-        drawArc(
-            color = Color.Yellow,
-            startAngle = 0f,
-            sweepAngle = sweepAngle,
-            useCenter = true,
-            style = Stroke(width = 8f, cap = StrokeCap.Square)
-        )
     }
 }
 
