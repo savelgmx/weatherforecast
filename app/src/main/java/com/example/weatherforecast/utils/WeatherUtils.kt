@@ -28,7 +28,29 @@ class WeatherUtils {
         }
 
         @Composable
-        fun updatePressure(pressureValue: Int): String {
+        fun updateMinMaxPressureValue(minMaxPressure:Int):Int{
+            //this function returns max possible barometic pressure
+        // , recalulating in choosen measurements unints
+            //val maxPressure=1033 min prssure =870 //base max pressure value is constant in mbar units
+            val localcontext= LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
+            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            // Check for a valid index
+            if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
+                return -1
+            }
+            val minMaxPressureValue = when(selectedPressureOption){
+                0 -> minMaxPressure * 0.7500615613 // Conversion from mBar to mm Hg
+                1 -> minMaxPressure * 0.029529983071445 // Conversion from mBar to inches Hg
+                2 -> minMaxPressure // 1 mBar is equivalent to 1 hPa
+                3 -> minMaxPressure // mBar is already the default unit
+                else -> return -1
+            }
+            return minMaxPressureValue.toInt()
+        }
+
+        @Composable
+        fun updatePressureUnit():String{
             val localcontext= LocalContext.current
             val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
             var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
@@ -40,6 +62,23 @@ class WeatherUtils {
 
             // Get the chosen unit
             val chosenUnit = pressureUnitsToSelect[selectedPressureOption]
+            return chosenUnit
+
+        }
+
+        @Composable
+        fun updatePressure(pressureValue: Int): Int {
+            val localcontext= LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
+            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+
+            // Check for a valid index
+            if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
+                return -1// "Invalid unit index"
+            }
+
+            // Get the chosen unit
+            val chosenUnit = pressureUnitsToSelect[selectedPressureOption]
 
             // Perform conversion based on the chosen unit
             val convertedPressure = when (selectedPressureOption) {
@@ -47,12 +86,12 @@ class WeatherUtils {
                 1 -> pressureValue * 0.029529983071445 // Conversion from mBar to inches Hg
                 2 -> pressureValue // 1 mBar is equivalent to 1 hPa
                 3 -> pressureValue // mBar is already the default unit
-                else -> return "Invalid unit"
+                else -> return -1 //"Invalid unit"
             }
             // Format the pressure value
             val formattedPressure = convertedPressure.toInt()
             // Return the result with unit
-            return " $formattedPressure $chosenUnit"
+            return formattedPressure //" $formattedPressure $chosenUnit"
         }
 
         @Composable

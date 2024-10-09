@@ -1,6 +1,5 @@
 package com.example.weatherforecast.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,13 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -135,8 +128,8 @@ fun UVIndexCard(index: Int) {
 
             CustomCircularProgressIndicator(
                 modifier = Modifier
-                .size(85.dp)
-                .background(Blue800)
+                    .size(85.dp)
+                    .background(Blue800)
                 ,
 
                 initialValue = index,
@@ -153,7 +146,8 @@ fun UVIndexCard(index: Int) {
 @Composable
 fun PressureCard(pressure: Int) {
     val context= LocalContext.current
-    val pressurevalue= WeatherUtils.updatePressure(pressureValue = pressure)
+    val pressureValue= WeatherUtils.updatePressure(pressureValue = pressure)
+    val pressureUnit= WeatherUtils.updatePressureUnit()
 
     Surface(
         modifier = Modifier
@@ -168,26 +162,23 @@ fun PressureCard(pressure: Int) {
             verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(context.getString(R.string.pressure), fontSize = 16.sp, fontWeight = FontWeight.Medium,color=Color.White)
-            PressureShape(pressure)
-            Text("$pressurevalue", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        }
-    }
-}
 
-@Composable
-fun PressureShape(pressure: Int) {
-    Canvas(modifier = Modifier
-        .size(64.dp)
-        .padding(all = 2.dp)) {
-        val position = (pressure - 900) / 200f * size.width
-        drawRoundRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFFFFFB07), Color(0xFFFF9800))
-            ),
-            topLeft = Offset(2f, size.height -position),
-            size = Size(size.width, position),
-            cornerRadius = CornerRadius(60f)
-        )
+            Text("$pressureValue $pressureUnit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+
+            CustomCircularProgressIndicator(
+                modifier = Modifier
+                    .size(85.dp)
+                    .background(Blue800)
+                ,
+                initialValue = pressureValue,
+                primaryColor = orange,
+                secondaryColor = white,
+                circleRadius = 80f,
+                minValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 870),
+                maxValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 1033)
+            )
+
+        }
     }
 }
 
