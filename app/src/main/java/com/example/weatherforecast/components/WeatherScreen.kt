@@ -192,16 +192,18 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
         elevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(all=8.dp),
+            modifier = Modifier.padding(all=3.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+/*
             Text(
                 context.getString(R.string.sunrise) +" / "+ context.getString(R.string.sunset),
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
                 style = QuickSandTypography.subtitle2
             )
+*/
             //  Spacer(modifier = Modifier.height(4.dp))
 
             Row    (modifier = Modifier.padding(all=3.dp),
@@ -209,7 +211,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 horizontalArrangement = Arrangement.Center)         {
 
                 Text(context.getString(R.string.sunrise)+": ",
-                    color =  Color.White, style = QuickSandTypography.h5)
+                    color =  Color.White, style = QuickSandTypography.h3)
 
             }
 
@@ -227,7 +229,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
 
             }
 
-            Row(modifier = Modifier.padding(all=5.dp),
+            Row(modifier = Modifier.padding(all=3.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
                  Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.h3)
