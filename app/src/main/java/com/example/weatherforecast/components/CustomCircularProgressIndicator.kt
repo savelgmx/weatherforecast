@@ -47,11 +47,7 @@ fun CustomCircularProgressIndicator(
         mutableStateOf(Offset.Zero)
     }
 
-    var positionValue by remember {
-        mutableStateOf(initialValue)
-    }
-
-
+    var positionValue = initialValue
 
     Box(
         modifier = modifier
@@ -86,7 +82,6 @@ fun CustomCircularProgressIndicator(
                 radius = circleRadius,
                 center = circleCenter
             )
-
             drawArc(
                 color = primaryColor,
                 startAngle = 90f,

@@ -162,9 +162,6 @@ fun PressureCard(pressure: Int) {
             verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(context.getString(R.string.pressure), fontSize = 16.sp, fontWeight = FontWeight.Medium,color=Color.White)
-
-            Text("$pressureValue $pressureUnit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-
             CustomCircularProgressIndicator(
                 modifier = Modifier
                     .size(85.dp)
@@ -177,6 +174,7 @@ fun PressureCard(pressure: Int) {
                 minValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 870),
                 maxValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 1033)
             )
+            Text("$pressureValue $pressureUnit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
 
         }
     }
