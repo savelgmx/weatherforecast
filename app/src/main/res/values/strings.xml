@@ -71,5 +71,7 @@
     <string name="very_high">Very high</string>
     <string name="extreme">Extreme</string>
     <string name="measurements_units">Measurements units</string>
+    <string name="dawn">Dawn</string>
+    <string name="dusk">Dusk</string>
 
 </resources>

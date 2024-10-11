@@ -58,6 +58,11 @@ fun DailyWeatherForecast(
     val moonset = WeatherUtils.updateTime(daily.moonset)
     val moonPhase = daily.moonPhase
 
+    val timeOfDawn=daily.sunrise
+    val timeOfDusk=daily.sunset
+    val timeOfDawnAndDusk= WeatherUtils.calculateDawnAndDusk(timeOfDawn,timeOfDusk)//it returns array of two elements
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,10 +125,18 @@ fun DailyWeatherForecast(
                         .padding(all = 3.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    SunriseSunsetCard(
+ /*                   SunriseSunsetCard(
                         sunrise =sunrise ,
                         sunset = sunset,
                         dawn = sunrise, dusk = sunset)
+*/
+                    timeOfDawnAndDusk[0]?.let {
+                        timeOfDawnAndDusk[1]?.let { it1 ->
+                            SunriseSunsetCard(sunrise = sunrise, sunset = sunset,
+                                dawn = it, dusk = it1
+                            )
+                        }
+                    }
 
                     MoonriseMoonsetCard(moonrise = moonrise, moonset =moonset , moonPhase =moonPhase )
 

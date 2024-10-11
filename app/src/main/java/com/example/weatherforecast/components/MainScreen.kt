@@ -57,6 +57,11 @@ fun MainScreen(
     val windDegree= currentState.data?.wind?.deg
     val timeOfSunrise = forecastState.data?.current?.sunrise.let { WeatherUtils.updateTime(it) }
     val timeOfSunset = forecastState.data?.current?.sunset.let{WeatherUtils.updateTime(it)}
+
+    val timeOfDawn=forecastState.data?.current?.sunrise
+    val timeOfDusk=forecastState.data?.current?.sunset
+    val timeOfDawnAndDusk= WeatherUtils.calculateDawnAndDusk(timeOfDawn,timeOfDusk)//it returns array of two elements
+
     val uvIndex = forecastState.data?.current?.uvi
     val pressureValue = currentState.data?.main?.pressure
 
@@ -183,7 +188,13 @@ fun MainScreen(
                 Row (modifier = Modifier
                     .fillMaxWidth()
                     .padding(all = 3.dp), horizontalArrangement = Arrangement.SpaceAround){
-                    SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset, dawn = timeOfSunrise, dusk = timeOfSunset)
+                    timeOfDawnAndDusk[0]?.let {
+                        timeOfDawnAndDusk[1]?.let { it1 ->
+                            SunriseSunsetCard(sunrise = timeOfSunrise, sunset = timeOfSunset,
+                                dawn = it, dusk = it1
+                            )
+                        }
+                    }
 
                     if (moonPhase != null) {
                         MoonriseMoonsetCard(moonrise =moonRise, moonset = moonSet, moonPhase = moonPhase )

@@ -196,43 +196,70 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-/*
-            Text(
-                context.getString(R.string.sunrise) +" / "+ context.getString(R.string.sunset),
-                fontWeight = FontWeight.Medium,
-                color = Color.White,
-                style = QuickSandTypography.subtitle2
-            )
-*/
-            //  Spacer(modifier = Modifier.height(4.dp))
 
-            Row    (modifier = Modifier.padding(all=3.dp),
+            Row    (modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)         {
 
                 Text(context.getString(R.string.sunrise)+": ",
-                    color =  Color.White, style = QuickSandTypography.h3)
+                    color =  Color.White, style = QuickSandTypography.h6, fontWeight = FontWeight.Bold)
 
             }
 
-            Row (modifier = Modifier.padding(all=3.dp),
+            Row (modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
 
-                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h3)
+                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
             }
 
-            Row(modifier = Modifier.padding(all=3.dp),
+            Row    (modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center)  {
-                Text(context.getString(R.string.sunset)+": ", color = Color.White,style = QuickSandTypography.h5)
+                horizontalArrangement = Arrangement.Center)         {
+                //Dawn
+                Text(context.getString(R.string.dawn)+": ",
+                    color =  Color.White, style = QuickSandTypography.h6, fontWeight = FontWeight.Bold)
 
             }
 
-            Row(modifier = Modifier.padding(all=3.dp),
+            Row (modifier = Modifier.padding(all=1.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+
+                Text(dawn, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.h6)
+            }
+
+
+
+            Row(modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
-                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.h3)
+                Text(context.getString(R.string.sunset)+": ",
+                    color = Color.White,style = QuickSandTypography.h6, fontWeight = FontWeight.Bold)
+
+            }
+
+            Row(modifier = Modifier.padding(all=1.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)  {
+                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.h6)
+
+            }
+
+
+
+            Row(modifier = Modifier.padding(all=1.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)  {
+                Text(context.getString(R.string.dusk)+": ",
+                    color = Color.White,style = QuickSandTypography.h6, fontWeight = FontWeight.SemiBold)
+
+            }
+
+            Row(modifier = Modifier.padding(all=1.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)  {
+                Text(dusk, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.h6)
 
             }
 

@@ -73,6 +73,8 @@
     <string name="very_high">Очень высокий</string>
     <string name="extreme">Экстремальный</string>
     <string name="measurements_units">Единицы измерения</string>
+    <string name="dawn">Рассвет</string>
+    <string name="dusk">Сумерки</string>
 
 
 </resources>

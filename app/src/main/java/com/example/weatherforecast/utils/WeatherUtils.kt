@@ -9,12 +9,13 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class WeatherUtils {
 
     companion object {
-        
+
         fun updateTemperature(temperature: Int, switchState: Boolean): String {
             val unitAbbreviation = if(switchState) "C° " else "F° "
 
@@ -30,7 +31,7 @@ class WeatherUtils {
         @Composable
         fun updateMinMaxPressureValue(minMaxPressure:Int):Int{
             //this function returns max possible barometic pressure
-        // , recalulating in choosen measurements unints
+            // , recalulating in choosen measurements unints
             //val maxPressure=1033 min prssure =870 //base max pressure value is constant in mbar units
             val localcontext= LocalContext.current
             val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
@@ -103,18 +104,6 @@ class WeatherUtils {
             if (selectedWindOptions < 0 || selectedWindOptions >= windSpeedUnitsToSelect.size) {
                 return "Invalid unit index"
             }
-            // Get the selected unit abbreviation
-            val unitAbbreviation = windSpeedUnitsToSelect[selectedWindOptions]
-            // Convert the wind speed to the selected unit using integer calculations
-/*            val convertedWindSpeed = when (selectedWindOptions) {
-                0 -> (windSpeed * 18) / 5 // Conversion from m/s to km/h
-                1 -> windSpeed // m/s is the default unit
-                2 -> (windSpeed * 194384) / 100000 // Conversion from m/s to knots
-                3 -> (windSpeed * 328084) / 100000 // Conversion from m/s to ft/s
-                else -> return "Invalid unit"
-            }*/
-            val convertedWindSpeed=convertWindSpeed(windSpeed,selectedWindOptions)
-            // Convert the wind direction to a compass direction
             val wind = degToCompass(windDirection.toInt(), context)
             // Create the wind string
             val windString = "$wind" //$convertedWindSpeed, $unitAbbreviation
@@ -233,6 +222,26 @@ class WeatherUtils {
                 uvLevel >=11            -> UVDescriptions[4]//extreme 11 and higher
                 else -> {context.resources.getString(R.string.wrong_value)}
             }
+        }
+
+        fun calculateDawnAndDusk(sunrise: Int?, sunset: Int?): Array<String?> {
+            // Constants for dawn and dusk offsets (30 minutes before and after)
+            val dawnOffset = -30 * 60 * 1000L  // 30 minutes BEFORE sunrise in milliseconds
+            val duskOffset =  30 * 60 * 1000L  // 30 minutes AFTER sunset in milliseconds
+
+            // Calculate dawn and dusk times in milliseconds
+            val dawnTime = (sunrise?.times(1000))?.plus(dawnOffset)
+            val duskTime = (sunset?.times(1000))?.plus(duskOffset)
+
+            // Format the times into a readable string
+            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+            val dawnString =
+                duskTime?.let { Date(it) }?.let { dateFormat.format(it) }//dawnTime?.let { Date(it) }?.let { dateFormat.format(it) }
+            val duskString =
+                dawnTime?.let { Date(it) }?.let { dateFormat.format(it) }//duskTime?.let { Date(it) }?.let { dateFormat.format(it) }
+
+            return arrayOf(dawnString, duskString)
         }
 
     }
