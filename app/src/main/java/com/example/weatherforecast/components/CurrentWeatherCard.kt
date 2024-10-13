@@ -73,9 +73,10 @@ fun CurrentWeatherCard(
                     val day =
                         weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
                     val pressure =
-                        localContext.getString(R.string.pressure) + ":" + weatherState.data?.main?.pressure?.let {
+                        localContext.getString(R.string.pressure) + ": " + weatherState.data?.main?.pressure?.let {
                             WeatherUtils.updatePressure(it)
                         }
+                    val pressureUnit= WeatherUtils.updatePressureUnit()
                     val feels_like =
                         localContext.getString(R.string.feels_like) + ": " + weatherState.data?.main?.feels_like?.let {
                             WeatherUtils.updateTemperature(it.toInt(), switchState)
@@ -175,7 +176,7 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = " $pressure",
+                                    text = "$pressure $pressureUnit",
                                     color = Color.White,
                                     style = QuickSandTypography.h6,
                                     modifier = Modifier.padding(1.dp)
