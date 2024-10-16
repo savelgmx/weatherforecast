@@ -31,11 +31,11 @@ class WeatherUtils {
         @Composable
         fun updateMinMaxPressureValue(minMaxPressure:Int):Int{
             //this function returns max possible barometic pressure
-            // , recalulating in choosen measurements unints
-            //val maxPressure=1033 min prssure =870 //base max pressure value is constant in mbar units
+            // , recalculating in chosen measurements unints
+            //val maxPressure=1033 min pressure =870 //base max pressure value is constant in mbar units
             val localcontext= LocalContext.current
             val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
                 return -1
@@ -54,7 +54,7 @@ class WeatherUtils {
         fun updatePressureUnit():String{
             val localcontext= LocalContext.current
             val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
 
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
@@ -71,16 +71,12 @@ class WeatherUtils {
         fun updatePressure(pressureValue: Int): Int {
             val localcontext= LocalContext.current
             val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            var pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
 
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
                 return -1// "Invalid unit index"
             }
-
-            // Get the chosen unit
-            val chosenUnit = pressureUnitsToSelect[selectedPressureOption]
-
             // Perform conversion based on the chosen unit
             val convertedPressure = when (selectedPressureOption) {
                 0 -> pressureValue * 0.7500615613 // Conversion from mBar to mm Hg
@@ -99,14 +95,14 @@ class WeatherUtils {
         fun updateWind(windDirection: String, windSpeed: Int, context: Context): String {
             // Obtain the selected wind speed unit from preferences
             val selectedWindOptions by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
-            var windSpeedUnitsToSelect=context.resources.getStringArray(R.array.wind_speed_units)
+            val windSpeedUnitsToSelect=context.resources.getStringArray(R.array.wind_speed_units)
             // Ensure the selected index is valid
             if (selectedWindOptions < 0 || selectedWindOptions >= windSpeedUnitsToSelect.size) {
                 return "Invalid unit index"
             }
             val wind = degToCompass(windDirection.toInt(), context)
             // Create the wind string
-            val windString = "$wind" //$convertedWindSpeed, $unitAbbreviation
+            val windString = wind //$convertedWindSpeed, $unitAbbreviation
 
             return windString
         }
@@ -194,7 +190,7 @@ class WeatherUtils {
         @Composable
         fun selectionWindSignature(selection:Int): String {
             val context= LocalContext.current
-            var windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
+            val windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
             // Get the chosen unit
             val selectedSignature = windSpeedUnitsToSelect[selection]
             return selectedSignature
@@ -203,7 +199,7 @@ class WeatherUtils {
         @Composable
         fun selectionPressureSignature(selection:Int): String {
             val context= LocalContext.current
-            var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
+            val pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
             val selectedSignature=pressureUnitsToSelect[selection]
             return selectedSignature
         }
@@ -225,21 +221,19 @@ class WeatherUtils {
         }
 
         fun calculateDawnAndDusk(sunrise: Int?, sunset: Int?): Array<String?> {
-            // Constants for dawn and dusk offsets (30 minutes before and after)
-            val dawnOffset = -30 * 60 * 1000L  // 30 minutes BEFORE sunrise in milliseconds
-            val duskOffset =  30 * 60 * 1000L  // 30 minutes AFTER sunset in milliseconds
+            // Constants for dawn and dusk offsets (30 minutes before and after) in seconds
+            val dawnOffset = -30 * 60  // 30 minutes BEFORE sunrise in seconds
+            val duskOffset = 30 * 60   // 30 minutes AFTER sunset in seconds
 
-            // Calculate dawn and dusk times in milliseconds
-            val dawnTime = (sunrise?.times(1000))?.plus(dawnOffset)
-            val duskTime = (sunset?.times(1000))?.plus(duskOffset)
+            // Calculate dawn and dusk times in seconds
+            val dawnTime = sunrise?.plus(dawnOffset)
+            val duskTime = sunset?.plus(duskOffset)
 
-            // Format the times into a readable string
+            // Convert to milliseconds for formatting
             val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-            val dawnString =
-                duskTime?.let { Date(it) }?.let { dateFormat.format(it) }//dawnTime?.let { Date(it) }?.let { dateFormat.format(it) }
-            val duskString =
-                dawnTime?.let { Date(it) }?.let { dateFormat.format(it) }//duskTime?.let { Date(it) }?.let { dateFormat.format(it) }
+            val dawnString = dawnTime?.let { Date(it * 1000L) }?.let { dateFormat.format(it) }
+            val duskString = duskTime?.let { Date(it * 1000L) }?.let { dateFormat.format(it) }
 
             return arrayOf(dawnString, duskString)
         }
