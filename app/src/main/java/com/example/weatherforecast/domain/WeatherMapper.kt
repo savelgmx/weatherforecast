@@ -4,10 +4,15 @@ import com.example.weatherforecast.domain.model.MainWeatherResponse
 
 object WeatherMapper {
 
-    fun fromForecastResponse():MainWeatherResponse{
+    fun fromForecastResponse() {
 
 
         return MainWeatherResponse()
+    }
+
+    private fun MainWeatherResponse() {
+
+
     }
 
 
