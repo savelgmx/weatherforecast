@@ -1,4 +1,14 @@
 package com.example.weatherforecast.domain
 
-class WeatherMapper {
+import com.example.weatherforecast.domain.model.MainWeatherResponse
+
+object WeatherMapper {
+
+    fun fromForecastResponse():MainWeatherResponse{
+
+
+        return MainWeatherResponse()
+    }
+
+
 }
