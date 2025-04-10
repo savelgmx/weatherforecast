@@ -1,6 +1,4 @@
-package com.example.weatherforecast.domain.model
-
-import com.example.weatherforecast.utils.WeatherUtils
+package com.example.weatherforecast.domain.models
 
 data class MainWeatherResponse(
 

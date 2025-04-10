@@ -1,6 +1,4 @@
-package com.example.weatherforecast.domain
-
-import com.example.weatherforecast.domain.model.MainWeatherResponse
+package com.example.weatherforecast.data.mappers
 
 object WeatherMapper {
 

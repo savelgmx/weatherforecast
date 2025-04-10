@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.components.MainScreen
-import com.example.weatherforecast.ui.viewmodel.OpenWeatherForecastViewModel
-import com.example.weatherforecast.ui.viewmodel.OpenWeatherMapViewModel
+import com.example.weatherforecast.ui.viewmodels.OpenWeatherForecastViewModel
+import com.example.weatherforecast.ui.viewmodels.OpenWeatherMapViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
