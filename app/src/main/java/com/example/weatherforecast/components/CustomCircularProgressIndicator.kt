@@ -25,9 +25,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weatherforecast.ui.theme.brightBlue
-import com.example.weatherforecast.ui.theme.orange
-import com.example.weatherforecast.ui.theme.white
+import com.example.weatherforecast.presentation.ui.theme.brightBlue
+import com.example.weatherforecast.presentation.ui.theme.orange
+import com.example.weatherforecast.presentation.ui.theme.white
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

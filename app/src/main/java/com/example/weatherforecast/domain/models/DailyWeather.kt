@@ -5,11 +5,20 @@ These entities will replace or adapt the existing WeatherResponse (current weath
  */
 
 data class DailyWeather(
-    val date: String,           // "2025-04-03"
-    val maxTemp: Double,        // tempmax
-    val minTemp: Double,        // tempmin
-    val avgTemp: Double,        // temp
-    val conditions: String,     // "Clear"
-    val icon: String,           // "clear-day"
-    val hours: List<HourlyWeather>? = null // Почасовые данные, если запрошены
+    val date: String,           // "2025-04-03" (datetime)
+    val temp: Double,           // Средняя температура (temp)
+    val feelsLike: Double,      // Ощущается как (feelslike)
+    val tempMin: Double,        // Минимальная температура (tempmin)
+    val tempMax: Double,        // Максимальная температура (tempmax)
+    val pressure: Double,       // Давление (pressure)
+    val humidity: Int,          // Влажность (humidity)
+    val windSpeed: Double,      // Скорость ветра (windspeed)
+    val windDeg: Int,           // Направление ветра (winddir)
+    val cloudiness: Int,        // Облачность (cloudcover)
+    val description: String,    // Описание (conditions)
+    val icon: String,           // Иконка (icon)
+    val sunrise: Long,          // Восход (sunriseEpoch)
+    val sunset: Long,           // Закат (sunsetEpoch)
+    val hours: List<HourlyWeather>? = null // Почасовые данные
 )
+

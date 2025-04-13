@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/forecastWeatherFragment"
-        android:name="com.example.weatherforecast.ui.ForecastWeatherFragment"
+        android:name="com.example.weatherforecast.presentation.ui.ForecastWeatherFragment"
         android:label="ForecastWeatherFragment">
         <action
             android:id="@+id/action_forecastWeatherFragment_to_forecastDetailFragment"
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/forecastDetailFragment"
-        android:name="com.example.weatherforecast.ui.ForecastDetailFragment"
+        android:name="com.example.weatherforecast.presentation.ui.ForecastDetailFragment"
         android:label="ForecastDetailFragment" >
         <argument
             android:name="daily"

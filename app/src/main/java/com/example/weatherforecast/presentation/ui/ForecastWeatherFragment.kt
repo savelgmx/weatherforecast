@@ -1,4 +1,4 @@
-package com.example.weatherforecast.ui
+package com.example.weatherforecast.presentation.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,15 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.components.MainScreen
-import com.example.weatherforecast.ui.viewmodels.OpenWeatherForecastViewModel
-import com.example.weatherforecast.ui.viewmodels.OpenWeatherMapViewModel
+import com.example.weatherforecast.presentation.viewmodels.OpenWeatherForecastViewModel
+import com.example.weatherforecast.presentation.viewmodels.OpenWeatherMapViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ForecastWeatherFragment : Fragment() {
 
     private val viewModel: OpenWeatherForecastViewModel by viewModels()
-    private val currentViewModel:OpenWeatherMapViewModel by viewModels()
+    private val currentViewModel: OpenWeatherMapViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

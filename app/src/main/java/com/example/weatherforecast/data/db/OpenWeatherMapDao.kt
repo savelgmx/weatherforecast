@@ -1,4 +1,4 @@
-package com.example.weatherforecast.db
+package com.example.weatherforecast.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

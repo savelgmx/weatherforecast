@@ -8,7 +8,7 @@ interface WeatherApiService {
         suspend fun getWeather(
             @Query("location") location: String,
             @Query("unitGroup") unitGroup: String = "metric",
-            @Query("include") include: String = "days",
+            @Query("include") include: String = "days,hours",
             @Query("key") apiKey: String,
             @Query("contentType") contentType: String = "json"
         ): WeatherApiResponse

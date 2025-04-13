@@ -3,11 +3,11 @@ package com.example.weatherforecast.api
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.example.weatherforecast.db.CurrentWeatherEntity
-import com.example.weatherforecast.db.DailyWeatherEntity
-import com.example.weatherforecast.db.ForecastWeatherEntity
-import com.example.weatherforecast.db.HourlyWeatherEntity
-import com.example.weatherforecast.db.OpenWeatherMapDao
+import com.example.weatherforecast.data.db.CurrentWeatherEntity
+import com.example.weatherforecast.data.db.DailyWeatherEntity
+import com.example.weatherforecast.data.db.ForecastWeatherEntity
+import com.example.weatherforecast.data.db.HourlyWeatherEntity
+import com.example.weatherforecast.data.db.OpenWeatherMapDao
 import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.Weather

@@ -31,7 +31,7 @@ import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.ui.ForecastWeatherFragmentDirections
+import com.example.weatherforecast.presentation.ui.ForecastWeatherFragmentDirections
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils

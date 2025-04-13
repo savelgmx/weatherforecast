@@ -1,4 +1,4 @@
-package com.example.weatherforecast.ui.viewmodels
+package com.example.weatherforecast.presentation.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.MutableState

@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.ui.theme.orange
-import com.example.weatherforecast.ui.theme.white
+import com.example.weatherforecast.presentation.ui.theme.orange
+import com.example.weatherforecast.presentation.ui.theme.white
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable

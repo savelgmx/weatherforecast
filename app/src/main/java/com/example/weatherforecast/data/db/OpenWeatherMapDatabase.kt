@@ -1,4 +1,4 @@
-package com.example.weatherforecast.db
+package com.example.weatherforecast.data.db
 
 import android.content.Context
 import androidx.room.Database
@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 
 @Database(entities = [CurrentWeatherEntity::class, ForecastWeatherEntity::class,
-                DailyWeatherEntity::class,HourlyWeatherEntity::class], version = 2, exportSchema = false)
+                DailyWeatherEntity::class, HourlyWeatherEntity::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class OpenWeatherMapDatabase : RoomDatabase() {
     abstract fun openWeatherMapDao(): OpenWeatherMapDao
