@@ -9,6 +9,7 @@ object WeatherMapper {
     fun toDailyWeather(apiDay: ApiDay): DailyWeather {
         return DailyWeather(
             date = apiDay.date,
+            dt = apiDay.dateEpoch,
             temp = apiDay.temp,
             feelsLike = apiDay.feelsLike,
             tempMin = apiDay.tempMin,

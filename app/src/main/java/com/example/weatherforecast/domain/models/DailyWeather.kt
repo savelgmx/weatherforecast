@@ -6,6 +6,7 @@ These entities will replace or adapt the existing WeatherResponse (current weath
 
 data class DailyWeather(
     val date: String,           // "2025-04-03" (datetime)
+    val dt:Long,                 //datetime in Unix epoch
     val temp: Double,           // Средняя температура (temp)
     val feelsLike: Double,      // Ощущается как (feelslike)
     val tempMin: Double,        // Минимальная температура (tempmin)

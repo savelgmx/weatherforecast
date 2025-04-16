@@ -24,8 +24,8 @@ object WeatherResponseMapper {
             main = Main(
                 temp = dailyWeather.temp.toDouble(),
                 feels_like = dailyWeather.feelsLike,
-                temp_min = dailyWeather.tempMin.toFloat(),
-                temp_max = dailyWeather.tempMax.toFloat(),
+                temp_min = dailyWeather.tempMin,
+                temp_max = dailyWeather.tempMax,
                 pressure = dailyWeather.pressure.toInt(),
                 humidity = dailyWeather.humidity
             ),
@@ -46,11 +46,11 @@ object WeatherResponseMapper {
             Daily(
                 clouds = daily.cloudiness,
                 dewPoint = 0.0,
-                dt = daily.date.toLongOrNull() ?: 0L,
+                dt = daily.dt.toInt(),
                 feelsLike = FeelsLike(daily.feelsLike, daily.feelsLike, daily.feelsLike, daily.feelsLike),
                 humidity = daily.humidity,
-                sunrise = daily.sunrise,
-                sunset = daily.sunset,
+                sunrise = daily.sunrise.toInt(),
+                sunset = daily.sunset.toInt(),
                 pressure = daily.pressure.toInt(),
                 moonrise = 0L,
                 moonset = 0L,
