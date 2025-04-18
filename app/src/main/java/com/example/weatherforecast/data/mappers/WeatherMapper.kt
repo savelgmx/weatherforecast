@@ -4,7 +4,7 @@ import com.example.weatherforecast.data.remote.ApiDay
 import com.example.weatherforecast.data.remote.ApiHour
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
-
+//преобразует данные API в доменные модели.
 object WeatherMapper {
     fun toDailyWeather(apiDay: ApiDay): DailyWeather {
         return DailyWeather(

@@ -13,7 +13,7 @@ import com.example.weatherforecast.response.Temp
 import com.example.weatherforecast.response.Weather
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.response.Wind
-
+//преобразует доменные модели в старые модели для UI.
 
 object WeatherResponseMapper {
     fun toWeatherResponse(dailyWeather: DailyWeather): WeatherResponse {
@@ -52,8 +52,8 @@ object WeatherResponseMapper {
                 sunrise = daily.sunrise.toInt(),
                 sunset = daily.sunset.toInt(),
                 pressure = daily.pressure.toInt(),
-                moonrise = 0L,
-                moonset = 0L,
+                moonrise = 0,
+                moonset = 0,
                 temp = Temp(daily.tempMin, daily.tempMax, daily.tempMin, daily.tempMax, daily.temp, daily.temp),
                 uvi = 0.0,
                 weather = listOf(Weather(0, daily.description, daily.description, daily.icon)),
