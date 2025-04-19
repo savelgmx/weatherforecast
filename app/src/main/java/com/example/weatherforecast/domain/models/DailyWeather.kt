@@ -20,6 +20,7 @@ data class DailyWeather(
     val icon: String,           // Иконка (icon)
     val sunrise: Long,          // Восход (sunriseEpoch)
     val sunset: Long,           // Закат (sunsetEpoch)
+    val moonPhase: Double,      //фаза луны
     val hours: List<HourlyWeather>? = null // Почасовые данные
 )
 

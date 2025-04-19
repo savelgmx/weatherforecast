@@ -48,6 +48,7 @@ object WeatherResponseMapper {
                 dewPoint = 0.0,
                 dt = daily.dt.toInt(),
                 feelsLike = FeelsLike(daily.feelsLike, daily.feelsLike, daily.feelsLike, daily.feelsLike),
+                moonPhase = daily.moonPhase,
                 humidity = daily.humidity,
                 sunrise = daily.sunrise.toInt(),
                 sunset = daily.sunset.toInt(),
@@ -62,8 +63,9 @@ object WeatherResponseMapper {
                 windSpeed = daily.windSpeed
             )
         }
+        val moonPhase = if (dailyWeathers.isNotEmpty()) dailyWeathers.first().moonPhase else 0.0
         return ForecastResponse(
-            current = Current(0, 0.0, 0L, 0.0, 0, 0, 0L, 0L, 0.0, 0.0, 0, emptyList(), 0, 0.0, 0.0),
+            current = Current(0, 0.0, 0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0, emptyList(), 0, 0.0, 0.0),
             daily = forecastItems,
             hourly = emptyList(),
             lat = 0.0,

@@ -23,6 +23,7 @@ object WeatherMapper {
             icon = apiDay.icon,
             sunrise = apiDay.sunriseEpoch,
             sunset = apiDay.sunsetEpoch,
+            moonPhase = apiDay.moonPhase,
             hours = apiDay.hours?.map { toHourlyWeather(it) }
         )
     }
