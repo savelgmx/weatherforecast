@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.api.OpenWeatherMapRepository
+import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OpenWeatherForecastViewModel @Inject constructor(
-    private val repository: OpenWeatherMapRepository
+    private val getWeatherUseCase: GetWeatherUseCase
 ):ViewModel(){
 
     val forecastLiveData: MutableState<Resource<ForecastResponse>> = mutableStateOf(Resource.Loading())
@@ -27,13 +28,11 @@ class OpenWeatherForecastViewModel @Inject constructor(
         if(!isForecastLoaded){
             viewModelScope.launch {
                 forecastLiveData.value = Resource.Loading()
-                try {
-                    val result = repository.getForecastWeather()
+                val result = getWeatherUseCase.getForecastWeather()
                     forecastLiveData.value = result
-                    Log.d("ViewModel result response",result.toString())
-
-                }catch (e:Exception){
-                    forecastLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
+                if (result is Resource.Success) {
+                    Log.d("Map view model response", result.data.toString())
+                    isForecastLoaded = true // Set only on success
                 }
             }
         }

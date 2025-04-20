@@ -5,7 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecast.api.OpenWeatherMapRepository
+import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,30 +14,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OpenWeatherMapViewModel @Inject constructor(
-    private val repository: OpenWeatherMapRepository
+    private val getWeatherUseCase: GetWeatherUseCase
 ) : ViewModel() {
 
     val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
     private var isWeatherLoaded = false // Flag to track if weather data is already loaded
 
     init {
-        // Call this function when ViewModel is initialized
-        getCurrentWeather() // or provide a default city
-        isWeatherLoaded=true
+        getCurrentWeather()
+        isWeatherLoaded = true // As per OpenWeatherForecastViewModel logic
     }
 
     fun getCurrentWeather() {
-        if (!isWeatherLoaded) { // Check if weather data is already loaded
+        if (!isWeatherLoaded) {
             viewModelScope.launch {
                 weatherLiveData.value = Resource.Loading()
-                try {
-                    val result = repository.getCurrentWeather()
-
-                    Log.d("Map view model response",result.toString())
-                    weatherLiveData.value = result
-                    isWeatherLoaded = true // Set flag to true after successful loading
-                } catch (e: Exception) {
-                    weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
+                val result = getWeatherUseCase.getCurrentWeather()
+                weatherLiveData.value = result
+                if (result is Resource.Success) {
+                    Log.d("Map view model response", result.data.toString())
+                    isWeatherLoaded = true // Set only on success
                 }
             }
         }
