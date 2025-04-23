@@ -16,7 +16,7 @@ import com.example.weatherforecast.response.Wind
 //преобразует доменные модели в старые модели для UI.
 
 object WeatherResponseMapper {
-    fun toWeatherResponse(dailyWeather: DailyWeather): WeatherResponse {
+    fun toWeatherResponse(dailyWeather: DailyWeather, cityName: String): WeatherResponse {
         return WeatherResponse(
             coord = Coord(0.0, 0.0),
             weather = listOf(Weather(0, dailyWeather.description, dailyWeather.description, dailyWeather.icon)),
@@ -32,11 +32,11 @@ object WeatherResponseMapper {
             visibility = 10000,
             wind = Wind(dailyWeather.windSpeed, dailyWeather.windDeg),
             clouds = Clouds(dailyWeather.cloudiness),
-            dt = System.currentTimeMillis() / 1000,
+            dt = dailyWeather.dt / 1000,
             sys = Sys(0, 0, "N/A", dailyWeather.sunrise, dailyWeather.sunset),
             timezone = 0,
             id = 0,
-            name = "Hamburg",
+            name = cityName,  // Используйте переданный cityName
             cod = 200
         )
     }
