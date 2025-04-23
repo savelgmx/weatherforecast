@@ -52,7 +52,7 @@ fun ForecastWeatherList(
     ) {
 
 
-        for (index in 0 until count) {
+        for (index in 1 until count) {
             dailyForecast?.getOrNull(index)?.let { daily ->
                 ClickableDayForecastItem(daily = daily, navController = navController)
             }
