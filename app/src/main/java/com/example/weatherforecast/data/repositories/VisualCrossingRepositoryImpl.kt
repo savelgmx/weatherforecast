@@ -54,7 +54,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 include = "days,hours"
             )
             val dailyWeather = WeatherMapper.toDailyWeather(response.days.first())
-        val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)  // Передайте cityName
+            val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)  // Передайте cityName
             Resource.Success(weatherResponse)
         } catch (e: IOException) {
             Resource.Internet()
