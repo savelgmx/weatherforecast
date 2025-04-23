@@ -23,9 +23,10 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideVisualCrossingRepository(
-        api: WeatherApiService
+        api: WeatherApiService,contextProvider:ContextProvider
+
     ): VisualCrossingRepository {
-        return VisualCrossingRepositoryImpl(api)
+        return VisualCrossingRepositoryImpl(api,contextProvider)
         }
     }
 

@@ -7,6 +7,7 @@ import com.example.weatherforecast.data.db.CurrentWeatherEntity
 import com.example.weatherforecast.data.mappers.WeatherMapper
 import com.example.weatherforecast.data.mappers.WeatherResponseMapper
 import com.example.weatherforecast.data.remote.WeatherApiService
+import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
@@ -15,8 +16,10 @@ import java.io.IOException
 import javax.inject.Inject
 
 class VisualCrossingRepositoryImpl @Inject constructor(
-    private val apiService: WeatherApiService
+    private val apiService: WeatherApiService,
+    contextProvider: ContextProvider
 ) : VisualCrossingRepository {
+
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
         return try {
