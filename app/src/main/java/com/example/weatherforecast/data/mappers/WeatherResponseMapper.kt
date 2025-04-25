@@ -32,7 +32,7 @@ object WeatherResponseMapper {
             visibility = 10000,
             wind = Wind(dailyWeather.windSpeed, dailyWeather.windDeg),
             clouds = Clouds(dailyWeather.cloudiness),
-            dt = dailyWeather.dt / 1000,
+            dt = dailyWeather.dt ,
             sys = Sys(0, 0, "N/A", dailyWeather.sunrise, dailyWeather.sunset),
             timezone = 0,
             id = 0,
