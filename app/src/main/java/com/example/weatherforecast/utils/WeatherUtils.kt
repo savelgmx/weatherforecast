@@ -110,10 +110,10 @@ class WeatherUtils {
         fun convertWindSpeed(windSpeed:Int,selectedWindOptions:Int):String {
             // Convert the wind speed to the selected unit using integer calculations
             val convertedWindSpeed = when (selectedWindOptions) {
-                0 -> windSpeed  // km/h is the default unit
-                1 -> (windSpeed/3.6) // Conversion from km/h to m/s
-                2 -> (windSpeed*0.587)  // Conversion from km/h to knots
-                3 -> (windSpeed * 0.91)  // Conversion from km/h to ft/s
+                0 ->  windSpeed  // km/h is the default unit
+                1 -> (windSpeed/3.6).toInt() // Conversion from km/h to m/s
+                2 -> (windSpeed*0.587).toInt() // Conversion from km/h to knots
+                3 -> (windSpeed * 0.91).toInt()  // Conversion from km/h to ft/s
                 else -> {}
             }
             return convertedWindSpeed.toString()
