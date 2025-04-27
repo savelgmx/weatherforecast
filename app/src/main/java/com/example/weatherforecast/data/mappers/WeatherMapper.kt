@@ -31,6 +31,7 @@ object WeatherMapper {
     fun toHourlyWeather(apiHour: ApiHour): HourlyWeather {
         return HourlyWeather(
             time = apiHour.time,
+            dt= apiHour.timeEpoch,
             temp = apiHour.temp,
             feelsLike = apiHour.feelsLike,
             pressure = apiHour.pressure,

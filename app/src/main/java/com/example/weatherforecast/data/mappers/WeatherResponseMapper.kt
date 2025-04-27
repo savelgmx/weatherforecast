@@ -7,6 +7,7 @@ import com.example.weatherforecast.response.Current
 import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.FeelsLike
 import com.example.weatherforecast.response.ForecastResponse
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.Main
 import com.example.weatherforecast.response.Sys
 import com.example.weatherforecast.response.Temp
@@ -63,11 +64,31 @@ object WeatherResponseMapper {
                 windSpeed = daily.windSpeed
             )
         }
+
+        // Извлекаем почасовые данные
+        val allHourly = dailyWeathers.flatMap { it.hours ?: emptyList() }.map { hourlyWeather ->
+            Hourly(
+                dt = hourlyWeather.dt.toInt(),
+                temp = hourlyWeather.temp,
+                feelsLike = hourlyWeather.feelsLike,
+                pressure = hourlyWeather.pressure.toInt(),
+                humidity = hourlyWeather.humidity,
+                dewPoint = 0.0, // Добавьте реальное значение, если доступно
+                uvi = 0.0,
+                clouds = hourlyWeather.cloudiness,
+                visibility = 10000,
+                windSpeed = hourlyWeather.windSpeed,
+                windDeg = hourlyWeather.windDeg,
+                windGust = 0.0,
+                weather = listOf(Weather(0, hourlyWeather.description, hourlyWeather.description, hourlyWeather.icon))
+            )
+        }
+
         val moonPhase = if (dailyWeathers.isNotEmpty()) dailyWeathers.first().moonPhase else 0.0
         return ForecastResponse(
             current = Current(0, 0.0, 0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0, emptyList(), 0, 0.0, 0.0),
             daily = forecastItems,
-            hourly = emptyList(),
+            hourly = allHourly,
             lat = 0.0,
             lon = 0.0,
             timezone = "",

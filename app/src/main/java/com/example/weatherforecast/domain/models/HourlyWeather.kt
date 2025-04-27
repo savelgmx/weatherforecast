@@ -5,6 +5,7 @@ package com.example.weatherforecast.domain.models
 
 data class HourlyWeather(
     val time: String,           // "12:00:00" (datetime)
+    val dt:Long,                 //datetime in Unix epoch
     val temp: Double,           // Температура (temp)
     val feelsLike: Double,      // Ощущается как (feelslike)
     val pressure: Double,       // Давление (pressure)
