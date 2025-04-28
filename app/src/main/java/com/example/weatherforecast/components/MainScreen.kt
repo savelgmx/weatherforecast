@@ -117,7 +117,16 @@ fun MainScreen(
             }
             item {
                 forecastState.data?.hourly?.let { hourlyWeatherList ->
-                    HourlyWeatherRow(hourlyWeatherList)
+                    val currentTime=System.currentTimeMillis()
+                    val next24Hours = currentTime + (24 * 60 * 60 * 1000)
+                    //filter list to display next 24 hours relatively to current time
+                    //sort items by dt and take only first 24 items in list
+                    val filteredHourlyWeatherList = hourlyWeatherList
+                        .filter { it.dt * 1000L >= currentTime && it.dt * 1000L <= next24Hours }
+                        .sortedBy { it.dt }
+                        .take(24)
+
+                    HourlyWeatherRow(filteredHourlyWeatherList)
                 }
             }
             item {
