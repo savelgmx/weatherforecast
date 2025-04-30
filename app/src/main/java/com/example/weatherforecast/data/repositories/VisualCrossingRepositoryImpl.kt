@@ -14,6 +14,8 @@ import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -33,8 +35,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             latitude = locationArray[0] ?: ""
             longitude = locationArray[1] ?: ""
             cityName = locationArray[2] ?: ""
-
-            Log.d("getlocation response",latitude+" "+longitude+cityName)
+            Log.d("getlocation response", "$latitude $longitude $cityName")
         } else {
             // Handle case when location retrieval fails
             // You might want to provide default values or throw an exception
@@ -47,7 +48,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
-        return try {
+        return withContext(Dispatchers.IO) {
+            try {
             val response = apiService.getWeather(
                 location = cityName,
                 apiKey = BuildConfig.API_KEY,
@@ -64,9 +66,11 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             Resource.Error(msg = "Unknown error: ${e.message}")
         }
     }
+    }
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
-        return try {
+        return withContext(Dispatchers.IO) {
+            try {
             val response = apiService.getWeather(
                 location = cityName,
                 apiKey = BuildConfig.API_KEY,
@@ -82,6 +86,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Resource.Error(msg = "Unknown error: ${e.message}")
         }
+    }
     }
 
     override suspend fun getWeatherForecastFromDB(): LiveData<List<CurrentWeatherEntity>> {
