@@ -4,7 +4,7 @@ package com.example.weatherforecast.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.BuildConfig
-import com.example.weatherforecast.data.db.CurrentWeatherEntity
+import com.example.weatherforecast.data.db.DailyWeatherEntity
 import com.example.weatherforecast.data.mappers.WeatherMapper
 import com.example.weatherforecast.data.mappers.WeatherResponseMapper
 import com.example.weatherforecast.data.remote.WeatherApiService
@@ -89,7 +89,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
     }
 
-    override suspend fun getWeatherForecastFromDB(): LiveData<List<CurrentWeatherEntity>> {
+    override suspend fun getWeatherForecastFromDB(): LiveData<List<DailyWeatherEntity>> {
         throw NotImplementedError("Database implementation not provided")
     }
 }

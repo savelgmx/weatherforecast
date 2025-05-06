@@ -8,31 +8,15 @@ import androidx.room.Query
 
 @Dao
 interface OpenWeatherMapDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(currentWeatherEntity: CurrentWeatherEntity)
-    @Query("SELECT * FROM weather")
-    fun getWeather(): LiveData<List<CurrentWeatherEntity>>
+    @Insert
+    suspend fun insertDailyWeather(daily: DailyWeatherEntity): Long
 
-    @Query("DELETE FROM weather")
-    fun deleteAllFromWeather()
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSevenDaysForecast(forecastWeatherEntity: ForecastWeatherEntity)
+    @Insert
+    suspend fun insertHourlyWeather(hourlies: List<HourlyWeatherEntity>)
 
-    @Query("SELECT * FROM forecast_weather")
-    fun getForecastWeather(): LiveData<List<ForecastWeatherEntity>>
-
-    @Query("DELETE FROM forecast_weather")
-    fun deleteAllFromForecastWeather()
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDailyWeather(dailyWeatherEntity: DailyWeatherEntity)
     @Query("DELETE FROM daily_weather")
-    fun deleteAllFromDailyWeather()
+    suspend fun deleteAllDailyWeather()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHourlyWeather(hourlyWeatherEntity: HourlyWeatherEntity)
     @Query("DELETE FROM hourly_weather")
-    fun deleteAllFromHourlyWeather()
-
-}
+    suspend fun deleteAllHourlyWeather()}
 
