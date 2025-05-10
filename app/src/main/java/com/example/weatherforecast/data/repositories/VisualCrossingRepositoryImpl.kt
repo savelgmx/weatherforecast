@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.data.db.DailyWeatherEntity
+import com.example.weatherforecast.data.db.HourlyWeatherEntity
+import com.example.weatherforecast.data.db.WeatherDao
 import com.example.weatherforecast.data.mappers.WeatherMapper
 import com.example.weatherforecast.data.mappers.WeatherResponseMapper
 import com.example.weatherforecast.data.remote.WeatherApiService
@@ -22,7 +24,8 @@ import javax.inject.Inject
 
 class VisualCrossingRepositoryImpl @Inject constructor(
     private val apiService: WeatherApiService,
-    contextProvider: ContextProvider
+    contextProvider: ContextProvider,
+    private val  weatherDao: WeatherDao
 ) : VisualCrossingRepository {
     private var latitude:String
     private var longitude:String
@@ -90,6 +93,60 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getWeatherForecastFromDB(): LiveData<List<DailyWeatherEntity>> {
-        throw NotImplementedError("Database implementation not provided")
+        return weatherDao.getAllDailyWeather()
     }
+
+    suspend fun clearDatabase() {
+        weatherDao.deleteAllDailyWeather()
+        weatherDao.deleteAllHourlyWeather()
+    }
+
+    suspend fun syncWeather() {
+        clearDatabase()
+         val response = apiService.getWeather(
+            location = cityName,
+            apiKey = BuildConfig.API_KEY,
+            include = "days,hours"
+        )
+        response.days.forEach { day ->
+            val dailyWeather = WeatherMapper.toDailyWeather(day)
+            val dailyEntity = DailyWeatherEntity(
+                date = dailyWeather.date,
+                dt = dailyWeather.dt,
+                temp = dailyWeather.temp,
+                feelsLike = dailyWeather.feelsLike,
+                tempMin = dailyWeather.tempMin,
+                tempMax = dailyWeather.tempMax,
+                pressure = dailyWeather.pressure,
+                humidity = dailyWeather.humidity,
+                windSpeed = dailyWeather.windSpeed,
+                windDeg = dailyWeather.windDeg,
+                cloudiness = dailyWeather.cloudiness,
+                description = dailyWeather.description,
+                icon = dailyWeather.icon,
+                sunrise = dailyWeather.sunrise,
+                sunset = dailyWeather.sunset,
+                moonPhase = dailyWeather.moonPhase
+                )
+
+            val dailyId = weatherDao.insertDailyWeather(dailyEntity)
+            val hourlyEntities = dailyWeather.hours?.map { hour ->
+                HourlyWeatherEntity(
+                    dailyId = dailyId,
+                    time = hour.time,
+                    dt = hour.dt,
+                    temp = hour.temp,
+                    feelsLike = hour.feelsLike,
+                    pressure = hour.pressure,
+                    humidity = hour.humidity,
+                    windSpeed = hour.windSpeed,
+                    windDeg = hour.windDeg,
+                    cloudiness = hour.cloudiness,
+                    description = hour.description,
+                    icon = hour.icon
+                )
+            } ?: emptyList()
+            weatherDao.insertHourlyWeather(hourlyEntities)
+        }
+     }
 }

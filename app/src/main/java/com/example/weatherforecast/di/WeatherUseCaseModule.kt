@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object WeatherUseCaseModule {
+object  WeatherUseCaseModule {
 
     @Provides
     fun provideGetWeatherUseCase(repository: VisualCrossingRepository): GetWeatherUseCase = GetWeatherUseCase(repository)

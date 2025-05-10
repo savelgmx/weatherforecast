@@ -2,7 +2,7 @@ package com.example.weatherforecast.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.weatherforecast.data.db.OpenWeatherMapDao
+import com.example.weatherforecast.data.db.WeatherDao
 import com.example.weatherforecast.data.db.OpenWeatherMapDatabase
 import dagger.Module
 import dagger.Provides
@@ -17,8 +17,8 @@ object LocalModule {
 
     @Provides
     @Singleton
-    fun provideOpenWeatherMapDao(database: OpenWeatherMapDatabase): OpenWeatherMapDao =
-        database.openWeatherMapDao()
+    fun provideOpenWeatherMapDao(database: OpenWeatherMapDatabase): WeatherDao =
+        database.weatherDao()
 
 
         @Provides

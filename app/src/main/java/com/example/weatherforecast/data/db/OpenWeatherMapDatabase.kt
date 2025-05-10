@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 
 
 @Database(entities = [DailyWeatherEntity::class, HourlyWeatherEntity::class], version = 1)
 abstract class OpenWeatherMapDatabase : RoomDatabase() {
-    abstract fun openWeatherMapDao(): OpenWeatherMapDao
+    abstract fun weatherDao(): WeatherDao
 
     companion object {
         @Volatile

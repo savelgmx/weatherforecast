@@ -1,6 +1,7 @@
 package com.example.weatherforecast.di;
 
 
+import com.example.weatherforecast.data.db.WeatherDao
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.example.weatherforecast.data.repositories.VisualCrossingRepository
 import com.example.weatherforecast.data.repositories.VisualCrossingRepositoryImpl
@@ -23,10 +24,10 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideVisualCrossingRepository(
-        api: WeatherApiService,contextProvider:ContextProvider
+        api: WeatherApiService,contextProvider:ContextProvider,weatherDao: WeatherDao
 
     ): VisualCrossingRepository {
-        return VisualCrossingRepositoryImpl(api,contextProvider)
+        return VisualCrossingRepositoryImpl(api,contextProvider,weatherDao)
         }
     }
 
