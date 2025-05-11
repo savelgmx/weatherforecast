@@ -8,10 +8,7 @@ object AppConstants {
     const val CITY_FORECAST="Krasnoyarsk"  //we set cityName constant and
     const val CITY_LAT="56.0097"  // latitude
     const val CITY_LON="92.7917" //langitude if we can't get no data about device location
-
-    const val LOCATION_PERMISSION_REQUEST_CODE = 100
-    const val MIN_TIME_BETWEEN_UPDATES: Long = 1000 * 60 * 5 // 5 minutes
-    const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Float = 10f // 10 meters
+    const val DATA_UPDATE_INTERVAL = 3600L // 1 час в секундах
 
     //https://dashboard.iqair.com/personal/api-keys
     //Air quality API key expires Sep 13, 2025

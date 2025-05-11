@@ -1,13 +1,7 @@
 package com.example.weatherforecast.data.db
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.example.weatherforecast.response.FeelsLike
-import com.example.weatherforecast.response.Temp
 
 @Entity(tableName = "daily_weather")
 data class DailyWeatherEntity(

@@ -21,5 +21,14 @@ interface WeatherDao {
 
     @Query("SELECT * FROM daily_weather")
     fun getAllDailyWeather(): LiveData<List<DailyWeatherEntity>>
+
+    @Query("SELECT MAX(dt) FROM daily_weather")
+    suspend fun getLastUpdateTime(): Long?
+
+    @Query("SELECT COUNT(*) FROM daily_weather")
+    suspend fun getDailyWeatherCount(): Int
+
+    @Query("SELECT * FROM daily_weather ORDER BY date ASC LIMIT 1")
+    suspend fun getCurrentDailyWeatherEntity(): DailyWeatherEntity?
 }
 
