@@ -16,9 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
@@ -85,32 +85,54 @@ fun WindDirectionShape(windDegree: Int) {
 
         // Draw N, E, S, W labels
         drawContext.canvas.nativeCanvas.apply {
-            drawText("N", size.width / 2, 15f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=26f;(Color.White)})
-            drawText("E", size.width - 2f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.RIGHT;textSize=26f;(Color.White) })
-            drawText("S", size.width / 2, size.height - 10f, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.CENTER;textSize=26f;(Color.White) })
-            drawText("W", 10f, size.height / 2, android.graphics.Paint().apply { textAlign = android.graphics.Paint.Align.LEFT;textSize=26f;(Color.White) })
+            val paint = android.graphics.Paint().apply {
+                textSize = 26f
+                color = android.graphics.Color.WHITE
+            }
+            paint.textAlign = android.graphics.Paint.Align.CENTER
+            drawText("N", size.width / 2, 15f, paint)
+            paint.textAlign = android.graphics.Paint.Align.RIGHT
+            drawText("E", size.width - 2f, size.height / 2, paint)
+            paint.textAlign = android.graphics.Paint.Align.CENTER
+            drawText("S", size.width / 2, size.height - 10f, paint)
+            paint.textAlign = android.graphics.Paint.Align.LEFT
+            drawText("W", 10f, size.height / 2, paint)
         }
 
-        // Draw wind direction arrow
-        val arrowPath = Path().apply {
-            moveTo(size.width / 2, size.height / 4)
-            lineTo(size.width / 2 + 10, size.height / 2)
-            lineTo(size.width / 2, size.height * 3 / 4)
-            lineTo(size.width / 2 - 10, size.height / 2)
+        // Define points
+        val W = size.width
+        val H = size.height
+        val topCenter = Offset(W / 2, H / 4)
+        val rightMiddle = Offset(W / 2 + 10, H / 2)
+        val bottomCenter = Offset(W / 2, H * 3 / 4)
+        val leftMiddle = Offset(W / 2 - 10, H / 2)
+
+        // Define topPath (upper half of arrow)
+        val topPath = Path().apply {
+            moveTo(topCenter.x, topCenter.y)
+            lineTo(rightMiddle.x, rightMiddle.y)
+            lineTo(leftMiddle.x, leftMiddle.y)
+            close()
+        }
+
+        // Define bottomPath (lower half of arrow)
+        val bottomPath = Path().apply {
+            moveTo(rightMiddle.x, rightMiddle.y)
+            lineTo(bottomCenter.x, bottomCenter.y)
+            lineTo(leftMiddle.x, leftMiddle.y)
             close()
         }
 
         rotate(degrees = windDegree.toFloat(), pivot = Offset(size.width / 2, size.height / 2)) {
             drawPath(
-                path = arrowPath,
+                path = topPath,
                 color = Color.Blue,
-                style = Stroke(width = 1f)
+                style = Fill
             )
             drawPath(
-                path = arrowPath,
+                path = bottomPath,
                 color = Color.Red,
-                alpha = 1.0f,
-                blendMode = BlendMode.Color
+                style = Fill
             )
         }
     }
