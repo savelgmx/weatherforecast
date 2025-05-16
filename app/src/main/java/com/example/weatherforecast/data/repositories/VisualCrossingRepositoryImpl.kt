@@ -137,7 +137,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
         return withContext(Dispatchers.IO) {
-            val currentTime = System.currentTimeMillis() / 1000
+            val currentTime = System.currentTimeMillis()
             val lastUpdateTime = weatherDao.getLastUpdateTime()
             val hasData = weatherDao.getDailyWeatherCount() > 0
 
