@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
@@ -40,7 +41,7 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
                 ,shape = AppShapes.large)
             .fillMaxWidth()
             .padding(all=20.dp),
-        )
+    )
     {
 
 
@@ -62,15 +63,23 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
 @Composable
 fun HourlyWeatherItem(hourly: Hourly) {
 
+
+
     var iconurl=AppConstants.WEATHER_API_IMAGE_ENDPOINT
     Column(modifier = Modifier
         .padding(3.dp)
         .background(Blue700),
-         )
+    )
     {
 
         val localContext= LocalContext.current
         val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+
+        val icon = hourly.weather[0].icon
+        val localIconName = icon.replace("-", "_")
+        val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
+        val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
+
 
         Text(
             text = WeatherUtils.updateTime(hourly.dt),
@@ -81,7 +90,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
             modifier = Modifier.padding(all = 3.dp)
         )
         AsyncImage(
-            model = "${iconurl}${hourly.weather[0].icon}.png",
+            model = imageModel, //"${iconurl}${hourly.weather[0].icon}.png",
             contentDescription = "Weather icon",
             modifier = Modifier
                 .size(40.dp) // Define your desired width and height

@@ -51,6 +51,10 @@ fun DailyWeatherCard(
             daily.feelsLike.night.toInt(), switchState
         )
 
+    val icon = daily.weather[0].icon
+    val localIconName = icon.replace("-", "_")
+    val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
+    val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
 
     Box(
         modifier = (Modifier.background(
@@ -96,7 +100,7 @@ fun DailyWeatherCard(
 
                 Column {
                     AsyncImage(
-                        model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
+                        model = imageModel, //"${UIUtils.iconurl}${daily.weather[0].icon}.png",
                         contentDescription = "Weather icon",
                         modifier = Modifier
                             .size(150.dp)
