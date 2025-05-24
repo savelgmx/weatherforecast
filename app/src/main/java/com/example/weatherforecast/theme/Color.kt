@@ -1,5 +1,7 @@
 package com.example.weatherforecast.theme
 
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val Blue300 = Color(0xFF64B5F6)
@@ -23,4 +25,30 @@ val Black2 = Color(0xFF000000)
 val RedErrorDark = Color(0xFFB00020)
 val RedErrorLight = Color(0xFFEF5350)
 
+val LightColorPalette = lightColors(
+    primary = Blue600,
+    primaryVariant = Blue700,
+    secondary = White1,
+    background = Grey1,
+    surface = White1,
+    error = RedErrorLight,
+    onPrimary = White1,
+    onSecondary = Black1,
+    onBackground = Black1,
+    onSurface = Black1,
+    onError = White1
+)
 
+val DarkColorPalette = darkColors(
+    primary = Blue700,
+    primaryVariant = Blue800,
+    secondary = Black1,
+    background = Black2,
+    surface = Black1,
+    error = RedErrorDark,
+    onPrimary = White1,
+    onSecondary = White1,
+    onBackground = White1,
+    onSurface = White1,
+    onError = Black1
+)

@@ -122,7 +122,7 @@ fun MainScreen(
                     //filter list to display next 24 hours relatively to current time
                     //sort items by dt and take only first 24 items in list
                     val filteredHourlyWeatherList = hourlyWeatherList
-                        .filter { it.dt * 1000L >= currentTime && it.dt * 1000L <= next24Hours }
+                        .filter { it.dt * 1000L in currentTime..next24Hours }
                         .sortedBy { it.dt }
                         .take(24)
 
