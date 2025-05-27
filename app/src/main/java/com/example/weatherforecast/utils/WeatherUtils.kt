@@ -2,12 +2,20 @@ package com.example.weatherforecast.utils
 
 
 import android.content.Context
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.theme.QuickSandTypography
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -236,6 +244,33 @@ class WeatherUtils {
             val duskString = duskTime?.let { Date(it * 1000L) }?.let { dateFormat.format(it) }
 
             return arrayOf(dawnString, duskString)
+        }
+        @Composable
+        fun WeatherText(
+            text: String,
+            style: TextStyle,
+            modifier: Modifier = Modifier
+        ) {
+            Text(
+                text = text,
+                style = style,
+                color = MaterialTheme.colors.onSurface,
+                modifier = modifier
+            )
+        }
+
+        @Composable
+        fun WeatherHeader(
+            text: String,
+            modifier: Modifier = Modifier.padding(start = 20.dp)
+        ) {
+            Text(
+                text = text,
+                fontWeight = FontWeight.Bold,
+                style = QuickSandTypography.subtitle1,
+                color = MaterialTheme.colors.onBackground,
+                modifier = modifier
+            )
         }
 
     }
