@@ -87,9 +87,9 @@ fun CurrentWeatherCard(
                             it.toInt(),
                             localContext
                         )
-                    } +": "+ weatherState.data?.wind?.speed.let {
+                    } +":  "+ weatherState.data?.wind?.speed.let {
                         it?.let { it1 -> WeatherUtils.convertWindSpeed(it1.toInt(),windSpeedUnits) }
-                    }   + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
+                    } +" "  + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -99,7 +99,7 @@ fun CurrentWeatherCard(
 
                         Text(
                             text = day!!, color = Color.White,
-                            style = QuickSandTypography.h5,
+                            style = QuickSandTypography.headlineMedium,
                             modifier = Modifier.padding(end = 1.dp)
                         )
                     }
@@ -118,7 +118,7 @@ fun CurrentWeatherCard(
                                 text = " $temperature",
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
-                                style = QuickSandTypography.h1,
+                                style = QuickSandTypography.headlineLarge,
                                 modifier = Modifier.padding(start = 3.dp)
                             )
 
@@ -151,7 +151,7 @@ fun CurrentWeatherCard(
                                 Text(
                                     text = feels_like,
                                     color = Color.White,
-                                    style = QuickSandTypography.h5,
+                                    style = QuickSandTypography.titleLarge,
                                     modifier = Modifier.padding(1.dp)
                                 )
                             }
@@ -165,7 +165,7 @@ fun CurrentWeatherCard(
                                 Text(
                                     text = wind,
                                     color = Color.White,
-                                    style = QuickSandTypography.h6,
+                                    style = QuickSandTypography.titleMedium,
                                     modifier = Modifier.padding(1.dp)
                                 )
 
@@ -176,9 +176,9 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "$pressure $pressureUnit",
+                                    text = "$pressure  $pressureUnit",
                                     color = Color.White,
-                                    style = QuickSandTypography.h6,
+                                    style = QuickSandTypography.titleSmall,
                                     modifier = Modifier.padding(1.dp)
                                 )
 

@@ -59,7 +59,7 @@ fun DrawerContent() {
         ) {
             Text(text=context.getString(R.string.measurements_units),
                 color=Color.White,
-                style = QuickSandTypography.h6,
+                style = QuickSandTypography.titleMedium,
                 modifier = Modifier.padding(all = 8.dp)
             )
         }

@@ -117,13 +117,13 @@ fun DailyWeatherCard(
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
-                            style = QuickSandTypography.body2,
+                            style = QuickSandTypography.bodyMedium,
                             modifier = Modifier.padding(all = 3.dp)
                         )
                         Text(
                             text = feelsLike,
                             color = Color.White,
-                            style = QuickSandTypography.subtitle2,
+                            style = QuickSandTypography.titleMedium,
                             modifier = Modifier.padding(all = 3.dp)
                         )
 
@@ -137,14 +137,14 @@ fun DailyWeatherCard(
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
-                            style = QuickSandTypography.body1,
+                            style = QuickSandTypography.bodyMedium,
                             modifier = Modifier.padding(all = 3.dp)
                         )
 
                         Text(
                             text = feelsLikeNight,
                             color = Color.White,
-                            style = QuickSandTypography.subtitle2,
+                            style = QuickSandTypography.titleMedium,
                             modifier = Modifier.padding(all = 3.dp)
                         )
                     }
@@ -154,7 +154,7 @@ fun DailyWeatherCard(
                         Text(
                             text = daily.weather[0].description,
                             color = Color.White,
-                            style = QuickSandTypography.subtitle2,
+                            style = QuickSandTypography.titleSmall,
                             modifier = Modifier.padding(all = 3.dp)
                         )
 

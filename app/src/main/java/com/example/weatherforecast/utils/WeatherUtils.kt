@@ -254,7 +254,7 @@ class WeatherUtils {
             Text(
                 text = text,
                 style = style,
-                color = MaterialTheme.colors.onSurface,
+                color = MaterialTheme.colors.surface,
                 modifier = modifier
             )
         }
@@ -267,7 +267,7 @@ class WeatherUtils {
             Text(
                 text = text,
                 fontWeight = FontWeight.Bold,
-                style = QuickSandTypography.subtitle1,
+                style = QuickSandTypography.titleMedium,
                 color = MaterialTheme.colors.onBackground,
                 modifier = modifier
             )

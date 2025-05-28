@@ -85,7 +85,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
             text = WeatherUtils.updateTime(hourly.dt),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
-            style = QuickSandTypography.h6,
+            style = QuickSandTypography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(all = 3.dp)
         )
@@ -100,7 +100,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
             text = WeatherUtils.updateTemperature(hourly.temp.toInt(), switchState),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
-            style = QuickSandTypography.h6,
+            style = QuickSandTypography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(all =3.dp)
         )

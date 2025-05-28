@@ -94,7 +94,7 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                     text = WeatherUtils.updateDateToToday(daily.dt),
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    style = QuickSandTypography.body1,
+                    style = QuickSandTypography.bodyLarge,
                     modifier = Modifier
                         .padding(all = 3.dp)
                 )
@@ -113,7 +113,7 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                     )}",
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    style = QuickSandTypography.body1,
+                    style = QuickSandTypography.bodyLarge,
                     modifier = Modifier.padding(all =3.dp)
                 )
             }

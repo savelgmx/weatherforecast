@@ -51,20 +51,20 @@ fun WindSpeedCard(speed: Int, windDegree: Int) {
             Text(" ${context.getText(R.string.wind_speed)}",
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
-                style= QuickSandTypography.subtitle2
+                style= QuickSandTypography.titleMedium
             )
             WindDirectionShape(windDegree = windDegree)
             Text("${WeatherUtils.convertWindSpeed(speed,selectedWindOptions)} ${WeatherUtils.selectionWindSignature(selection = selectedWindOptions)}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                style = QuickSandTypography.h4,
+                style = QuickSandTypography.headlineSmall,
                 color = Color.White
             )
             Text(
                 WeatherUtils.updateWind(windDirection = windDegree.toString(), windSpeed = speed, context =context ),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                style = QuickSandTypography.h4,
+                style = QuickSandTypography.headlineSmall,
                 color = Color.White
             )
         }
