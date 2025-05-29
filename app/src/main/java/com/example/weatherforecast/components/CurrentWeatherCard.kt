@@ -66,6 +66,7 @@ fun CurrentWeatherCard(
 
                     val temperature = weatherState.data?.main?.temp?.let {
                         WeatherUtils.updateTemperature(it.toInt(),switchState)
+
                     }
 
 
@@ -126,8 +127,12 @@ fun CurrentWeatherCard(
 
                         Column {
                             val icon = weatherState.data?.weather?.get(0)?.icon
+                            val localIconName = icon?.replace("-", "_")
+                            val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
+                            val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
+
                             AsyncImage(
-                                model = "${UIUtils.iconurl}$icon.png",
+                                model =imageModel,// "${UIUtils.iconurl}$icon.png",
                                 contentDescription = "Weather icon",
                                 modifier = Modifier
                                     .size(70.dp) // Define your desired width and height

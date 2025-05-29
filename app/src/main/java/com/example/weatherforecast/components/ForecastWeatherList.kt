@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.weatherforecast.R
 import com.example.weatherforecast.presentation.ui.ForecastWeatherFragmentDirections
 import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.ForecastResponse
@@ -75,6 +76,11 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
         val localContext = LocalContext.current
         val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
 
+        val icon = daily.weather?.get(0)?.icon
+        val localIconName = icon?.replace("-", "_")
+        val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
+        val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
+
 
         Column(modifier = Modifier
             .padding(all=1.dp)
@@ -99,7 +105,7 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                         .padding(all = 3.dp)
                 )
                 AsyncImage(
-                    model = "${UIUtils.iconurl}${daily.weather[0].icon}.png",
+                    model = imageModel,//"${UIUtils.iconurl}${daily.weather[0].icon}.png",
                     contentDescription = "Weather icon",
                     modifier = Modifier
                         .size(40.dp)// Define your desired width and height
