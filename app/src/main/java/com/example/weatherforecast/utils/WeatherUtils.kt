@@ -268,7 +268,7 @@ class WeatherUtils {
                 text = text,
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.titleMedium,
-                color = MaterialTheme.colors.onBackground,
+                color = MaterialTheme.colors.onPrimary,
                 modifier = modifier
             )
         }

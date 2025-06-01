@@ -2,6 +2,8 @@ package com.example.weatherforecast.components
 
 
 
+import android.content.res.Resources.Theme
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +33,7 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppTheme
+import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -92,6 +95,7 @@ fun MainScreen(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 if (hasError) {
                     item {
