@@ -203,7 +203,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 horizontalArrangement = Arrangement.Center)         {
 
                 Text(context.getString(R.string.sunrise)+": ",
-                    color =  Color.White, style = QuickSandTypography.titleLarge, fontWeight = FontWeight.Bold)
+                    color =  Color.White, style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
 
             }
 
@@ -211,7 +211,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
 
-                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.titleLarge)
+                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
             }
 
             Row    (modifier = Modifier.padding(all=1.dp),
@@ -219,7 +219,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 horizontalArrangement = Arrangement.Center)         {
                 //Dawn
                 Text(context.getString(R.string.dawn)+": ",
-                    color =  Color.White, style = QuickSandTypography.titleLarge, fontWeight = FontWeight.Bold)
+                    color =  Color.White, style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
 
             }
 
@@ -227,7 +227,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
 
-                Text(dawn, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.titleLarge)
+                Text(dawn, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.titleMedium)
             }
 
 
@@ -236,14 +236,14 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
                 Text(context.getString(R.string.sunset)+": ",
-                    color = Color.White,style = QuickSandTypography.titleLarge, fontWeight = FontWeight.Bold)
+                    color = Color.White,style = QuickSandTypography.bodyMedium, fontWeight = FontWeight.Bold)
 
             }
 
             Row(modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
-                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.titleLarge)
+                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.titleMedium)
 
             }
 
@@ -253,14 +253,14 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
                 Text(context.getString(R.string.dusk)+": ",
-                    color = Color.White,style = QuickSandTypography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    color = Color.White,style = QuickSandTypography.titleMedium, fontWeight = FontWeight.SemiBold)
 
             }
 
             Row(modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
-                Text(dusk, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.titleLarge)
+                Text(dusk, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.bodyMedium)
 
             }
 
@@ -297,7 +297,7 @@ fun MoonriseMoonsetCard(
                     text = localContext.getString(R.string.moonrise),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.titleLarge,
+                    style = QuickSandTypography.titleMedium,
                     modifier = Modifier.padding(all = 1.dp)
                 )
             }
@@ -315,7 +315,7 @@ fun MoonriseMoonsetCard(
                     text = localContext.getString(R.string.moonset),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.titleLarge,
+                    style = QuickSandTypography.titleMedium,
                     modifier = Modifier.padding(all = 3.dp)
                 )
             }
@@ -334,7 +334,7 @@ fun MoonriseMoonsetCard(
                     text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),
                     color = Color.White,
                     fontWeight = FontWeight.Light,
-                    style = QuickSandTypography.titleLarge,
+                    style = QuickSandTypography.titleMedium,
                     modifier = Modifier.padding(all = 1.dp)
                 )
 

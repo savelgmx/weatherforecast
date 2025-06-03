@@ -191,8 +191,8 @@ fun MainScreen(
                                 .padding(all = 3.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            forecastData.current?.sunrise?.let { sunrise ->
-                                forecastData.current.sunset?.let { sunset ->
+                            forecastData.daily[0].sunrise?.let { sunrise ->
+                                forecastData.daily[0].sunset?.let { sunset ->
                                     val timeOfSunrise = WeatherUtils.updateTime(sunrise)
                                     val timeOfSunset = WeatherUtils.updateTime(sunset)
                                     val timeOfDawnAndDusk = WeatherUtils.calculateDawnAndDusk(sunrise, sunset)
