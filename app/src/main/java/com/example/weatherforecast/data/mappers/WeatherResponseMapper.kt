@@ -56,7 +56,7 @@ object WeatherResponseMapper {
                 pressure = daily.pressure.toInt(),
                 moonrise = 0,
                 moonset = 0,
-                temp = Temp(daily.tempMin, daily.tempMax, daily.tempMin, daily.tempMax, daily.temp, daily.temp),
+                temp = Temp(daily.temp, daily.temp, daily.tempMax, daily.tempMin, daily.temp, daily.temp),
                 uvi = 0.0,
                 weather = listOf(Weather(0, daily.description, daily.description, daily.icon)),
                 windDeg = daily.windDeg,

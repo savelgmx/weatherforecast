@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
@@ -41,7 +43,7 @@ fun CurrentWeatherCard(
 
     Box(
         modifier = (Modifier.background(
-            Blue300,
+            Blue600,
             shape = AppShapes.large
         )
                 )
@@ -66,9 +68,12 @@ fun CurrentWeatherCard(
 
                     val temperature = weatherState.data?.main?.temp?.let {
                         WeatherUtils.updateTemperature(it.toInt(),switchState)
-
                     }
-
+                    val tempMax = weatherState.data?.main?.temp_max?.let {
+                        WeatherUtils.updateTemperature(it.toInt(),switchState) }
+                    val tempMin = weatherState.data?.main?.temp_min?.let {
+                        WeatherUtils.updateTemperature(it.toInt(),switchState)
+                    }
 
                     weatherState.data?.name
                     val day =
@@ -111,6 +116,8 @@ fun CurrentWeatherCard(
                         verticalAlignment = Alignment.CenterVertically
                     )
                     {
+
+
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement =Arrangement.Top
@@ -124,6 +131,7 @@ fun CurrentWeatherCard(
                             )
 
                         } //column#1 inside temperature
+
 
                         Column {
                             val icon = weatherState.data?.weather?.get(0)?.icon
@@ -144,6 +152,7 @@ fun CurrentWeatherCard(
 
                         Column {
 
+
                             // Row 2: Temperature with Weather Icon
 
                             Row(
@@ -152,7 +161,6 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 
-
                                 Text(
                                     text = feels_like,
                                     color = Color.White,
@@ -160,6 +168,17 @@ fun CurrentWeatherCard(
                                     modifier = Modifier.padding(1.dp)
                                 )
                             }
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment =Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "max: $tempMax  min: $tempMin" ,
+                                    color= Color.White,
+                                    style= QuickSandTypography.labelLarge,
+                                    modifier = Modifier.padding(3.dp)
+                                )
+                            }//t max t min
 
 
                             Row(

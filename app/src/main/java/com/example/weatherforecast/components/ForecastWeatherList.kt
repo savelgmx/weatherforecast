@@ -31,6 +31,7 @@ import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
@@ -49,7 +50,7 @@ fun ForecastWeatherList(
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(all=16.dp)
-            .border(width = 3.dp, color = Blue300, shape = AppShapes.large),
+            .border(width = 3.dp, color = Blue600, shape = AppShapes.large),
     ) {
 
 
@@ -113,8 +114,8 @@ fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
                 )
 
                 Text(
-                    text = "${WeatherUtils.updateTemperature(daily.temp.day.toInt(), switchState)}/${WeatherUtils.updateTemperature(
-                        daily.temp.night.toInt(),
+                    text = "${WeatherUtils.updateTemperature(daily.temp.max.toInt(), switchState)}/${WeatherUtils.updateTemperature(
+                        daily.temp.min.toInt(),
                         switchState
                     )}",
                     fontWeight = FontWeight.Bold,

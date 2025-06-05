@@ -25,6 +25,7 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue300
+import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.AppConstants
@@ -37,7 +38,7 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
     Box (
         modifier = Modifier
             .background(
-                Blue300
+                Blue600
                 ,shape = AppShapes.large)
             .fillMaxWidth()
             .padding(all=20.dp),

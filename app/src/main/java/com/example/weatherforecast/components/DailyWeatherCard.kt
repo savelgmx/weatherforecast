@@ -44,7 +44,7 @@ fun DailyWeatherCard(
 
     val feelsLike =
         localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
-            daily.feelsLike.day.toInt(), switchState
+            daily.feelsLike.morn.toInt(), switchState
         )
     val feelsLikeNight =
         localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
@@ -113,7 +113,7 @@ fun DailyWeatherCard(
                     Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
                         Text(
                             text = localContext.getString(R.string.day) + ": " + WeatherUtils.updateTemperature(
-                                daily.temp.day.toInt(),
+                                daily.temp.max.toInt(),
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
@@ -133,7 +133,7 @@ fun DailyWeatherCard(
                         Text(
                             text = localContext.getString(R.string.night) + ": "
                                     + WeatherUtils.updateTemperature(
-                                daily.temp.night.toInt(),
+                                daily.temp.min.toInt(),
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
