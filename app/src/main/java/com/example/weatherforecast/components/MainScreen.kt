@@ -3,6 +3,7 @@ package com.example.weatherforecast.components
 
 
 import android.content.res.Resources.Theme
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ fun MainScreen(
     val hasError = currentState is Resource.Error || forecastState is Resource.Error
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
+
 
     AppTheme {
         Scaffold(
@@ -109,6 +111,21 @@ fun MainScreen(
                     }
                 } else if (weatherData != null && forecastData != null) {
                     item {
+                        forecastData.hourly?.let { hourlyWeatherList ->
+                            val currentTime = System.currentTimeMillis()
+                            val nextHour = currentTime + (60 * 60 * 1000)
+                            //filter list to display  current temperature
+                            //sort items by dt and take only first 24 items in list
+                            val filteredCurrentWeatherList = hourlyWeatherList
+                                .filter { it.dt * 1000L in currentTime..nextHour }
+                                .sortedBy { it.dt }
+                                .take(1)
+
+                            Log.d("current weather response", filteredCurrentWeatherList.toString())
+                        }
+
+
+
                         CurrentWeatherCard(weatherState = currentState)
                     }
                     item {

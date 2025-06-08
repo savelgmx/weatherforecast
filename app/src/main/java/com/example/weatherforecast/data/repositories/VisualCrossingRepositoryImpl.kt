@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.Locale
 import javax.inject.Inject
 
 class VisualCrossingRepositoryImpl @Inject constructor(
@@ -32,6 +33,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     private var latitude:String
     private var longitude:String
     private var cityName:String
+    private lateinit var devLocaleLanguage:String //define system locale for substitute into query
 
     init {
         val defineLocation=DefineDeviceLocation(contextProvider.provideContext())
@@ -49,6 +51,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             longitude= AppConstants.CITY_LON
             cityName= AppConstants.CITY_FORECAST
         }
+        devLocaleLanguage = Locale.getDefault().getLanguage();
 
     }
 
@@ -58,7 +61,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 val response = apiService.getWeather(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
-                    include = "days,hours"
+                    include = "days,hours",
+                    lang=devLocaleLanguage
                 )
                 val dailyWeather = WeatherMapper.toDailyWeather(response.days.first())
                 val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)  // Передайте cityName
@@ -79,7 +83,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 val response = apiService.getWeather(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
-                    include = "days,hours"
+                    include = "days,hours",
+                    lang=devLocaleLanguage
                 )
                 Resource.Success(response)
             } catch (e: IOException) {
@@ -200,7 +205,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 val response = apiService.getWeather(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
-                    include = "days,hours"
+                    include = "days,hours",
+                    lang=devLocaleLanguage
                 )
                 val dailyWeathers = response.days.map { WeatherMapper.toDailyWeather(it) }
                 val forecastResponse = WeatherResponseMapper.toForecastResponse(dailyWeathers)
@@ -229,7 +235,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         val response = apiService.getWeather(
             location = cityName,
             apiKey = BuildConfig.API_KEY,
-            include = "days,hours"
+            include = "days,hours",
+            lang=devLocaleLanguage
         )
         insertWeatherData(response)
     }

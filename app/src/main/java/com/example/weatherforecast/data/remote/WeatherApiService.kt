@@ -10,7 +10,8 @@ interface WeatherApiService {
             @Query("unitGroup") unitGroup: String = "metric",
             @Query("include") include: String = "days,hours",
             @Query("key") apiKey: String,
-            @Query("contentType") contentType: String = "json"
+            @Query("contentType") contentType: String = "json",
+            @Query("lang") lang: String
         ): WeatherApiResponse
 
 }
