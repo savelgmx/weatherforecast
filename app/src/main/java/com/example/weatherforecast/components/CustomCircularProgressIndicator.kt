@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,9 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.presentation.ui.theme.brightBlue
 import com.example.weatherforecast.presentation.ui.theme.orange
 import com.example.weatherforecast.presentation.ui.theme.white
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Composable
 fun CustomCircularProgressIndicator(

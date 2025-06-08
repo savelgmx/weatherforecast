@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,9 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppShapes
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
@@ -38,8 +37,9 @@ import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
 fun CurrentWeatherCard(
-    weatherState: Resource<WeatherResponse>
-){
+    weatherState: Resource<WeatherResponse>,
+    filteredCurrentWeatherList: List<Hourly>
+) {
 
     Box(
         modifier = (Modifier.background(
@@ -48,7 +48,8 @@ fun CurrentWeatherCard(
         )
                 )
             .fillMaxWidth()
-            .padding(all = 20.dp)) {
+            .padding(all = 20.dp)
+    ) {
 
         Column(
             modifier = (Modifier.background(
@@ -63,39 +64,46 @@ fun CurrentWeatherCard(
                 is Resource.Success -> {
                     val localContext =
                         LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-                    val switchState    by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
-                    val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
+                    val switchState by DataStoreManager.tempSwitchPrefFlow(localContext)
+                        .collectAsState(initial = false)
+                    val windSpeedUnits by DataStoreManager.windPrefFlow(localContext)
+                        .collectAsState(initial = 0)
 
-                    val temperature = weatherState.data?.main?.temp?.let {
-                        WeatherUtils.updateTemperature(it.toInt(),switchState)
-                    }
+                    val temperature = WeatherUtils.updateTemperature(
+                        filteredCurrentWeatherList[0].temp.toInt(),
+                        switchState
+                    )
                     val tempMax = weatherState.data?.main?.temp_max?.let {
-                        WeatherUtils.updateTemperature(it.toInt(),switchState) }
+                        WeatherUtils.updateTemperature(it.toInt(), switchState)
+                    }
                     val tempMin = weatherState.data?.main?.temp_min?.let {
-                        WeatherUtils.updateTemperature(it.toInt(),switchState)
+                        WeatherUtils.updateTemperature(it.toInt(), switchState)
                     }
 
                     weatherState.data?.name
                     val day =
                         weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
+
                     val pressure =
-                        localContext.getString(R.string.pressure) + ": " + weatherState.data?.main?.pressure?.let {
-                            WeatherUtils.updatePressure(it)
-                        }
-                    val pressureUnit= WeatherUtils.updatePressureUnit()
-                    val feels_like =
-                        localContext.getString(R.string.feels_like) + ": " + weatherState.data?.main?.feels_like?.let {
-                            WeatherUtils.updateTemperature(it.toInt(), switchState)
-                        }
-                    val wind = weatherState.data?.wind?.speed?.let {
-                        WeatherUtils.updateWind(
-                            weatherState.data.wind.deg.toString(),
-                            it.toInt(),
-                            localContext
-                        )
-                    } +":  "+ weatherState.data?.wind?.speed.let {
-                        it?.let { it1 -> WeatherUtils.convertWindSpeed(it1.toInt(),windSpeedUnits) }
-                    } +" "  + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
+                        WeatherUtils.updatePressure(filteredCurrentWeatherList[0].pressure)
+                    val pressureUnit = WeatherUtils.updatePressureUnit()
+                    val feels_like = localContext.getString(R.string.feels_like) + " :" +
+                            WeatherUtils.updateTemperature(
+                                filteredCurrentWeatherList[0].feelsLike.toInt(),
+                                switchState
+                            )
+
+                    val wind = WeatherUtils.updateWind(
+                        filteredCurrentWeatherList[0].windDeg.toString(),
+                        filteredCurrentWeatherList[0].windSpeed.toInt(),
+                        localContext
+                    ) + ":  " +
+                            WeatherUtils.convertWindSpeed(
+                                filteredCurrentWeatherList[0].windSpeed.toInt(),
+                                windSpeedUnits
+                            ) +
+                            " " + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
+
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -120,7 +128,7 @@ fun CurrentWeatherCard(
 
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement =Arrangement.Top
+                            verticalArrangement = Arrangement.Top
                         ) {
                             Text(
                                 text = " $temperature",
@@ -134,13 +142,19 @@ fun CurrentWeatherCard(
 
 
                         Column {
-                            val icon = weatherState.data?.weather?.get(0)?.icon
-                            val localIconName = icon?.replace("-", "_")
-                            val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
-                            val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
+                            val icon =
+                                filteredCurrentWeatherList[0].weather[0].icon //weatherState.data?.weather?.get(0)?.icon
+                            val localIconName = icon.replace("-", "_")
+                            val drawableId = localContext.resources.getIdentifier(
+                                localIconName,
+                                "drawable",
+                                localContext.packageName
+                            )
+                            val imageModel =
+                                if (drawableId != 0) drawableId else R.drawable.default_icon
 
                             AsyncImage(
-                                model =imageModel,// "${UIUtils.iconurl}$icon.png",
+                                model = imageModel,// "${UIUtils.iconurl}$icon.png",
                                 contentDescription = "Weather icon",
                                 modifier = Modifier
                                     .size(70.dp) // Define your desired width and height
@@ -168,14 +182,15 @@ fun CurrentWeatherCard(
                                     modifier = Modifier.padding(1.dp)
                                 )
                             }
-                            Row(modifier = Modifier.fillMaxWidth(),
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
-                                verticalAlignment =Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "max: $tempMax  min: $tempMin" ,
-                                    color= Color.White,
-                                    style= QuickSandTypography.labelLarge,
+                                    text = "max: $tempMax  min: $tempMin",
+                                    color = Color.White,
+                                    style = QuickSandTypography.labelLarge,
                                     modifier = Modifier.padding(3.dp)
                                 )
                             }//t max t min
@@ -211,8 +226,6 @@ fun CurrentWeatherCard(
                         }//row
 
 
-
-
                     }
 
                 }
@@ -233,10 +246,11 @@ fun CurrentWeatherCard(
         } //colum
     }
 }
+
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
 fun WeatherUISuccessPreview() {
     val successState = Resource.Success(UIUtils.getMockWeatherCard())
-    CurrentWeatherCard( successState)
+    ///   CurrentWeatherCard(successState, filteredCurrentWeatherList)
 }
 

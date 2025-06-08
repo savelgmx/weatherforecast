@@ -24,7 +24,6 @@ import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.AppShapes
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography

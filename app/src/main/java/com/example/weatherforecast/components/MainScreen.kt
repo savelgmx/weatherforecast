@@ -2,7 +2,6 @@ package com.example.weatherforecast.components
 
 
 
-import android.content.res.Resources.Theme
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +33,6 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppTheme
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -56,7 +54,7 @@ fun MainScreen(
     val hasError = currentState is Resource.Error || forecastState is Resource.Error
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
-
+    val hourlyData= (forecastState as? Resource.Success)?.data?.hourly
 
     AppTheme {
         Scaffold(
@@ -111,7 +109,7 @@ fun MainScreen(
                     }
                 } else if (weatherData != null && forecastData != null) {
                     item {
-                        forecastData.hourly?.let { hourlyWeatherList ->
+                        hourlyData?.let { hourlyWeatherList ->
                             val currentTime = System.currentTimeMillis()
                             val nextHour = currentTime + (60 * 60 * 1000)
                             //filter list to display  current temperature
@@ -122,11 +120,13 @@ fun MainScreen(
                                 .take(1)
 
                             Log.d("current weather response", filteredCurrentWeatherList.toString())
+
+                            CurrentWeatherCard(weatherState = currentState,filteredCurrentWeatherList)
                         }
 
 
 
-                        CurrentWeatherCard(weatherState = currentState)
+
                     }
                     item {
                         Spacer(modifier = Modifier.height(8.dp))

@@ -30,7 +30,6 @@ import com.example.weatherforecast.presentation.ui.ForecastWeatherFragmentDirect
 import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.theme.AppShapes
-import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
