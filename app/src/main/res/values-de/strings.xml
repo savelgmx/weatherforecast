@@ -77,6 +77,7 @@
     <string name="measurements_units">Maßeinheiten</string>
     <string name="dawn">Morgendämmerung</string>
     <string name="dusk">Dämmerung</string>
+    <string name="now">Jetzt</string>
 
 
 </resources>

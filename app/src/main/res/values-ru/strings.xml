@@ -75,6 +75,7 @@
     <string name="measurements_units">Единицы измерения</string>
     <string name="dawn">Рассвет</string>
     <string name="dusk">Сумерки</string>
+    <string name="now">Сейчас</string>
 
 
 </resources>

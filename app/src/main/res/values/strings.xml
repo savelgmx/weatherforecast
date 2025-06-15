@@ -73,5 +73,6 @@
     <string name="measurements_units">Measurements units</string>
     <string name="dawn">Dawn</string>
     <string name="dusk">Dusk</string>
+    <string name="now">Now</string>
 
 </resources>

@@ -93,6 +93,8 @@ fun CurrentWeatherCard(
                                 switchState
                             )
 
+                    val now=localContext.getString(R.string.now)
+
                     val wind = WeatherUtils.updateWind(
                         filteredCurrentWeatherList[0].windDeg.toString(),
                         filteredCurrentWeatherList[0].windSpeed.toInt(),
@@ -115,6 +117,25 @@ fun CurrentWeatherCard(
                             text = day!!, color = Color.White,
                             style = QuickSandTypography.headlineMedium,
                             modifier = Modifier.padding(end = 1.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = now,
+                            color=Color.White,
+                            style = QuickSandTypography.labelLarge,
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
+
+                        Text(
+                            text = feels_like,
+                            color = Color.White,
+                            style = QuickSandTypography.titleMedium,
+                            modifier = Modifier.padding(1.dp)
                         )
                     }
 
@@ -169,19 +190,27 @@ fun CurrentWeatherCard(
 
                             // Row 2: Temperature with Weather Icon
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            /*
+                                                        Row(
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            horizontalArrangement = Arrangement.Start,
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Text(
+                                                                text = "Now ",
+                                                                color=Color.White,
+                                                                style = QuickSandTypography.labelLarge,
+                                                                modifier = Modifier.padding(start = 2.dp)
+                                                            )
 
-                                Text(
-                                    text = feels_like,
-                                    color = Color.White,
-                                    style = QuickSandTypography.titleLarge,
-                                    modifier = Modifier.padding(1.dp)
-                                )
-                            }
+                                                            Text(
+                                                                text = feels_like,
+                                                                color = Color.White,
+                                                                style = QuickSandTypography.titleMedium,
+                                                                modifier = Modifier.padding(1.dp)
+                                                            )
+                                                        }
+                            */
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
@@ -251,6 +280,7 @@ fun CurrentWeatherCard(
 @Composable
 fun WeatherUISuccessPreview() {
     val successState = Resource.Success(UIUtils.getMockWeatherCard())
-    ///   CurrentWeatherCard(successState, filteredCurrentWeatherList)
+    val filteredCurrentWeatherList=UIUtils.getMockHourlylist()
+    CurrentWeatherCard(successState, filteredCurrentWeatherList)
 }
 
