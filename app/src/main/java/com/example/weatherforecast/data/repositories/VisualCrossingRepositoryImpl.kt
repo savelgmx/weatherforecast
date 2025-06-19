@@ -1,6 +1,9 @@
 package com.example.weatherforecast.data.repositories
 
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.weatherforecast.BuildConfig
@@ -27,7 +30,7 @@ import javax.inject.Inject
 
 class VisualCrossingRepositoryImpl @Inject constructor(
     private val apiService: WeatherApiService,
-    contextProvider: ContextProvider,
+    private val contextProvider: ContextProvider,
     private val  weatherDao: WeatherDao
 ) : VisualCrossingRepository {
     private var latitude:String
@@ -51,8 +54,15 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             longitude= AppConstants.CITY_LON
             cityName= AppConstants.CITY_FORECAST
         }
-        devLocaleLanguage = Locale.getDefault().getLanguage();
+        devLocaleLanguage = Locale.getDefault().language
+    }
 
+    private fun isNetworkAvailable(): Boolean {
+        val context = contextProvider.provideContext()
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     private suspend fun getCurrentWeatherFromAPI(): Resource<WeatherResponse> {
@@ -142,48 +152,44 @@ class VisualCrossingRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
         return withContext(Dispatchers.IO) {
-            val currentTime = System.currentTimeMillis()
-            val lastUpdateTime = weatherDao.getLastUpdateTime()
+            // Шаг 1: Проверяем наличие данных в базе
             val hasData = weatherDao.getDailyWeatherCount() > 0
+            val dbWeather = getCurrentWeatherFromDB()
 
-            if (!hasData) {
-                // База данных пуста: получаем из API, заполняем БД, возвращаем из БД
+            if (!hasData || dbWeather == null) {
+                // База пуста или данные недоступны: пробуем API
+                if (!isNetworkAvailable()) {
+                    return@withContext Resource.Internet()
+                }
                 val apiResult = getWeatherApiResponse()
                 if (apiResult is Resource.Success) {
                     apiResult.data?.let { insertWeatherData(it) }
-                    val dbWeather = getCurrentWeatherFromDB()
-                    if (dbWeather != null) {
-                        Resource.Success(dbWeather)
-                    } else {
-                        Resource.Error(null, "Failed to get data from DB after insertion")
-                    }
+                    getCurrentWeatherFromDB()?.let { Resource.Success(it) }
+                        ?: Resource.Error(null, "Failed to get data from DB after insertion")
                 } else {
                     apiResult as Resource<WeatherResponse>
                 }
-            } else if (lastUpdateTime != null && currentTime > lastUpdateTime + AppConstants.DATA_UPDATE_INTERVAL) {
-                // БД не пуста, но данные устарели: получаем из API, очищаем БД, заполняем БД, возвращаем из API
-                val apiResult = getCurrentWeatherFromAPI()
-                if (apiResult is Resource.Success) {
-                    clearDatabase()
-                    syncWeather()
-                    apiResult
-                } else {
-                    apiResult
-                }
             } else {
-                // БД не пуста и данные свежие: возвращаем из БД
-                val dbWeather = getCurrentWeatherFromDB()
-                if (dbWeather != null) {
+                // Данные есть: проверяем актуальность
+                val currentTime = System.currentTimeMillis()
+                val lastUpdateTime = weatherDao.getLastUpdateTime()
+                val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.CURRENT_WEATHER_UPDATE_INTERVAL
+
+                if (isDataFresh) {
+                    Resource.Success(dbWeather)
+                } else if (!isNetworkAvailable()) {
+                    // Данные устарели, но интернета нет: возвращаем устаревшие
                     Resource.Success(dbWeather)
                 } else {
-                    // Если данных в базе нет, пробуем получить из API
+                    // Данные устарели, интернет есть: обновляем через API
                     val apiResult = getCurrentWeatherFromAPI()
                     if (apiResult is Resource.Success) {
                         clearDatabase()
                         syncWeather()
                         apiResult
                     } else {
-                        Resource.Error(null, "No data in DB and failed to fetch from API")
+                        // При ошибке API возвращаем устаревшие данные
+                        Resource.Success(dbWeather)
                     }
                 }
             }
@@ -240,4 +246,5 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         )
         insertWeatherData(response)
     }
+
 }
