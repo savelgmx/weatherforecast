@@ -10,5 +10,4 @@ import com.example.weatherforecast.utils.Resource
 interface VisualCrossingRepository {
     suspend fun getCurrentWeather(): Resource<WeatherResponse>
     suspend fun getForecastWeather(): Resource<ForecastResponse>
-    suspend fun getWeatherForecastFromDB(): LiveData<List<DailyWeatherEntity>>
 }

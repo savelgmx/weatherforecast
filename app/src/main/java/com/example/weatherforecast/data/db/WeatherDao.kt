@@ -30,5 +30,7 @@ interface WeatherDao {
 
     @Query("SELECT * FROM daily_weather ORDER BY date ASC LIMIT 1")
     suspend fun getCurrentDailyWeatherEntity(): DailyWeatherEntity?
-}
+
+    @Query("SELECT * FROM daily_weather")
+    fun getAllDailyWeatherSync(): List<DailyWeatherEntity>}
 

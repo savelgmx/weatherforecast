@@ -207,12 +207,57 @@ class VisualCrossingRepositoryImpl @Inject constructor(
 
     override suspend fun getForecastWeather(): Resource<ForecastResponse> {
         return withContext(Dispatchers.IO) {
+            // Шаг 1: Проверяем наличие данных в базе
+            val hasData = weatherDao.getDailyWeatherCount() > 0
+            val dbForecast = getForecastWeatherFromDB()
+            if (!hasData || dbForecast == null) {
+                // База пуста или данные недоступны: пробуем API
+                if (!isNetworkAvailable()) {
+                    return@withContext Resource.Internet()
+                }
+                val apiResult = getWeatherApiResponse()
+                if (apiResult is Resource.Success) {
+                    apiResult.data?.let { insertWeatherData(it) }
+                    getForecastWeatherFromDB()?.let { Resource.Success(it) }
+                        ?: Resource.Error(null, "Failed to get forecast data from DB after insertion")
+                } else {
+                    apiResult as Resource<ForecastResponse>
+                }
+            } else {
+                // Данные есть: проверяем актуальность
+                val currentTime = System.currentTimeMillis()
+                val lastUpdateTime = weatherDao.getLastUpdateTime()
+                val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.FORECAST_UPDATE_INTERVAL
+
+                if (isDataFresh) {
+                    Resource.Success(dbForecast)
+                } else if (!isNetworkAvailable()) {
+                    // Данные устарели, но интернета нет: возвращаем устаревшие
+                    Resource.Success(dbForecast)
+                } else {
+                    // Данные устарели, интернет есть: обновляем через API
+                    val apiResult = getForecastWeatherFromAPI()
+                    if (apiResult is Resource.Success) {
+                        clearDatabase()
+                        syncWeather()
+                        apiResult
+                    } else {
+                        // При ошибке API возвращаем устаревшие данные
+                        Resource.Success(dbForecast)
+                    }
+                }
+            }
+        }
+    }
+    
+    private suspend fun getForecastWeatherFromAPI(): Resource<ForecastResponse> {
+        return withContext(Dispatchers.IO) {
             try {
                 val response = apiService.getWeather(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
                     include = "days,hours",
-                    lang=devLocaleLanguage
+                    lang = devLocaleLanguage
                 )
                 val dailyWeathers = response.days.map { WeatherMapper.toDailyWeather(it) }
                 val forecastResponse = WeatherResponseMapper.toForecastResponse(dailyWeathers)
@@ -220,17 +265,21 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 Resource.Internet()
             } catch (e: HttpException) {
-                Resource.Error(msg = "API error: ${e.message()}")
+                Resource.Error(null, "API error: ${e.message()}")
             } catch (e: Exception) {
-                Resource.Error(msg = "Unknown error: ${e.message}")
+                Resource.Error(null, "Unknown error: ${e.message}")
             }
         }
     }
 
-    override suspend fun getWeatherForecastFromDB(): LiveData<List<DailyWeatherEntity>> {
-        return weatherDao.getAllDailyWeather()
+    private suspend fun getForecastWeatherFromDB(): ForecastResponse? {
+        val entities = weatherDao.getAllDailyWeatherSync()
+        if (entities.isNotEmpty()) {
+            val dailyWeathers = entities.map { EntityMapper.toDailyWeather(it) }
+            return WeatherResponseMapper.toForecastResponse(dailyWeathers)
+        }
+        return null
     }
-
     private suspend fun clearDatabase() {
         weatherDao.deleteAllDailyWeather()
         weatherDao.deleteAllHourlyWeather()
