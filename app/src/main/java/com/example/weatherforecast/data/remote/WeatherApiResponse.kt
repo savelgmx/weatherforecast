@@ -10,9 +10,8 @@ data class WeatherApiResponse(
     @SerializedName("address") val address: String,
     @SerializedName("timezone") val timezone: String,
     @SerializedName("tzoffset") val tzOffset: Double,
-    @SerializedName("days") val days: List<ApiDay>,
-    @SerializedName("stations") val stations: Map<String, Station>?
-)
+    @SerializedName("days") val days: List<ApiDay>
+    )
 
 data class ApiDay(
     @SerializedName("datetime") val date: String,
@@ -49,8 +48,6 @@ data class ApiDay(
     @SerializedName("conditions") val conditions: String,
     @SerializedName("description") val description: String,
     @SerializedName("icon") val icon: String,
-    @SerializedName("stations") val stations: List<String>?,
-    @SerializedName("source") val source: String,
     @SerializedName("hours") val hours: List<ApiHour>?
 )
 
@@ -78,17 +75,5 @@ data class ApiHour(
     @SerializedName("severerisk") val severeRisk: Int,
     @SerializedName("conditions") val conditions: String,
     @SerializedName("icon") val icon: String,
-    @SerializedName("stations") val stations: List<String>?,
-    @SerializedName("source") val source: String
 )
 
-data class Station(
-    @SerializedName("distance") val distance: Double,
-    @SerializedName("latitude") val latitude: Double,
-    @SerializedName("longitude") val longitude: Double,
-    @SerializedName("useCount") val useCount: Int,
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
-    @SerializedName("quality") val quality: Int,
-    @SerializedName("contribution") val contribution: Double
-)
