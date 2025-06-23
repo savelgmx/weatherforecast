@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import com.example.weatherforecast.data.db.DailyWeatherEntity
 import com.example.weatherforecast.data.db.OpenWeatherMapDatabase
 import com.example.weatherforecast.data.db.WeatherDao
@@ -49,29 +48,38 @@ class VisualCrossingRepositoryImplTest {
     fun setUp() {
         // Настройка тестового окружения
         Dispatchers.setMain(testDispatcher)
-        context = ApplicationProvider.getApplicationContext()
-        apiService = Mockito.mock(WeatherApiService::class.java)
+        val mockContext = Mockito.mock(Context::class.java)
         contextProvider = Mockito.mock(ContextProvider::class.java)
+        Mockito.`when`(contextProvider.provideContext()).thenReturn(mockContext)
         connectivityManager = Mockito.mock(ConnectivityManager::class.java)
-        Mockito.`when`(contextProvider.provideContext()).thenReturn(context)
-        Mockito.`when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
-
-        // Создание in-memory базы данных
-        db = Room.inMemoryDatabaseBuilder(context, OpenWeatherMapDatabase::class.java)
+        Mockito.`when`(mockContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        db = Room.inMemoryDatabaseBuilder(mockContext, OpenWeatherMapDatabase::class.java)
             .allowMainThreadQueries()
+            .setTransactionExecutor { it.run() } // Ensure single-threaded execution
             .build()
         weatherDao = db.weatherDao()
 
-        // Инициализация репозитория с мок-объектами
-        repository = VisualCrossingRepositoryImpl(apiService, contextProvider, weatherDao).apply {
-            javaClass.getDeclaredField("cityName").apply {
-                isAccessible = true
-                set(this@apply, "TestCity")
-            }
-            javaClass.getDeclaredField("devLocaleLanguage").apply {
-                isAccessible = true
-                set(this@apply, "en")
-            }
+        // Инициализация apiService
+        apiService = Mockito.mock(WeatherApiService::class.java)
+
+        // Инициализация репозитория с мок-объектами и фиктивными данными
+        repository = VisualCrossingRepositoryImpl(apiService, contextProvider, weatherDao)
+        // Исправленная установка значений через рефлексию
+        repository.javaClass.getDeclaredField("cityName").apply {
+            isAccessible = true
+            set(repository, "Krasnoyarsk") // Первый аргумент - экземпляр, второй - значение
+        }
+        repository.javaClass.getDeclaredField("devLocaleLanguage").apply {
+            isAccessible = true
+            set(repository, "en")
+        }
+        repository.javaClass.getDeclaredField("latitude").apply {
+            isAccessible = true
+            set(repository, "56.01")
+        }
+        repository.javaClass.getDeclaredField("longitude").apply {
+            isAccessible = true
+            set(repository, "92.87")
         }
     }
 
@@ -153,8 +161,8 @@ class VisualCrossingRepositoryImplTest {
             sunsetEpoch = 1624053600
         )
         return WeatherApiResponse(
-            address = "TestCity",
-            resolvedAddress = "TestCity",
+            address = "Krasnoyarsk",
+            resolvedAddress = "Krasnoyarsk",
             latitude = 0.0,
             longitude = 0.0,
             queryCost = 0,
@@ -193,10 +201,10 @@ class VisualCrossingRepositoryImplTest {
 
         // Then: Данные возвращаются из базы, API не вызывается
         assertTrue(result is Resource.Success)
-        assertEquals("TestCity", result.data?.name)
+        assertEquals("Krasnoyarsk", result.data?.name)
         assertEquals(25.0, result.data?.main?.temp)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
-            eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
+            eq("metric"), eq("days,hours"),eq("FS67QRY9G8HVLCANZJM6QBJJC"), eq("json"), eq("en"))
     }
 
     @Test
@@ -204,18 +212,25 @@ class VisualCrossingRepositoryImplTest {
         // Given: Пустая база, интернет доступен
         mockNetworkAvailability(true)
         val apiResponse = createMockWeatherApiResponse()
-        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("TestCity"),
-            eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
+        val apiKey = "FS67QRY9G8HVLCANZJM6QBJJC" // Явное значение API ключа
+        Mockito.`when`(apiService.getWeather(
+            eq("Krasnoyarsk"),
+            eq("metric"),
+            eq("days,hours"),
+            eq(apiKey),
+            eq("json"),
+            eq("en")
+        )).thenReturn(apiResponse) // Используем when...thenReturn
 
         // When: Вызываем метод
         val result = repository.getCurrentWeather()
 
         // Then: Данные запрашиваются из API и сохраняются в базу
         assertTrue(result is Resource.Success)
-        assertEquals("TestCity", result.data?.name)
+        assertEquals("Krasnoyarsk", result.data?.name)
         assertEquals(25.0, result.data?.main?.temp)
         assertTrue(weatherDao.getDailyWeatherCount() > 0)
-        Mockito.verify(apiService).getWeather(eq("TestCity"),
+        Mockito.verify(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -243,7 +258,7 @@ class VisualCrossingRepositoryImplTest {
         weatherDao.insertDailyWeather(entity)
         mockNetworkAvailability(true)
         val apiResponse = createMockWeatherApiResponse()
-        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("TestCity"),
+        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
 
         // When: Вызываем метод
@@ -251,9 +266,9 @@ class VisualCrossingRepositoryImplTest {
 
         // Then: Данные обновляются из API
         assertTrue(result is Resource.Success)
-        assertEquals("TestCity", result.data?.name)
+        assertEquals("Krasnoyarsk", result.data?.name)
         assertEquals(25.0, result.data?.main?.temp)
-        Mockito.verify(apiService).getWeather(eq("TestCity"),
+        Mockito.verify(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -286,9 +301,9 @@ class VisualCrossingRepositoryImplTest {
 
         // Then: Возвращаются устаревшие данные
         assertTrue(result is Resource.Success)
-        assertEquals("TestCity", result.data?.name)
+        assertEquals("Krasnoyarsk", result.data?.name)
         assertEquals(20.0, result.data?.main?.temp)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -302,7 +317,7 @@ class VisualCrossingRepositoryImplTest {
 
         // Then: Возвращается Resource.Internet
         assertTrue(result is Resource.Internet)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -337,7 +352,7 @@ class VisualCrossingRepositoryImplTest {
         assertTrue(result is Resource.Success)
         assertEquals(1, result.data?.daily?.size)
         assertEquals(25.0, result.data?.daily?.first()?.temp)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -346,7 +361,7 @@ class VisualCrossingRepositoryImplTest {
         // Given: Пустая база, интернет доступен
         mockNetworkAvailability(true)
         val apiResponse = createMockWeatherApiResponse()
-        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("TestCity"),
+        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
 
         // When: Вызываем метод
@@ -357,7 +372,7 @@ class VisualCrossingRepositoryImplTest {
         assertEquals(1, result.data?.daily?.size)
         assertEquals(25.0, result.data?.daily?.first()?.temp)
         assertTrue(weatherDao.getDailyWeatherCount() > 0)
-        Mockito.verify(apiService).getWeather(eq("TestCity"),
+        Mockito.verify(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -385,7 +400,7 @@ class VisualCrossingRepositoryImplTest {
         weatherDao.insertDailyWeather(entity)
         mockNetworkAvailability(true)
         val apiResponse = createMockWeatherApiResponse()
-        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("TestCity"),
+        Mockito.doReturn(apiResponse).`when`(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
 
         // When: Вызываем метод
@@ -395,7 +410,7 @@ class VisualCrossingRepositoryImplTest {
         assertTrue(result is Resource.Success)
         assertEquals(1, result.data?.daily?.size)
         assertEquals(25.0, result.data?.daily?.first()?.temp)
-        Mockito.verify(apiService).getWeather(eq("TestCity"),
+        Mockito.verify(apiService).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -430,7 +445,7 @@ class VisualCrossingRepositoryImplTest {
         assertTrue(result is Resource.Success)
         assertEquals(1, result.data?.daily?.size)
         assertEquals(20.0, result.data?.daily?.first()?.temp)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 
@@ -444,7 +459,7 @@ class VisualCrossingRepositoryImplTest {
 
         // Then: Возвращается Resource.Internet
         assertTrue(result is Resource.Internet)
-        Mockito.verify(apiService, Mockito.never()).getWeather(eq("TestCity"),
+        Mockito.verify(apiService, Mockito.never()).getWeather(eq("Krasnoyarsk"),
             eq("metric"), eq("days,hours"),eq(BuildConfig.API_KEY), eq("json"), eq("en"))
     }
 }

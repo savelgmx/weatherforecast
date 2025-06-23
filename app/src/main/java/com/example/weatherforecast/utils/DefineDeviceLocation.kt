@@ -9,7 +9,7 @@ import java.util.Locale
 class DefineDeviceLocation(private val context: Context) {
 
     fun getLocation(): Array<String?> {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return emptyArray()
         var locationArray = emptyArray<String?>()
 
         if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED &&
