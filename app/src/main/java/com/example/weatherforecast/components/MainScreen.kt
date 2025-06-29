@@ -229,8 +229,6 @@ fun MainScreen(
                                 val moonRise = WeatherUtils.updateTime(forecastData.daily[0].moonrise)
                                 val moonSet = WeatherUtils.updateTime(forecastData.daily[0].moonset)
                                 MoonriseMoonsetCard(
-                                    moonrise = moonRise,
-                                    moonset = moonSet,
                                     moonPhase = moonPhase
                                 )
                             }

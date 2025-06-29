@@ -138,7 +138,7 @@ fun DailyWeatherForecast(
                         }
                     }
 
-                    MoonriseMoonsetCard(moonrise = moonrise, moonset =moonset , moonPhase =moonPhase )
+                    MoonriseMoonsetCard( moonPhase =moonPhase )
 
                 }
                 //sunset sun rise

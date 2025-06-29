@@ -1,5 +1,6 @@
 package com.example.weatherforecast.components
 
+import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.presentation.ui.theme.orange
 import com.example.weatherforecast.presentation.ui.theme.white
@@ -59,7 +61,7 @@ fun WeatherScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MoonriseMoonsetCard(moonrise = "17:00", moonset = "7:02", moonPhase = 0.43)
+            MoonriseMoonsetCard( moonPhase = 0.43)
             SunriseSunsetCard(sunrise = "04:04", sunset = "21:39", dawn = "03:02", dusk = "22:41")
         }
     }
@@ -273,9 +275,8 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
 
 @Composable
 fun MoonriseMoonsetCard(
-    moonrise:String,
-    moonset:String,
     moonPhase:Double
+
 ){
     val localContext= LocalContext.current
     Surface(
@@ -292,43 +293,21 @@ fun MoonriseMoonsetCard(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row (modifier = Modifier.padding(1.dp)){
-                androidx.compose.material3.Text(
-                    text = localContext.getString(R.string.moonrise),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.titleMedium,
-                    modifier = Modifier.padding(all = 1.dp)
-                )
-            }
-            Row (modifier = Modifier.padding(1.dp)){
-                androidx.compose.material3.Text(
-                    text = moonrise,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.titleMedium,
-                    modifier = Modifier.padding(all = 1.dp)
-                )
-            }
-            Row (modifier = Modifier.padding(1.dp)){
-                androidx.compose.material3.Text(
-                    text = localContext.getString(R.string.moonset),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.titleMedium,
-                    modifier = Modifier.padding(all = 3.dp)
-                )
-            }
-            Row(modifier = Modifier.padding(1.dp)) {
-                androidx.compose.material3.Text(
-                    text = moonset,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = QuickSandTypography.headlineMedium,
-                    modifier = Modifier.padding(all = 1.dp)
-                )
 
-            }
+
+            Row(modifier = Modifier.padding(1.dp)) {
+                val moonPhaseIconId = WeatherUtils.getMoonPhaseIconName(localContext,moonPhase).toString()
+
+ //               imageView.setImageResource(moonPhase)
+   //             imageView.layoutParams = ViewGroup.LayoutParams(64, 64)
+                AsyncImage(
+                    model = moonPhaseIconId,
+                    contentDescription = "MoonPhase icon",
+                    modifier = Modifier
+                        .size(64.dp) // Define your desired width and height
+                        .padding(all = 1.dp)
+                )
+          }
             Row(modifier = Modifier.padding(1.dp)){
                 androidx.compose.material3.Text(
                     text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),

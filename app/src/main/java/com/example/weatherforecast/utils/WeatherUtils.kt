@@ -195,6 +195,41 @@ class WeatherUtils {
             }
         }
 
+        fun getMoonPhaseIconName(context: Context, phase: Double): Int {
+
+            val moonIcons = arrayOf(
+                R.drawable.moon_new,
+                R.drawable.moon_waxing_crescent,
+                R.drawable.moon_first_quarter,
+                R.drawable.moon_waxing_gibbous,
+                R.drawable.moon_full,
+                R.drawable.moon_waning_gibbous,
+                R.drawable.moon_last_quarter,
+                R.drawable.moon_waning_crescent,
+                R.drawable.moon_new
+            )
+
+            if (phase < 0.0 || phase > 1.0) {
+                return 0 //"Ungültiger Wert"
+            }
+           val index = (phase * (moonIcons.size - 1)).toInt()
+            return moonIcons[index]
+
+ /*           return when {
+                //phase < 0.0 || phase > 1.0 -> wrongValue
+                phase == 0.0 -> "${moonIcons[0]}"
+                phase < 0.25 -> "${moonIcons[1]}"
+                phase == 0.25 -> "${moonIcons[2]}"
+                phase < 0.5 -> "${moonIcons[3]}"
+                phase == 0.5 -> "${moonIcons[4]}"
+                phase < 0.75 -> "${moonIcons[5]}"
+                phase == 0.75 -> "${moonIcons[6]}"
+                phase < 1.0 -> "${moonIcons[7]}"
+                phase == 1.0 -> "${moonIcons[8]}"
+                else -> wrongValue
+            }
+*/        }
+
         @Composable
         fun selectionWindSignature(selection:Int): String {
             val context= LocalContext.current
