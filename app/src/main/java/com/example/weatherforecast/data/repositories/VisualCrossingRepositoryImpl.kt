@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.data.db.DailyWeatherEntity
 import com.example.weatherforecast.data.db.HourlyWeatherEntity

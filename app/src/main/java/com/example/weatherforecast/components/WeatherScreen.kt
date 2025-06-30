@@ -1,6 +1,5 @@
 package com.example.weatherforecast.components
 
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
