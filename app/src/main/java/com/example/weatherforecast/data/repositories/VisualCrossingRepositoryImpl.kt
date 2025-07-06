@@ -131,7 +131,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             val dailyId = weatherDao.insertDailyWeather(dailyEntity)
             val hourlyEntities = dailyWeather.hours?.map { hour ->
                 HourlyWeatherEntity(
-                    dailyId = dailyId,
+                    dailyId = dailyId.toInt(),
                     time = hour.time,
                     dt = hour.dt,
                     temp = hour.temp,

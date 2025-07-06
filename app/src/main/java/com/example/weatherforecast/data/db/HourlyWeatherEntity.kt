@@ -1,6 +1,7 @@
 package com.example.weatherforecast.data.db
 
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -15,8 +16,8 @@ import androidx.room.PrimaryKey
     )]
 )
 data class HourlyWeatherEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val dailyId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "dailyId") val dailyId: Int,
     val time: String,
     val dt: Long,
     val temp: Double,

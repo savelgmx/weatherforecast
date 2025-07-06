@@ -32,5 +32,10 @@ interface WeatherDao {
     suspend fun getCurrentDailyWeatherEntity(): DailyWeatherEntity?
 
     @Query("SELECT * FROM daily_weather")
-    fun getAllDailyWeatherSync(): List<DailyWeatherEntity>}
+    fun getAllDailyWeatherSync(): List<DailyWeatherEntity>
+
+    @Query("SELECT * FROM hourly_weather WHERE dailyId = :dailyId")
+    suspend fun getHourlyWeatherForDay(dailyId: Int): List<HourlyWeatherEntity>
+
+}
 
