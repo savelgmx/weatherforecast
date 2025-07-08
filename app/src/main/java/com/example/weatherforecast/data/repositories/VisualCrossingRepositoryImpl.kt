@@ -1,6 +1,5 @@
 package com.example.weatherforecast.data.repositories
 
-
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -30,28 +29,21 @@ import javax.inject.Inject
 class VisualCrossingRepositoryImpl @Inject constructor(
     private val apiService: WeatherApiService,
     private val contextProvider: ContextProvider,
-    private val  weatherDao: WeatherDao
+    private val weatherDao: WeatherDao
 ) : VisualCrossingRepository {
-    private var latitude:String
-    private var longitude:String
-    private var cityName:String
-    private lateinit var devLocaleLanguage:String //define system locale for substitute into query
+    private var latitude: String = AppConstants.CITY_LAT
+    private var longitude: String = AppConstants.CITY_LON
+    private var cityName: String = AppConstants.CITY_FORECAST
+    private lateinit var devLocaleLanguage: String
 
     init {
-        val defineLocation=DefineDeviceLocation(contextProvider.provideContext())
-        val locationArray= defineLocation.getLocation()
+        val defineLocation = DefineDeviceLocation(contextProvider.provideContext())
+        val locationArray = defineLocation.getLocation()
         if (locationArray.isNotEmpty() && locationArray.size == 3) {
-            latitude = locationArray[0] ?: ""
-            longitude = locationArray[1] ?: ""
-            cityName = locationArray[2] ?: ""
+            latitude = locationArray[0] ?: AppConstants.CITY_LAT
+            longitude = locationArray[1] ?: AppConstants.CITY_LON
+            cityName = locationArray[2] ?: AppConstants.CITY_FORECAST
             Log.d("getlocation response", "$latitude $longitude $cityName")
-        } else {
-            // Handle case when location retrieval fails
-            // You might want to provide default values or throw an exception
-            //i prefer use default values
-            latitude= AppConstants.CITY_LAT
-            longitude= AppConstants.CITY_LON
-            cityName= AppConstants.CITY_FORECAST
         }
         devLocaleLanguage = Locale.getDefault().language
     }
@@ -71,13 +63,13 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
                     include = "days,hours",
-                    lang=devLocaleLanguage
+                    lang = devLocaleLanguage
                 )
                 val dailyWeather = WeatherMapper.toDailyWeather(response.days.first())
-                val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)  // Передайте cityName
+                val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)
                 Resource.Success(weatherResponse)
             } catch (e: IOException) {
-                Resource.Internet()
+                Resource.Error(null, "Network error: ${e.message}")
             } catch (e: HttpException) {
                 Resource.Error(null, "API error: ${e.message()}")
             } catch (e: Exception) {
@@ -93,11 +85,11 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     location = cityName,
                     apiKey = BuildConfig.API_KEY,
                     include = "days,hours",
-                    lang=devLocaleLanguage
+                    lang = devLocaleLanguage
                 )
                 Resource.Success(response)
             } catch (e: IOException) {
-                Resource.Internet()
+                Resource.Error(null, "Network error: ${e.message}")
             } catch (e: HttpException) {
                 Resource.Error(null, "API error: ${e.message()}")
             } catch (e: Exception) {
@@ -110,6 +102,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         response.days.forEach { day ->
             val dailyWeather = WeatherMapper.toDailyWeather(day)
             val dailyEntity = DailyWeatherEntity(
+                id = 0, // Room auto-generates
                 date = dailyWeather.date,
                 dt = dailyWeather.dt,
                 temp = dailyWeather.temp,
@@ -131,6 +124,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             val dailyId = weatherDao.insertDailyWeather(dailyEntity)
             val hourlyEntities = dailyWeather.hours?.map { hour ->
                 HourlyWeatherEntity(
+                    id = 0, // Room auto-generates
                     dailyId = dailyId.toInt(),
                     time = hour.time,
                     dt = hour.dt,
@@ -158,7 +152,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             if (!hasData || dbWeather == null) {
                 // База пуста или данные недоступны: пробуем API
                 if (!isNetworkAvailable()) {
-                    return@withContext Resource.Internet()
+                    return@withContext Resource.Error(null, "Please connect to the internet to fetch weather data.")
                 }
                 val apiResult = getWeatherApiResponse()
                 if (apiResult is Resource.Success) {
@@ -166,7 +160,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     getCurrentWeatherFromDB()?.let { Resource.Success(it) }
                         ?: Resource.Error(null, "Failed to get data from DB after insertion")
                 } else {
-                    apiResult as Resource<WeatherResponse>
+                    Resource.Error(null, "Unknown error")
                 }
             } else {
                 // Данные есть: проверяем актуальность
@@ -209,10 +203,11 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             // Шаг 1: Проверяем наличие данных в базе
             val hasData = weatherDao.getDailyWeatherCount() > 0
             val dbForecast = getForecastWeatherFromDB()
+
             if (!hasData || dbForecast == null) {
                 // База пуста или данные недоступны: пробуем API
                 if (!isNetworkAvailable()) {
-                    return@withContext Resource.Internet()
+                    return@withContext Resource.Error(null, "Please connect to the internet to fetch weather data.")
                 }
                 val apiResult = getWeatherApiResponse()
                 if (apiResult is Resource.Success) {
@@ -220,7 +215,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     getForecastWeatherFromDB()?.let { Resource.Success(it) }
                         ?: Resource.Error(null, "Failed to get forecast data from DB after insertion")
                 } else {
-                    apiResult as Resource<ForecastResponse>
+                    Resource.Error(null, "Unknown error")
                 }
             } else {
                 // Данные есть: проверяем актуальность
@@ -248,7 +243,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             }
         }
     }
-    
+
     private suspend fun getForecastWeatherFromAPI(): Resource<ForecastResponse> {
         return withContext(Dispatchers.IO) {
             try {
@@ -262,7 +257,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 val forecastResponse = WeatherResponseMapper.toForecastResponse(dailyWeathers)
                 Resource.Success(forecastResponse)
             } catch (e: IOException) {
-                Resource.Internet()
+                Resource.Error(null, "Network error: ${e.message}")
             } catch (e: HttpException) {
                 Resource.Error(null, "API error: ${e.message()}")
             } catch (e: Exception) {
@@ -279,6 +274,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         }
         return null
     }
+
     private suspend fun clearDatabase() {
         weatherDao.deleteAllDailyWeather()
         weatherDao.deleteAllHourlyWeather()
@@ -290,9 +286,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             location = cityName,
             apiKey = BuildConfig.API_KEY,
             include = "days,hours",
-            lang=devLocaleLanguage
+            lang = devLocaleLanguage
         )
         insertWeatherData(response)
     }
-
 }

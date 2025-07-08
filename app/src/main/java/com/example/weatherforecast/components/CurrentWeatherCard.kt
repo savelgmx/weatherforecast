@@ -62,50 +62,28 @@ fun CurrentWeatherCard(
         ) {
             when (weatherState) {
                 is Resource.Success -> {
-                    val localContext =
-                        LocalContext.current //To access the context within a Composable function, use the LocalContext provided by Jetpack Compose
-                    val switchState by DataStoreManager.tempSwitchPrefFlow(localContext)
-                        .collectAsState(initial = false)
-                    val windSpeedUnits by DataStoreManager.windPrefFlow(localContext)
-                        .collectAsState(initial = 0)
+                    val firstHourly = filteredCurrentWeatherList.firstOrNull()
+                    if (firstHourly != null) {
+                        val localContext = LocalContext.current
+                        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+                        val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
 
-                    val temperature = WeatherUtils.updateTemperature(
-                        filteredCurrentWeatherList[0].temp.toInt(),
-                        switchState
-                    )
-                    val tempMax = weatherState.data?.main?.temp_max?.let {
-                        WeatherUtils.updateTemperature(it.toInt(), switchState)
-                    }
-                    val tempMin = weatherState.data?.main?.temp_min?.let {
-                        WeatherUtils.updateTemperature(it.toInt(), switchState)
-                    }
-
-                    weatherState.data?.name
-                    val day =
-                        weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
-
-                    val pressure =
-                        WeatherUtils.updatePressure(filteredCurrentWeatherList[0].pressure)
-                    val pressureUnit = WeatherUtils.updatePressureUnit()
+                        val temperature = WeatherUtils.updateTemperature(firstHourly.temp.toInt(), switchState)
+                        val pressure = WeatherUtils.updatePressure(firstHourly.pressure)
                     val feels_like = localContext.getString(R.string.feels_like) + " :" +
-                            WeatherUtils.updateTemperature(
-                                filteredCurrentWeatherList[0].feelsLike.toInt(),
-                                switchState
-                            )
-
-                    val now=localContext.getString(R.string.now)
-
+                                WeatherUtils.updateTemperature(firstHourly.feelsLike.toInt(), switchState)
                     val wind = WeatherUtils.updateWind(
-                        filteredCurrentWeatherList[0].windDeg.toString(),
-                        filteredCurrentWeatherList[0].windSpeed.toInt(),
+                            firstHourly.windDeg.toString(),
+                            firstHourly.windSpeed.toInt(),
                         localContext
                     ) + ":  " +
-                            WeatherUtils.convertWindSpeed(
-                                filteredCurrentWeatherList[0].windSpeed.toInt(),
-                                windSpeedUnits
-                            ) +
+                                WeatherUtils.convertWindSpeed(firstHourly.windSpeed.toInt(), windSpeedUnits) +
                             " " + WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
-
+                        val icon = firstHourly.weather.getOrNull(0)?.icon
+                        val tempMax = weatherState.data?.main?.temp_max?.let { WeatherUtils.updateTemperature(it.toInt(), switchState) }
+                        val tempMin = weatherState.data?.main?.temp_min?.let { WeatherUtils.updateTemperature(it.toInt(), switchState) }
+                        val day = weatherState.data?.dt?.let { WeatherUtils.updateDateToToday(it.toInt()) }
+                        val now = localContext.getString(R.string.now)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +92,8 @@ fun CurrentWeatherCard(
                     ) {
 
                         Text(
-                            text = day!!, color = Color.White,
+                                text = day ?: "N/A",
+                                color = Color.White,
                             style = QuickSandTypography.headlineMedium,
                             modifier = Modifier.padding(end = 1.dp)
                         )
@@ -158,73 +137,34 @@ fun CurrentWeatherCard(
                                 style = QuickSandTypography.headlineLarge,
                                 modifier = Modifier.padding(start = 3.dp)
                             )
-
-                        } //column#1 inside temperature
-
-
+                            }
                         Column {
-                            val icon =
-                                filteredCurrentWeatherList[0].weather[0].icon //weatherState.data?.weather?.get(0)?.icon
-                            val localIconName = icon.replace("-", "_")
-                            val drawableId = localContext.resources.getIdentifier(
-                                localIconName,
-                                "drawable",
-                                localContext.packageName
-                            )
-                            val imageModel =
-                                if (drawableId != 0) drawableId else R.drawable.default_icon
-
+                                val localIconName = icon?.replace("-", "_")
+                                val drawableId = localIconName?.let {
+                                    localContext.resources.getIdentifier(it, "drawable", localContext.packageName)
+                                } ?: 0
+                                val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
                             AsyncImage(
-                                model = imageModel,// "${UIUtils.iconurl}$icon.png",
+                                    model = imageModel,
                                 contentDescription = "Weather icon",
                                 modifier = Modifier
-                                    .size(70.dp) // Define your desired width and height
+                                        .size(70.dp)
                                     .padding(all = 1.dp)
                             )
-
-                        } //column#2 weather icon
-
-
+                            }
                         Column {
-
-
-                            // Row 2: Temperature with Weather Icon
-
-                            /*
-                                                        Row(
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            horizontalArrangement = Arrangement.Start,
-                                                            verticalAlignment = Alignment.CenterVertically
-                                                        ) {
-                                                            Text(
-                                                                text = "Now ",
-                                                                color=Color.White,
-                                                                style = QuickSandTypography.labelLarge,
-                                                                modifier = Modifier.padding(start = 2.dp)
-                                                            )
-
-                                                            Text(
-                                                                text = feels_like,
-                                                                color = Color.White,
-                                                                style = QuickSandTypography.titleMedium,
-                                                                modifier = Modifier.padding(1.dp)
-                                                            )
-                                                        }
-                            */
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "max: $tempMax  min: $tempMin",
+                                        text = "max: ${tempMax ?: "N/A"}  min: ${tempMin ?: "N/A"}",
                                     color = Color.White,
                                     style = QuickSandTypography.labelLarge,
                                     modifier = Modifier.padding(3.dp)
                                 )
-                            }//t max t min
-
-
+                                }
                             Row(
                                 Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
@@ -244,21 +184,22 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "$pressure  $pressureUnit",
+                                        text = "$pressure  ${WeatherUtils.updatePressureUnit()}",
                                     color = Color.White,
                                     style = QuickSandTypography.titleSmall,
                                     modifier = Modifier.padding(1.dp)
                                 )
-
-                            }//Column#3
-
-                        }//row
-
-
+                                }
                     }
-
+                        }
+                    } else {
+                        Text(
+                            text = "No current weather data available",
+                            color = Color.White,
+                            modifier = Modifier.padding(10.dp)
+                        )
                 }
-
+                }
                 is Resource.Loading -> {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
@@ -271,8 +212,7 @@ fun CurrentWeatherCard(
 
                 else -> {}
             }
-
-        } //colum
+        }
     }
 }
 

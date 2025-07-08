@@ -1,9 +1,12 @@
 package com.example.weatherforecast.utils
 
 import android.content.Context
+import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
+import java.io.IOException
 import java.util.Locale
 
 class DefineDeviceLocation(private val context: Context) {
@@ -28,7 +31,12 @@ class DefineDeviceLocation(private val context: Context) {
 
     private fun showLocation(location: Location): Array<String?> {
         val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+    var addresses: List<Address>? = null
+    try {
+        addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+    } catch (e: IOException) {
+        Log.e("Geocoder", "Error: ${e.message}")
+    }
         val cityName = addresses?.get(0)?.locality
 
         return arrayOf(location.latitude.toString(), location.longitude.toString(), cityName)
