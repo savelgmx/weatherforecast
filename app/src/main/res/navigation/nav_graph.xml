@@ -12,8 +12,8 @@
             android:id="@+id/action_forecastWeatherFragment_to_forecastDetailFragment"
             app:destination="@id/forecastDetailFragment">
             <argument
-               android:name="daily"
-                app:argType="com.example.weatherforecast.response.Daily"
+                android:name="index"
+                app:argType="integer"
                 app:nullable="false" />
         </action>
     </fragment>
@@ -21,14 +21,9 @@
     <fragment
         android:id="@+id/forecastDetailFragment"
         android:name="com.example.weatherforecast.presentation.ui.ForecastDetailFragment"
-        android:label="ForecastDetailFragment" >
+    android:label="forecast_detail_fragment" >
         <argument
-            android:name="daily"
-            app:argType="com.example.weatherforecast.response.Daily"
-            app:nullable="false" />
-        <action
-            android:id="@+id/action_forecastDetailFragment_to_forecastWeatherFragment"
-            app:destination="@id/forecastWeatherFragment" />
+        android:name="index"
+        app:argType="integer" />
     </fragment>
-
 </navigation>

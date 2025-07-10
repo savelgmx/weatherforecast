@@ -55,21 +55,20 @@ fun ForecastWeatherList(
 
         for (index in 0 until count) {
             dailyForecast?.getOrNull(index)?.let { daily ->
-                ClickableDayForecastItem(daily = daily, navController = navController)
+            ClickableDayForecastItem(index = index, daily = daily, navController = navController)
             }
         }
     }
 }
 @Composable
-fun ClickableDayForecastItem(daily: Daily, navController: NavController) {
+fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
            // .padding(all = 1.dp)
             .clickable {
-                navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(daily))
-            },
-         shape = AppShapes.large
+                navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(index))
+            }  ,       shape = AppShapes.large
 
     ) {
 
