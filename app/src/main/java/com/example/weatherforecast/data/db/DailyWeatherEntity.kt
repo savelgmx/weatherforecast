@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "daily_weather")
 data class DailyWeatherEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val dew:Double,              //point of dew (точка росы)
+    val uvindex:Int,             //UV index (УФ индекс)
     val date: String,
     val dt: Long,
     val temp: Double,

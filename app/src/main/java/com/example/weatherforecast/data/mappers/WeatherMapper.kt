@@ -8,6 +8,8 @@ import com.example.weatherforecast.domain.models.HourlyWeather
 object WeatherMapper {
     fun toDailyWeather(apiDay: ApiDay): DailyWeather {
         return DailyWeather(
+            dew=apiDay.dew,              //point of dew (точка росы)
+            uvindex=apiDay.uvIndex,             //UV index (УФ индекс)
             date = apiDay.date,
             dt = apiDay.dateEpoch,
             temp = apiDay.temp,

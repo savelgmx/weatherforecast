@@ -140,7 +140,7 @@ fun UVIndexCard(index: Int) {
             )
 
             Text(WeatherUtils.updateUVLevel(LocalContext.current,index),
-                color = Color.White, style = QuickSandTypography.headlineSmall)
+                color = Color.White, style = QuickSandTypography.labelLarge)
         }
     }
 }

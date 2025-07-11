@@ -79,7 +79,7 @@ data class Daily(
     @SerializedName("temp")
     val temp: Temp,
     @SerializedName("uvi")
-    val uvi: Double,
+    val uvi: Int,
     @SerializedName("weather")
     val weather: List<Weather>,
     @SerializedName("wind_deg")

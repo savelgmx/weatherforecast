@@ -5,6 +5,8 @@ These entities will replace or adapt the existing WeatherResponse (current weath
  */
 
 data class DailyWeather(
+    val dew:Double,              //point of dew (точка росы)
+    val uvindex:Int,             //UV index (УФ индекс)
     val date: String,           // "2025-04-03" (datetime)
     val dt:Long,                 //datetime in Unix epoch
     val temp: Double,           // Средняя температура (temp)

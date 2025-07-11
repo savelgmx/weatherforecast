@@ -46,7 +46,7 @@ object WeatherResponseMapper {
         val forecastItems = dailyWeathers.map { daily ->
             Daily(
                 clouds = daily.cloudiness,
-                dewPoint = 0.0,
+                dewPoint = daily.dew,
                 dt = daily.dt.toInt(),
                 feelsLike = FeelsLike(daily.feelsLike, daily.feelsLike, daily.feelsLike, daily.feelsLike),
                 moonPhase = daily.moonPhase,
@@ -57,7 +57,7 @@ object WeatherResponseMapper {
                 moonrise = 0,
                 moonset = 0,
                 temp = Temp(daily.temp, daily.temp, daily.tempMax, daily.tempMin, daily.temp, daily.temp),
-                uvi = 0.0,
+                uvi = daily.uvindex,
                 weather = listOf(Weather(0, daily.description, daily.description, daily.icon)),
                 windDeg = daily.windDeg,
                 windGust = 0.0,

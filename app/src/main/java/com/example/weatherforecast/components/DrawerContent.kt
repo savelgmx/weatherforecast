@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 fun DrawerContent() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = false)
+    val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = true)
 
     val selectedWindOption by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
     var windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")

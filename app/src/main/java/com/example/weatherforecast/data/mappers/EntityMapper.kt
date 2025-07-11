@@ -7,6 +7,8 @@ import com.example.weatherforecast.domain.models.DailyWeather
 object EntityMapper {
     fun toDailyWeather(entity: DailyWeatherEntity): DailyWeather {
         return DailyWeather(
+             dew=entity.dew,              //point of dew (точка росы)
+            uvindex=entity.uvindex,             //UV index (УФ индекс)
             date = entity.date,
             dt = entity.dt,
             temp = entity.temp,
