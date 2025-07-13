@@ -12,6 +12,7 @@ object WeatherMapper {
             uvindex=apiDay.uvIndex,             //UV index (УФ индекс)
             date = apiDay.date,
             dt = apiDay.dateEpoch,
+            visibility = apiDay.visibility,
             temp = apiDay.temp,
             feelsLike = apiDay.feelsLike,
             tempMin = apiDay.tempMin,

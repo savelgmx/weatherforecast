@@ -12,6 +12,7 @@ object EntityMapper {
             date = entity.date,
             dt = entity.dt,
             temp = entity.temp,
+            visibility = entity.visibility,
             feelsLike = entity.feelsLike,
             tempMin = entity.tempMin,
             tempMax = entity.tempMax,

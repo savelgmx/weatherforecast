@@ -30,7 +30,7 @@ object WeatherResponseMapper {
                 pressure = dailyWeather.pressure.toInt(),
                 humidity = dailyWeather.humidity
             ),
-            visibility = 10000,
+            visibility = dailyWeather.visibility.toInt(),
             wind = Wind(dailyWeather.windSpeed, dailyWeather.windDeg),
             clouds = Clouds(dailyWeather.cloudiness),
             dt = dailyWeather.dt ,
@@ -48,7 +48,7 @@ object WeatherResponseMapper {
                 clouds = daily.cloudiness,
                 dewPoint = daily.dew,
                 dt = daily.dt.toInt(),
-                feelsLike = FeelsLike(daily.feelsLike, daily.feelsLike, daily.feelsLike, daily.feelsLike),
+                feelsLike = FeelsLike(daily.feelsLike, daily.feelsLike, daily.tempMax, daily.tempMin),
                 moonPhase = daily.moonPhase,
                 humidity = daily.humidity,
                 sunrise = daily.sunrise.toInt(),
@@ -86,7 +86,23 @@ object WeatherResponseMapper {
 
         val moonPhase = if (dailyWeathers.isNotEmpty()) dailyWeathers.first().moonPhase else 0.0
         return ForecastResponse(
-            current = Current(0, 0.0, 0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0, emptyList(), 0, 0.0, 0.0),
+            current = Current(
+                forecastItems[0].clouds,
+                forecastItems[0].dewPoint,
+                forecastItems[0].dt,
+                forecastItems[0].feelsLike.day,
+                forecastItems[0].humidity,
+                forecastItems[0].pressure,
+                forecastItems[0].sunrise,
+                forecastItems[0].sunset,
+                forecastItems[0].temp.eve,
+                forecastItems[0].uvi.toDouble(),
+                0,
+                forecastItems[0].weather,
+                forecastItems[0].windDeg,
+                forecastItems[0].windGust,
+                forecastItems[0].windSpeed
+            ),
             daily = forecastItems,
             hourly = allHourly,
             lat = 0.0,

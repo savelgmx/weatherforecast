@@ -105,6 +105,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 id = 0, // Room auto-generates
                 date = dailyWeather.date,
                 dt = dailyWeather.dt,
+                visibility = dailyWeather.visibility,
                 temp = dailyWeather.temp,
                 feelsLike = dailyWeather.feelsLike,
                 tempMin = dailyWeather.tempMin,

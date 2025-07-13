@@ -14,6 +14,7 @@ data class DailyWeather(
     val tempMin: Double,        // Минимальная температура (tempmin)
     val tempMax: Double,        // Максимальная температура (tempmax)
     val pressure: Double,       // Давление (pressure)
+    val visibility: Double,     // visibility (видимость)
     val humidity: Int,          // Влажность (humidity)
     val windSpeed: Double,      // Скорость ветра (windspeed)
     val windDeg: Int,           // Направление ветра (winddir)
