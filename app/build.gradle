@@ -58,6 +58,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -162,4 +167,8 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.9'
     testImplementation 'androidx.room:room-testing:2.5.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'io.mockk:mockk:1.13.4'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test:1.8.21'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.36'
 }
