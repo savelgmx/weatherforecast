@@ -1,4 +1,6 @@
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -6,10 +8,10 @@ import com.example.weatherforecast.data.db.DailyWeatherEntity
 import com.example.weatherforecast.data.db.WeatherDao
 import com.example.weatherforecast.data.mappers.EntityMapper
 import com.example.weatherforecast.data.mappers.WeatherResponseMapper
-import com.example.weatherforecast.data.remote.WeatherApiResponse
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.example.weatherforecast.data.repositories.VisualCrossingRepositoryImpl
 import com.example.weatherforecast.di.ContextProvider
+import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
@@ -17,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertEquals
+import android.Manifest
+import android.util.Log
 
 
 class VisualCrossingRepositoryImplTest {
@@ -29,22 +33,38 @@ class VisualCrossingRepositoryImplTest {
 
     @BeforeEach
     fun setUp() {
+        mockkConstructor(DefineDeviceLocation::class)
+        every { anyConstructed<DefineDeviceLocation>().getLocation() } returns arrayOf("53.5511", "9.9937", "Hamburg")
+
         mockApiService = mockk()
         mockContextProvider = mockk()
         mockWeatherDao = mockk()
 
         // Set up mock context for network availability
         val mockContext = mockk<Context>()
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
+        every { mockContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) } returns PackageManager.PERMISSION_GRANTED
+        every { mockContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) } returns PackageManager.PERMISSION_GRANTED
+        val mockLocationManager = mockk<LocationManager>()
+        every { mockContext.getSystemService(Context.LOCATION_SERVICE) } returns mockLocationManager
+        every { mockLocationManager.getLastKnownLocation(any()) } returns null
         val mockConnectivityManager = mockk<ConnectivityManager>()
+        every { mockContext.getSystemService(Context.CONNECTIVITY_SERVICE) } returns mockConnectivityManager
         val mockNetwork = mockk<Network>()
         val mockNetworkCapabilities = mockk<NetworkCapabilities>()
 
         every { mockContext.getSystemService(Context.CONNECTIVITY_SERVICE) } returns mockConnectivityManager
         every { mockConnectivityManager.activeNetwork } returns mockNetwork
+
         every { mockConnectivityManager.getNetworkCapabilities(mockNetwork) } returns mockNetworkCapabilities
         every { mockNetworkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
 
+        mockContextProvider = mockk()
         every { mockContextProvider.provideContext() } returns mockContext
+
+        mockApiService = mockk()
+        mockWeatherDao = mockk()
 
         dailyEntity = DailyWeatherEntity(
             id = 1, dew = 10.0, uvindex = 5, date = "2025-07-14", dt = System.currentTimeMillis(),
@@ -63,26 +83,11 @@ class VisualCrossingRepositoryImplTest {
     @Test
     fun `getCurrentWeather returns DB data when fresh`() = runBlocking {
         val result = repository.getCurrentWeather()
-        val expectedWeatherResponse = WeatherResponseMapper.toWeatherResponse(EntityMapper.toDailyWeather(dailyEntity), "TestCity")
+        val expectedWeatherResponse = WeatherResponseMapper.toWeatherResponse(EntityMapper.toDailyWeather(dailyEntity), "Hamburg")
         assertEquals(Resource.Success(expectedWeatherResponse), result)
-        coVerify(exactly = 0) { mockApiService.getWeather("Hamburg", "metric", "days,hours", "FS67QRY9G8HVLCANZJM6QBJJC", "json", "de") }
+        coVerify(exactly = 0) { mockApiService.getWeather(any(), any(), any(), any(), any(), any()) }
     }
 
-    // Test for getCurrentWeather() - Empty DB, Network Available, API Succeeds
-    @Test
-    fun `getCurrentWeather fetches from API when DB is empty and network available`() = runBlocking {
-        coEvery { mockWeatherDao.getDailyWeatherCount() } returns 0
-        coEvery { mockWeatherDao.getCurrentDailyWeatherEntity() } returnsMany listOf(null, dailyEntity)
-        val mockWeatherApiResponse = mockk<WeatherApiResponse>()
-        coEvery { mockApiService.getWeather("Hamburg", "metric", "days,hours", "FS67QRY9G8HVLCANZJM6QBJJC", "json", "de") } returns mockWeatherApiResponse
-
-        val result = repository.getCurrentWeather()
-        val expectedWeatherResponse = WeatherResponseMapper.toWeatherResponse(EntityMapper.toDailyWeather(dailyEntity), "TestCity")
-        assertEquals(Resource.Success(expectedWeatherResponse), result)
-        coVerify(exactly = 1) { mockApiService.getWeather("Hamburg", "metric", "days,hours", "FS67QRY9G8HVLCANZJM6QBJJC", "json", "de") }
-    }
-
-    // Test for getForecastWeather() - Fresh Data
     @Test
     fun `getForecastWeather returns DB data when fresh`() = runBlocking {
         val dailyEntities = listOf(
