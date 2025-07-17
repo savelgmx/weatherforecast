@@ -84,7 +84,7 @@ class VisualCrossingRepositoryImplTest {
     fun `getCurrentWeather returns DB data when fresh`() = runBlocking {
         val result = repository.getCurrentWeather()
         val expectedWeatherResponse = WeatherResponseMapper.toWeatherResponse(EntityMapper.toDailyWeather(dailyEntity), "Hamburg")
-        assertEquals(Resource.Success(expectedWeatherResponse), result)
+        assertEquals(expectedWeatherResponse, (result as Resource.Success).data)
         coVerify(exactly = 0) { mockApiService.getWeather(any(), any(), any(), any(), any(), any()) }
     }
 
@@ -103,15 +103,7 @@ class VisualCrossingRepositoryImplTest {
 
         val result = repository.getForecastWeather()
         val expectedForecastResponse = WeatherResponseMapper.toForecastResponse(dailyEntities.map { EntityMapper.toDailyWeather(it) })
-        assertEquals(Resource.Success(expectedForecastResponse), result)
+        assertEquals(expectedForecastResponse, (result as Resource.Success).data)
         coVerify(exactly = 0) {mockApiService.getWeather("Hamburg", "metric", "days,hours", "FS67QRY9G8HVLCANZJM6QBJJC", "json", "de") }
     }
 }
-
-// Helper: Define expectedDailyEntity for tests
-private val expectedDailyEntity = DailyWeatherEntity(
-    id = 1, dew = 10.5, uvindex = 6, date = "2025-07-14", dt = System.currentTimeMillis(),
-    temp = 26.0, feelsLike = 27.0, tempMin = 21.0, tempMax = 31.0, pressure = 1014.0,
-    humidity = 61, windSpeed = 5.5, windDeg = 180, cloudiness = 22, description = "scattered clouds",
-    icon = "03d", sunrise = 1626219600000, sunset = 1626258800000, moonPhase = 0.6, visibility = 10.5
-)
