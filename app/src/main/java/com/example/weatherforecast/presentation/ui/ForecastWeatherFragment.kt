@@ -42,7 +42,15 @@ class ForecastWeatherFragment : Fragment() {
 
                 val currentState = currentViewModel.weatherLiveData.value
                 val forecastState = viewModel.forecastLiveData.value
-                MainScreen(navController = navController, currentState =currentState , forecastState = forecastState)
+                MainScreen(
+                    navController = navController,
+                    currentState = currentState,
+                    forecastState = forecastState,
+                    onRefresh = {
+                        currentViewModel.getCurrentWeather()
+                        viewModel.getForecastWeather()
+                    }
+                )
 
             }
         }
