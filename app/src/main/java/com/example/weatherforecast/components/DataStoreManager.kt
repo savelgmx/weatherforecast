@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -17,6 +18,8 @@ object DataStoreManager {
     private val TEMP_SWITCH_PREF_KEY     = booleanPreferencesKey("temp_switch_preference")
     private val WIND_PREF_KEY       = intPreferencesKey("wind_speed_preference")
     private val PRESSURE_PREF_KEY   = intPreferencesKey("pressure_preference")
+    private val LOCATED_CITY_NAME_KEY  = stringPreferencesKey("located_city_preference")
+    private val USE_DEVICE_LOCATION_KEY = booleanPreferencesKey("use_dev_location_preference")
 
     fun tempSwitchPrefFlow(context: Context): Flow<Boolean> {
         return context.dataStore.data

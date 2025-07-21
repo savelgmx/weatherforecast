@@ -214,6 +214,20 @@ fun DrawerContent() {
         HorizontalDivider()
 
     }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(35.dp)
+            .background(Blue300)
+    ) {
+        Text(text="Location",
+            color=Color.White,
+            style = QuickSandTypography.titleMedium,
+            modifier = Modifier.padding(all = 8.dp)
+        )
+    }
+    HorizontalDivider()
+
 }
 
 

@@ -12,8 +12,8 @@ object AppConstants {
     const val FORECAST_UPDATE_INTERVAL = 6 * 60 * 60 * 1000L // 6 часов
 
     //https://dashboard.iqair.com/personal/api-keys
-    //Air quality API key expires Sep 13, 2025
-    const val IQAir_API_KEY="16e8af95-47d9-41a4-88ae-8d1a318252d4"
-    //https://api.airvisual.com/v2/nearest_city?lat=56.0097&lon=92.7917&key=16e8af95-47d9-41a4-88ae-8d1a318252d4
+    //Air quality API key expires Jul 21, 2026
+    const val IQAir_API_KEY="f3324376-d944-44f4-bda6-e936f76bbbeb"
+    //https://api.airvisual.com/v2/nearest_city?lat=56.0097&lon=92.7917&key=f3324376-d944-44f4-bda6-e936f76bbbeb
 
 }
