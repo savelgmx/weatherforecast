@@ -146,7 +146,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentWeather(): Resource<WeatherResponse> {
+    override suspend fun getCurrentWeather(
+        city: String,
+        forceRefresh: Boolean
+    ): Resource<WeatherResponse> {
         return withContext(Dispatchers.IO) {
             // Шаг 1: Проверяем наличие данных в базе
             val hasData = weatherDao.getDailyWeatherCount() > 0
@@ -201,7 +204,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         return null
     }
 
-    override suspend fun getForecastWeather(): Resource<ForecastResponse> {
+    override suspend fun getForecastWeather(
+        city: String,
+        forceRefresh: Boolean
+    ): Resource<ForecastResponse> {
         return withContext(Dispatchers.IO) {
             // Шаг 1: Проверяем наличие данных в базе
             val hasData = weatherDao.getDailyWeatherCount() > 0
@@ -245,6 +251,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun syncWeather(city: String) {
+        TODO("Not yet implemented")
     }
 
     private suspend fun getForecastWeatherFromAPI(): Resource<ForecastResponse> {

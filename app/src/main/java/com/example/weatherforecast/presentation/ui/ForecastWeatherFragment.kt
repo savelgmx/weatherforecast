@@ -47,8 +47,8 @@ class ForecastWeatherFragment : Fragment() {
                     currentState = currentState,
                     forecastState = forecastState,
                     onRefresh = {
-                        currentViewModel.getCurrentWeather()
-                        viewModel.getForecastWeather()
+                    currentViewModel.refreshWeather()
+                    viewModel.refreshWeather()
                     }
                 )
 

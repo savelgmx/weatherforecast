@@ -11,11 +11,11 @@ import javax.inject.Inject
 class GetWeatherUseCase @Inject constructor(
     private val weatherRepository: VisualCrossingRepository
 ) {
-    suspend fun getCurrentWeather(): Resource<WeatherResponse> {
-        return weatherRepository.getCurrentWeather()
+    suspend fun getCurrentWeather(city: String, forceRefresh: Boolean = false): Resource<WeatherResponse> {
+        return weatherRepository.getCurrentWeather(city, forceRefresh)
     }
 
-    suspend fun getForecastWeather(): Resource<ForecastResponse> {
-        return weatherRepository.getForecastWeather()
+    suspend fun getForecastWeather(city: String, forceRefresh: Boolean = false): Resource<ForecastResponse> {
+        return weatherRepository.getForecastWeather(city, forceRefresh)
     }
 }
