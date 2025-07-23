@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.R
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
@@ -59,6 +60,8 @@ fun MainScreen(
     val context = LocalContext.current
     val isLoading = currentState is Resource.Loading || forecastState is Resource.Loading
     val hasError = currentState is Resource.Error || forecastState is Resource.Error
+    val hasInternetError = currentState is Resource.Internet || forecastState is Resource.Internet
+    val isStale = (currentState as? Resource.Success)?.isStale == true || (forecastState as? Resource.Success)?.isStale == true
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
     val hourlyData= (forecastState as? Resource.Success)?.data?.hourly
@@ -123,7 +126,24 @@ fun MainScreen(
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
+                    } else if (hasInternetError) {
+                        item {
+                            WeatherText(
+                                text = context.resources.getString(R.string.no_internet_connection),
+                                style = QuickSandTypography.bodyMedium,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     } else if (weatherData != null && forecastData != null) {
+                        if (isStale) {
+                            item {
+                                WeatherText(
+                                    text = context.resources.getString(R.string.data_is_stale),
+                                    style = QuickSandTypography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
                         item {
                             hourlyData?.let { hourlyWeatherList ->
                                 val currentTime = System.currentTimeMillis()
@@ -135,7 +155,9 @@ fun MainScreen(
                                     .sortedBy { it.dt }
                                     .take(1)
 
-                                Log.d("current weather response", filteredCurrentWeatherList.toString())
+                                if (BuildConfig.DEBUG) {
+                                    Log.d("current weather response", filteredCurrentWeatherList.toString())
+                                }
 
                                 CurrentWeatherCard(weatherState = currentState,filteredCurrentWeatherList)
                             }

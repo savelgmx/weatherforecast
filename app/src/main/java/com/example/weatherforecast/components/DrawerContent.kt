@@ -220,7 +220,7 @@ fun DrawerContent() {
             .height(35.dp)
             .background(Blue300)
     ) {
-        Text(text="Location",
+        Text(text=context.getString(R.string.pref_custom_location_title),
             color=Color.White,
             style = QuickSandTypography.titleMedium,
             modifier = Modifier.padding(all = 8.dp)

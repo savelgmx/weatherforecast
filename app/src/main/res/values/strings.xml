@@ -74,5 +74,7 @@
     <string name="dawn">Dawn</string>
     <string name="dusk">Dusk</string>
     <string name="now">Now</string>
+    <string name="data_is_stale">Data is stale. Pull to refresh</string>
+    <string name="no_internet_connection">"No internet connection. \nShowing cached data.\"</string>
 
 </resources>

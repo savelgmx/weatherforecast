@@ -76,6 +76,8 @@
     <string name="dawn">Рассвет</string>
     <string name="dusk">Сумерки</string>
     <string name="now">Сейчас</string>
+    <string name="data_is_stale"> Данные устарели.Проведите пальцем, чтобы обновить.</string>
+    <string name="no_internet_connection">\"Нет подключения к Интернету.\nПоказаны кэшированные данные.\"</string>
 
 
 </resources>

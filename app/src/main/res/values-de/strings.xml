@@ -78,6 +78,8 @@
     <string name="dawn">Morgendämmerung</string>
     <string name="dusk">Dämmerung</string>
     <string name="now">Jetzt</string>
+    <string name="data_is_stale">Die Daten sind veraltet.Zum Aktualisieren wischen</string>
+    <string name="no_internet_connection">\"Keine Internetverbindung.\nZwischengespeicherte Daten werden angezeigt.\"</string>
 
 
 </resources>
