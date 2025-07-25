@@ -24,6 +24,7 @@ data class DailyWeatherEntity(
     val sunrise: Long,
     val sunset: Long,
     val moonPhase: Double,
-    val visibility:Double
+    val visibility:Double,
+    val cityName: String?
 )
 

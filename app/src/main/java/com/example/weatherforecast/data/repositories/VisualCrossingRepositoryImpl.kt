@@ -121,7 +121,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 sunset = dailyWeather.sunset,
                 moonPhase = dailyWeather.moonPhase,
                 dew=dailyWeather.dew,              //point of dew (точка росы)
-                uvindex=dailyWeather.uvindex             //UV index (УФ индекс)
+                uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
+                cityName = cityName
             )
 
             val dailyId = weatherDao.insertDailyWeather(dailyEntity)

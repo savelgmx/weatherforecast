@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface WeatherDao {
@@ -37,5 +38,11 @@ interface WeatherDao {
     @Query("SELECT * FROM hourly_weather WHERE dailyId = :dailyId")
     suspend fun getHourlyWeatherForDay(dailyId: Int): List<HourlyWeatherEntity>
 
+    @Transaction
+    suspend fun insertWeatherTransaction(dailyWeather: DailyWeatherEntity, hourlyWeathers: List<HourlyWeatherEntity>) {
+        val dailyId = insertDailyWeather(dailyWeather)
+        val updatedHourly = hourlyWeathers.map { it.copy(dailyId = dailyId.toInt()) }
+        insertHourlyWeather(updatedHourly)
+    }
 }
 

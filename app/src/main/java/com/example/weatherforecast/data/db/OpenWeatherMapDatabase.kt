@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [DailyWeatherEntity::class, HourlyWeatherEntity::class], version = 2)
+@Database(entities = [DailyWeatherEntity::class, HourlyWeatherEntity::class], version = 3)
 abstract class OpenWeatherMapDatabase : RoomDatabase() {
     abstract fun weatherDao(): WeatherDao
 
