@@ -43,7 +43,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             latitude = locationArray[0] ?: AppConstants.CITY_LAT
             longitude = locationArray[1] ?: AppConstants.CITY_LON
             cityName = locationArray[2] ?: AppConstants.CITY_FORECAST
-            Log.d("getlocation response", "$latitude $longitude $cityName")
+            if (BuildConfig.DEBUG) Log.d("getlocation response", "$latitude $longitude $cityName")
         }
         devLocaleLanguage = Locale.getDefault().language
     }
@@ -56,142 +56,55 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    private suspend fun getCurrentWeatherFromAPI(): Resource<WeatherResponse> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getWeather(
-                    location = cityName,
-                    apiKey = BuildConfig.API_KEY,
-                    include = "days,hours",
-                    lang = devLocaleLanguage
-                )
-                val dailyWeather = WeatherMapper.toDailyWeather(response.days.first())
-                val weatherResponse = WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)
-                Resource.Success(weatherResponse)
-            } catch (e: IOException) {
-                Resource.Error(null, "Network error: ${e.message}")
-            } catch (e: HttpException) {
-                Resource.Error(null, "API error: ${e.message()}")
-            } catch (e: Exception) {
-                Resource.Error(null, "Unknown error: ${e.message}")
-            }
-        }
-    }
-
-    private suspend fun getWeatherApiResponse(): Resource<WeatherApiResponse> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getWeather(
-                    location = cityName,
-                    apiKey = BuildConfig.API_KEY,
-                    include = "days,hours",
-                    lang = devLocaleLanguage
-                )
-                Resource.Success(response)
-            } catch (e: IOException) {
-                Resource.Error(null, "Network error: ${e.message}")
-            } catch (e: HttpException) {
-                Resource.Error(null, "API error: ${e.message()}")
-            } catch (e: Exception) {
-                Resource.Error(null, "Unknown error: ${e.message}")
-            }
-        }
-    }
 
     private suspend fun insertWeatherData(response: WeatherApiResponse) {
-        response.days.forEach { day ->
-            val dailyWeather = WeatherMapper.toDailyWeather(day)
-            val dailyEntity = DailyWeatherEntity(
-                id = 0, // Room auto-generates
-                date = dailyWeather.date,
-                dt = dailyWeather.dt,
-                visibility = dailyWeather.visibility,
-                temp = dailyWeather.temp,
-                feelsLike = dailyWeather.feelsLike,
-                tempMin = dailyWeather.tempMin,
-                tempMax = dailyWeather.tempMax,
-                pressure = dailyWeather.pressure,
-                humidity = dailyWeather.humidity,
-                windSpeed = dailyWeather.windSpeed,
-                windDeg = dailyWeather.windDeg,
-                cloudiness = dailyWeather.cloudiness,
-                description = dailyWeather.description,
-                icon = dailyWeather.icon,
-                sunrise = dailyWeather.sunrise,
-                sunset = dailyWeather.sunset,
-                moonPhase = dailyWeather.moonPhase,
-                dew=dailyWeather.dew,              //point of dew (точка росы)
-                uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
-                cityName = cityName
-            )
-
-            val dailyId = weatherDao.insertDailyWeather(dailyEntity)
-            val hourlyEntities = dailyWeather.hours?.map { hour ->
-                HourlyWeatherEntity(
+        withContext(Dispatchers.IO) {
+            response.days.forEach { day ->
+                val dailyWeather = WeatherMapper.toDailyWeather(day)
+                val dailyEntity = DailyWeatherEntity(
                     id = 0, // Room auto-generates
-                    dailyId = dailyId.toInt(),
-                    time = hour.time,
-                    dt = hour.dt,
-                    temp = hour.temp,
-                    feelsLike = hour.feelsLike,
-                    pressure = hour.pressure,
-                    humidity = hour.humidity,
-                    windSpeed = hour.windSpeed,
-                    windDeg = hour.windDeg,
-                    cloudiness = hour.cloudiness,
-                    description = hour.description,
-                    icon = hour.icon
+                    date = dailyWeather.date,
+                    dt = dailyWeather.dt,
+                    visibility = dailyWeather.visibility,
+                    temp = dailyWeather.temp,
+                    feelsLike = dailyWeather.feelsLike,
+                    tempMin = dailyWeather.tempMin,
+                    tempMax = dailyWeather.tempMax,
+                    pressure = dailyWeather.pressure,
+                    humidity = dailyWeather.humidity,
+                    windSpeed = dailyWeather.windSpeed,
+                    windDeg = dailyWeather.windDeg,
+                    cloudiness = dailyWeather.cloudiness,
+                    description = dailyWeather.description,
+                    icon = dailyWeather.icon,
+                    sunrise = dailyWeather.sunrise,
+                    sunset = dailyWeather.sunset,
+                    moonPhase = dailyWeather.moonPhase,
+                    dew=dailyWeather.dew,              //point of dew (точка росы)
+                    uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
+                    cityName = cityName
                 )
-            } ?: emptyList()
-            weatherDao.insertHourlyWeather(hourlyEntities)
-        }
-    }
 
-    override suspend fun getCurrentWeather(
-        city: String,
-        forceRefresh: Boolean
-    ): Resource<WeatherResponse> {
-        return withContext(Dispatchers.IO) {
-            // Шаг 1: Проверяем наличие данных в базе
-            val hasData = weatherDao.getDailyWeatherCount() > 0
-            val dbWeather = getCurrentWeatherFromDB()
+                val hourlyEntities = dailyWeather.hours?.map { hour ->
+                    HourlyWeatherEntity(
+                        id = 0, // Room auto-generates
+                        dailyId = 0, // Placeholder, будет обновлён в транзакции
+                        time = hour.time,
+                        dt = hour.dt,
+                        temp = hour.temp,
+                        feelsLike = hour.feelsLike,
+                        pressure = hour.pressure,
+                        humidity = hour.humidity,
+                        windSpeed = hour.windSpeed,
+                        windDeg = hour.windDeg,
+                        cloudiness = hour.cloudiness,
+                        description = hour.description,
+                        icon = hour.icon
+                    )
+                } ?: emptyList()
 
-            if (!hasData || dbWeather == null) {
-                // База пуста или данные недоступны: пробуем API
-                if (!isNetworkAvailable()) {
-                    return@withContext Resource.Error(null, "Please connect to the internet to fetch weather data.")
-                }
-                val apiResult = getWeatherApiResponse()
-                if (apiResult is Resource.Success) {
-                    apiResult.data?.let { insertWeatherData(it) }
-                    getCurrentWeatherFromDB()?.let { Resource.Success(it) }
-                        ?: Resource.Error(null, "Failed to get data from DB after insertion")
-                } else {
-                    Resource.Error(null, "Unknown error")
-                }
-            } else {
-                // Данные есть: проверяем актуальность
-                val currentTime = System.currentTimeMillis()
-                val lastUpdateTime = weatherDao.getLastUpdateTime()
-                val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.CURRENT_WEATHER_UPDATE_INTERVAL
-
-                if (isDataFresh) {
-                    Resource.Success(dbWeather)
-                } else if (!isNetworkAvailable()) {
-                    // Данные устарели, но интернета нет: возвращаем устаревшие
-                    Resource.Success(dbWeather)
-                } else {
-                    // Данные устарели, интернет есть: обновляем через API
-                    val apiResult = getCurrentWeatherFromAPI()
-                    if (apiResult is Resource.Success) {
-                        clearDatabase()
-                        syncWeather()
-                        apiResult
-                    } else {
-                        // При ошибке API возвращаем устаревшие данные
-                        Resource.Success(dbWeather)
-                    }
-                }
+                weatherDao.insertWeatherTransaction(dailyEntity, hourlyEntities)
+                if (BuildConfig.DEBUG) Log.d("Inserted dailyId", weatherDao.insertDailyWeather(dailyEntity).toString())
             }
         }
     }
@@ -200,87 +113,12 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         val entity = weatherDao.getCurrentDailyWeatherEntity()
         if (entity != null) {
             val dailyWeather = EntityMapper.toDailyWeather(entity)
-            return WeatherResponseMapper.toWeatherResponse(dailyWeather, cityName)
+            return WeatherResponseMapper.toWeatherResponse(dailyWeather, entity.cityName ?: "Unknown")
         }
         return null
     }
 
-    override suspend fun getForecastWeather(
-        city: String,
-        forceRefresh: Boolean
-    ): Resource<ForecastResponse> {
-        return withContext(Dispatchers.IO) {
-            // Шаг 1: Проверяем наличие данных в базе
-            val hasData = weatherDao.getDailyWeatherCount() > 0
-            val dbForecast = getForecastWeatherFromDB()
-
-            if (!hasData || dbForecast == null) {
-                // База пуста или данные недоступны: пробуем API
-                if (!isNetworkAvailable()) {
-                    return@withContext Resource.Error(null, "Please connect to the internet to fetch weather data.")
-                }
-                val apiResult = getWeatherApiResponse()
-                if (apiResult is Resource.Success) {
-                    apiResult.data?.let { insertWeatherData(it) }
-                    getForecastWeatherFromDB()?.let { Resource.Success(it) }
-                        ?: Resource.Error(null, "Failed to get forecast data from DB after insertion")
-                } else {
-                    Resource.Error(null, "Unknown error")
-                }
-            } else {
-                // Данные есть: проверяем актуальность
-                val currentTime = System.currentTimeMillis()
-                val lastUpdateTime = weatherDao.getLastUpdateTime()
-                val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.FORECAST_UPDATE_INTERVAL
-
-                if (isDataFresh) {
-                    Resource.Success(dbForecast)
-                } else if (!isNetworkAvailable()) {
-                    // Данные устарели, но интернета нет: возвращаем устаревшие
-                    Resource.Success(dbForecast)
-                } else {
-                    // Данные устарели, интернет есть: обновляем через API
-                    val apiResult = getForecastWeatherFromAPI()
-                    if (apiResult is Resource.Success) {
-                        clearDatabase()
-                        syncWeather()
-                        apiResult
-                    } else {
-                        // При ошибке API возвращаем устаревшие данные
-                        Resource.Success(dbForecast)
-                    }
-                }
-            }
-        }
-    }
-
-    override suspend fun syncWeather(city: String) {
-        TODO("Not yet implemented")
-    }
-
-    private suspend fun getForecastWeatherFromAPI(): Resource<ForecastResponse> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getWeather(
-                    location = cityName,
-                    apiKey = BuildConfig.API_KEY,
-                    include = "days,hours",
-                    lang = devLocaleLanguage
-                )
-                val dailyWeathers = response.days.map { WeatherMapper.toDailyWeather(it) }
-                val forecastResponse = WeatherResponseMapper.toForecastResponse(dailyWeathers)
-                Resource.Success(forecastResponse)
-            } catch (e: IOException) {
-                Resource.Error(null, "Network error: ${e.message}")
-            } catch (e: HttpException) {
-                Resource.Error(null, "API error: ${e.message()}")
-            } catch (e: Exception) {
-                Resource.Error(null, "Unknown error: ${e.message}")
-            }
-        }
-    }
-
-    private suspend fun getForecastWeatherFromDB(): ForecastResponse? {
+    private fun getForecastWeatherFromDB(): ForecastResponse? {
         val entities = weatherDao.getAllDailyWeatherSync()
         if (entities.isNotEmpty()) {
             val dailyWeathers = entities.map { EntityMapper.toDailyWeather(it) }
@@ -294,7 +132,124 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         weatherDao.deleteAllHourlyWeather()
     }
 
-    suspend fun syncWeather() {
+    private suspend fun <T> fetchWeather(
+        city: String,
+        forceRefresh: Boolean,
+        fromDb: suspend () -> T?,
+        fromApi: suspend (String) -> Resource<WeatherApiResponse>,
+        mapApiToResult: suspend (WeatherApiResponse) -> T
+    ): Resource<T> where T : Any {
+        return withContext(Dispatchers.IO) {
+            val hasData = weatherDao.getDailyWeatherCount() > 0
+            val dbData = fromDb()
+
+            if (!hasData || dbData == null || forceRefresh) {
+                if (!isNetworkAvailable()) {
+                    return@withContext if (dbData != null) {
+                        Resource.Success(dbData, isStale = true)
+                    } else {
+                        Resource.Internet()
+                    }
+                }
+                val apiResult = fromApi(city)
+                if (apiResult is Resource.Success) {
+                    apiResult.data?.let { apiData ->
+                        insertWeatherData(apiData)
+                        val mappedResult = mapApiToResult(apiData)
+                        Resource.Success(mappedResult)
+                    } ?: Resource.Error("No data from API", "")
+                } else {
+                    apiResult
+                }
+            } else {
+                val currentTime = System.currentTimeMillis()
+                val lastUpdateTime = weatherDao.getLastUpdateTime()
+                val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.FORECAST_UPDATE_INTERVAL
+
+                if (isDataFresh) {
+                    Resource.Success(dbData)
+                } else if (!isNetworkAvailable()) {
+                    Resource.Success(dbData, isStale = true)
+                } else {
+                    val apiResult = fromApi(city)
+                    if (apiResult is Resource.Success) {
+                        clearDatabase()
+                        apiResult.data?.let { apiData ->
+                            insertWeatherData(apiData)
+                            val mappedResult = mapApiToResult(apiData)
+                            Resource.Success(mappedResult)
+                        } ?: Resource.Error("No data from API", "")
+                    } else {
+                        Resource.Success(dbData, isStale = true)
+                    }
+                }
+            }
+        } as Resource<T>
+    }
+
+    override suspend fun getCurrentWeather(city: String, forceRefresh: Boolean): Resource<WeatherResponse> {
+        return fetchWeather(
+            city = city,
+            forceRefresh = forceRefresh,
+            fromDb = { getCurrentWeatherFromDB() },
+            fromApi = { cityName ->
+                withContext(Dispatchers.IO) {
+                    try {
+                        val response = apiService.getWeather(
+                            location = cityName,
+                            apiKey = BuildConfig.API_KEY,
+                            include = "days,hours",
+                            lang = devLocaleLanguage
+                        )
+                        Resource.Success(response)
+                    } catch (e: IOException) {
+                        Resource.Internet()
+                    } catch (e: HttpException) {
+                        Resource.Error(null, "API error: ${e.message()}")
+                    } catch (e: Exception) {
+                        Resource.Error(null, "Unknown error: ${e.message}")
+                    }
+                }
+            },
+            mapApiToResult = { apiResponse ->
+                val dailyWeather = WeatherMapper.toDailyWeather(apiResponse.days.first())
+                WeatherResponseMapper.toWeatherResponse(dailyWeather, city)
+            }
+        )
+    }
+
+    override suspend fun getForecastWeather(city: String, forceRefresh: Boolean): Resource<ForecastResponse> {
+        return fetchWeather(
+            city = city,
+            forceRefresh = forceRefresh,
+            fromDb = { getForecastWeatherFromDB() },
+            fromApi = { cityName ->
+                withContext(Dispatchers.IO) {
+                    try {
+                        val response = apiService.getWeather(
+                            location = cityName,
+                            apiKey = BuildConfig.API_KEY,
+                            include = "days,hours",
+                            lang = devLocaleLanguage
+                        )
+                        Resource.Success(response)
+                    } catch (e: IOException) {
+                        Resource.Internet()
+                    } catch (e: HttpException) {
+                        Resource.Error(null, "API error: ${e.message()}")
+                    } catch (e: Exception) {
+                        Resource.Error(null, "Unknown error: ${e.message}")
+                    }
+                }
+            },
+            mapApiToResult = { apiResponse ->
+                val dailyWeathers = apiResponse.days.map { WeatherMapper.toDailyWeather(it) }
+                WeatherResponseMapper.toForecastResponse(dailyWeathers)
+            }
+        )
+    }
+
+    override suspend fun syncWeather(city: String) {
         clearDatabase()
         val response = apiService.getWeather(
             location = cityName,
