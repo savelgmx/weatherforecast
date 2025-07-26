@@ -70,7 +70,7 @@ class VisualCrossingRepositoryImplTest {
             id = 1, dew = 10.0, uvindex = 5, date = "2025-07-14", dt = System.currentTimeMillis(),
             temp = 25.0, feelsLike = 26.0, tempMin = 20.0, tempMax = 30.0, pressure = 1013.0,
             humidity = 60, windSpeed = 5.0, windDeg = 180, cloudiness = 20, description = "clear sky",
-            icon = "01d", sunrise = 1626219600000, sunset = 1626258800000, moonPhase = 0.5, visibility = 10.0
+            icon = "01d", sunrise = 1626219600000, sunset = 1626258800000, moonPhase = 0.5, visibility = 10.0, cityName = "Hamburg"
         )
 
         coEvery { mockWeatherDao.getCurrentDailyWeatherEntity() } returns dailyEntity
@@ -82,7 +82,7 @@ class VisualCrossingRepositoryImplTest {
 
     @Test
     fun `getCurrentWeather returns DB data when fresh`() = runBlocking {
-        val result = repository.getCurrentWeather()
+        val result = repository.getCurrentWeather("Hamburg")
         val expectedWeatherResponse = WeatherResponseMapper.toWeatherResponse(EntityMapper.toDailyWeather(dailyEntity), "Hamburg")
         assertEquals(expectedWeatherResponse, (result as Resource.Success).data)
         coVerify(exactly = 0) { mockApiService.getWeather(any(), any(), any(), any(), any(), any()) }
@@ -95,13 +95,13 @@ class VisualCrossingRepositoryImplTest {
             DailyWeatherEntity(id = 2, dew = 11.0, uvindex = 6, date = "2025-07-15", dt = System.currentTimeMillis(),
                 temp = 26.0, feelsLike = 27.0, tempMin = 21.0, tempMax = 31.0, pressure = 1014.0,
                 humidity = 61, windSpeed = 5.5, windDeg = 180, cloudiness = 22, description = "scattered clouds",
-                icon = "03d", sunrise = 1626306000000, sunset = 1626345200000, moonPhase = 0.6, visibility = 10.5)
+                icon = "03d", sunrise = 1626306000000, sunset = 1626345200000, moonPhase = 0.6, visibility = 10.5, cityName = "Hamburg")
         )
         coEvery { mockWeatherDao.getAllDailyWeatherSync() } returns dailyEntities
         coEvery { mockWeatherDao.getLastUpdateTime() } returns System.currentTimeMillis()
         coEvery { mockWeatherDao.getDailyWeatherCount() } returns dailyEntities.size
 
-        val result = repository.getForecastWeather()
+        val result = repository.getForecastWeather("Hamburg")
         val expectedForecastResponse = WeatherResponseMapper.toForecastResponse(dailyEntities.map { EntityMapper.toDailyWeather(it) })
         assertEquals(expectedForecastResponse, (result as Resource.Success).data)
         coVerify(exactly = 0) {mockApiService.getWeather("Hamburg", "metric", "days,hours", "FS67QRY9G8HVLCANZJM6QBJJC", "json", "de") }
