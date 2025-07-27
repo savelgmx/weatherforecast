@@ -37,20 +37,16 @@ class VisualCrossingRepositoryImpl @Inject constructor(
 ) : VisualCrossingRepository {
 
     // Дефолтные настройки местоположения
-    private var latitude: String = AppConstants.CITY_LAT
-    private var longitude: String = AppConstants.CITY_LON
     private var cityName: String = AppConstants.CITY_FORECAST
-    private lateinit var devLocaleLanguage: String
+    private var devLocaleLanguage: String
 
     init {
         // Инициализация местоположения и языка устройства
         val defineLocation = DefineDeviceLocation(contextProvider.provideContext())
         val locationArray = defineLocation.getLocation()
         if (locationArray.isNotEmpty() && locationArray.size == 3) {
-            latitude = locationArray[0] ?: AppConstants.CITY_LAT
-            longitude = locationArray[1] ?: AppConstants.CITY_LON
             cityName = locationArray[2] ?: AppConstants.CITY_FORECAST
-            if (BuildConfig.DEBUG) Log.d("getlocation response", "$latitude $longitude $cityName")
+            if (BuildConfig.DEBUG) Log.d("getlocation response", " $cityName")
         }
         devLocaleLanguage = Locale.getDefault().language
     }
@@ -68,27 +64,16 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Выполняет запрос к API Visual Crossing для получения данных о погоде.
-     * @param city Название города для запроса.
-     * @return Resource<WeatherApiResponse> с результатом запроса.
+     * Получает название города устройства с использованием DefineDeviceLocation.
+     * @return Название города или дефолтное значение из AppConstants.
      */
-    private suspend fun getWeatherApiResponse(city: String): Resource<WeatherApiResponse> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getWeather(
-                    location = city,
-                    apiKey = BuildConfig.API_KEY,
-                    include = "days,hours",
-                    lang = devLocaleLanguage
-                )
-                Resource.Success(response)
-            } catch (e: IOException) {
-                Resource.Internet()
-            } catch (e: HttpException) {
-                Resource.Error(null, "API error: ${e.message()}")
-            } catch (e: Exception) {
-                Resource.Error(null, "Unknown error: ${e.message}")
-            }
+    override suspend fun getDeviceCity(): String = withContext(Dispatchers.IO) {
+        val defineLocation = DefineDeviceLocation(contextProvider.provideContext())
+        val locationArray = defineLocation.getLocation()
+        if (locationArray.isNotEmpty() && locationArray.size == 3) {
+            locationArray[2] ?: AppConstants.CITY_FORECAST
+        } else {
+            AppConstants.CITY_FORECAST
         }
     }
 

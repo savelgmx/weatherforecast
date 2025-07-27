@@ -9,4 +9,5 @@ interface VisualCrossingRepository {
     suspend fun getCurrentWeather(city: String, forceRefresh: Boolean = false): Resource<WeatherResponse>
     suspend fun getForecastWeather(city: String, forceRefresh: Boolean = false): Resource<ForecastResponse>
     suspend fun syncWeather(city: String)
+    suspend fun getDeviceCity():String
 }
