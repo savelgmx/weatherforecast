@@ -61,6 +61,19 @@ object DataStoreManager {
                 preferences[PRESSURE_PREF_KEY] ?: 0
             }
     }
+    fun cityNamePrefFlow(context: Context): Flow<String?> {
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[LOCATED_CITY_NAME_KEY]
+            }
+    }
 
     suspend fun updateSwitchPref(context: Context, isOn: Boolean) {
         context.dataStore.edit { preferences ->
@@ -76,6 +89,12 @@ object DataStoreManager {
     suspend fun updatePressurePref(context: Context, selectedOption: Int) {
         context.dataStore.edit { preferences ->
             preferences[PRESSURE_PREF_KEY] = selectedOption
+        }
+    }
+
+    suspend fun updateCityName(context: Context, cityName: String) {
+        context.dataStore.edit { preferences ->
+            preferences[LOCATED_CITY_NAME_KEY] = cityName
         }
     }
 

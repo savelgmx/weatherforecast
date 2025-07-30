@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
@@ -49,6 +51,10 @@ fun DrawerContent() {
     val selectedPressureOption by DataStoreManager.pressurePrefFlow(context).collectAsState(initial = 0)
     var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
     var pressureUnitsPopup by remember { mutableStateOf(false) }
+
+    val enteredCity by DataStoreManager.cityNamePrefFlow(context).collectAsState(initial = "")//text field with entered city name
+    var enteredCityPopup by remember { mutableStateOf(false) }
+
 
     Column {
         Row(
@@ -228,7 +234,48 @@ fun DrawerContent() {
     }
     HorizontalDivider()
 
+    Row (
+        Modifier
+            .padding(all = 8.dp)
+            .clickable(onClick = { enteredCityPopup = true }),
+    )
+
+    {
+        Column(verticalArrangement = Arrangement.Center) {
+            Icon(Icons.Outlined.Home, contentDescription = "city Icon")
+        }
+
+        Column {
+            if (enteredCityPopup) {
+
+                AlertDialog(
+                    onDismissRequest = { enteredCityPopup = false },
+                    title = { Text("Введите город") },
+                    text = {
+                        enteredCity?.let {
+                            TextField(
+                                value = it,
+                                onValueChange = { it ->
+                                    scope.launch {
+                                        DataStoreManager.updateCityName(context, it)
+                                    }
+                                },
+                                label = { Text("Название города") }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = { enteredCityPopup = false }) {
+                            Text(context.getString(R.string.close))
+                        }
+                    }
+                )
+            }
+
+
+        }
+        Column { Text("The selected city") }
+    }
+    HorizontalDivider()
 }
-
-
 
