@@ -306,7 +306,10 @@ class WeatherUtils {
                 modifier = modifier
             )
         }
-
+    }
+    @Composable
+    fun enteredCityNameSignature(text: String):String{
+       return text
     }
 
 }

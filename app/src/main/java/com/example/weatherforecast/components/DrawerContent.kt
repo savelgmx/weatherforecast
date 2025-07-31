@@ -260,7 +260,7 @@ fun DrawerContent() {
                                         DataStoreManager.updateCityName(context, it)
                                     }
                                 },
-                                label = { Text("Название города") }
+                                label = { Text(context.getString(R.string.entered_city_name)) }
                             )
                         }
                     },
@@ -274,7 +274,7 @@ fun DrawerContent() {
 
 
         }
-        Column { Text("The selected city") }
+        Column { Text(context.getString(R.string.entered_city_name)+enteredCity.toString() ) }
     }
     HorizontalDivider()
 }
