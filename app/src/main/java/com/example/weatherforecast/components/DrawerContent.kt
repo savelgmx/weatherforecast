@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Refresh
@@ -242,40 +243,56 @@ fun DrawerContent() {
 
     {
         Column(verticalArrangement = Arrangement.Center) {
-            Icon(Icons.Outlined.Home, contentDescription = "city Icon")
+            Icon(Icons.Default.LocationOn, contentDescription = "city Icon")
         }
 
         Column {
+            Text(context.getString(R.string.entered_city_name) + enteredCity.toString())
             if (enteredCityPopup) {
-
-                AlertDialog(
-                    onDismissRequest = { enteredCityPopup = false },
-                    title = { Text("Введите город") },
-                    text = {
-                        enteredCity?.let {
-                            TextField(
-                                value = it,
-                                onValueChange = { it ->
-                                    scope.launch {
-                                        DataStoreManager.updateCityName(context, it)
-                                    }
-                                },
-                                label = { Text(context.getString(R.string.entered_city_name)) }
-                            )
+                CityDialog(
+                    initialCity = enteredCity ?: "",
+                    onCityChange = { newCity ->
+                        scope.launch {
+                            DataStoreManager.updateCityName(context, newCity)
+                            enteredCityPopup = false
                         }
                     },
-                    confirmButton = {
-                        Button(onClick = { enteredCityPopup = false }) {
-                            Text(context.getString(R.string.close))
-                        }
-                    }
+                    onDismiss = { enteredCityPopup = false }
                 )
             }
-
-
         }
-        Column { Text(context.getString(R.string.entered_city_name)+enteredCity.toString() ) }
     }
     HorizontalDivider()
+}
+
+@Composable
+fun CityDialog(initialCity: String, onCityChange: (String) -> Unit, onDismiss: () -> Unit) {
+    var enteredCity by remember { mutableStateOf(initialCity) }
+                AlertDialog(
+        onDismissRequest = onDismiss,
+                    title = { Text("Введите город") },
+                    text = {
+                            TextField(
+                value = enteredCity,
+                onValueChange = { enteredCity = it },
+                label = { Text("City Name") }
+                            )
+                    },
+                    confirmButton = {
+            Button(onClick = {
+                if (enteredCity.isNotBlank()) {
+                    onCityChange(enteredCity)
+                    }
+                onDismiss()
+            }) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+        }
+    }
+    )
 }
 

@@ -1,6 +1,7 @@
 package com.example.weatherforecast.di
 
 import android.app.Application
+import com.example.weatherforecast.components.DataStoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +17,10 @@ object AppModule {
     fun provideApplicationContextProvider(application: Application): ContextProvider {
         return ApplicationContextProvider(application)
     }
+
+    @Provides
+    @Singleton
+    fun provideDataStoreManager(contextProvider: ContextProvider): DataStoreManager {
+        return DataStoreManager
+}
 }
