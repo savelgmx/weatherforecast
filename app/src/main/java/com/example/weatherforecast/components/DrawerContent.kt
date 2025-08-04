@@ -9,17 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue300
@@ -268,29 +268,41 @@ fun DrawerContent() {
 @Composable
 fun CityDialog(initialCity: String, onCityChange: (String) -> Unit, onDismiss: () -> Unit) {
     var enteredCity by remember { mutableStateOf(initialCity) }
+    val context = LocalContext.current
+
                 AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text("Введите город") },
+        title = {
+            Text(
+                text = context.getString(R.string.select_city),
+                style = QuickSandTypography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        },
                     text = {
-                            TextField(
+            OutlinedTextField(
                 value = enteredCity,
                 onValueChange = { enteredCity = it },
-                label = { Text("City Name") }
+                label = { Text(context.getString(R.string.entered_city_name)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
                             )
                     },
                     confirmButton = {
             Button(onClick = {
                 if (enteredCity.isNotBlank()) {
-                    onCityChange(enteredCity)
+                        onCityChange(enteredCity.trim())
                     }
                 onDismiss()
-            }) {
-                Text("Save")
+                },
+                enabled = enteredCity.isNotBlank()
+            ) {
+                Text(context.getString(R.string.confirm))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Cancel")
+                Text(context.getString(R.string.cancel))
         }
     }
     )

@@ -53,7 +53,10 @@ fun MainScreen(
     navController: NavController,
     currentState: Resource<WeatherResponse>?,
     forecastState: Resource<ForecastResponse>?,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    showCitySelectionDialog: Boolean = false,
+    onCitySelected: (String) -> Unit = {},
+    onDismissCityDialog: () -> Unit = {}
 ) {
     val scaffoldState= rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -286,6 +289,14 @@ fun MainScreen(
                     refreshing = isLoading,
                     state = refreshState,
                     modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
+
+            // Show city selection dialog if needed
+            if (showCitySelectionDialog) {
+                CitySelectionDialog(
+                    onCitySelected = onCitySelected,
+                    onDismiss = onDismissCityDialog
                 )
             }
         }
