@@ -81,6 +81,10 @@
     <string name="data_is_stale">Die Daten sind veraltet.Zum Aktualisieren wischen</string>
     <string name="no_internet_connection">\"Keine Internetverbindung.\nZwischengespeicherte Daten werden angezeigt.\"</string>
     <string name="entered_city_name">\"Wettervorhersage in: \"</string>
+    <string name="confirm">confirm</string>
+    <string name="cancel">cancel</string>
+    <string name="select_city">Select City</string>
+    <string name="city_selection_message">Please enter a city name to get weather information</string>
 
 
 </resources>
