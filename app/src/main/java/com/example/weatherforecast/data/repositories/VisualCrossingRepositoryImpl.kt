@@ -20,6 +20,7 @@ import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -38,8 +39,6 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     private val weatherDao: WeatherDao // DAO для работы с базой данных
 ) : VisualCrossingRepository {
 
-    // Дефолтные настройки местоположения
-    private var cityName: String? = null
     private var devLocaleLanguage: String
 
     init {
@@ -49,35 +48,18 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Инициализирует название города из настроек или устройства
+     * Gets the current city name from WeatherUtils
      */
-    private suspend fun initializeCityName() {
-        // Сначала проверяем сохраненный город в настройках
-        val savedCity = DataStoreManager.cityNamePrefFlow(contextProvider.provideContext()).first()
-        if (!savedCity.isNullOrBlank()) {
-            cityName = savedCity
-            if (BuildConfig.DEBUG) Log.d("City from preferences", " $cityName")
-            return
-        }
-
-        // Если нет сохраненного города, пытаемся получить местоположение устройства
-        val defineLocation = DefineDeviceLocation(contextProvider.provideContext())
-        val locationArray = defineLocation.getLocation()
-        if (locationArray.isNotEmpty() && locationArray.size == 3) {
-            cityName = locationArray[2]
-            if (BuildConfig.DEBUG) Log.d("City from device location", " $cityName")
-        }
+    override suspend fun getDeviceCity(): String {
+        return WeatherUtils.getCityName(contextProvider.provideContext())
     }
 
     /**
-     * Проверяет, установлен ли город. Если нет, инициализирует его.
-     * @return true, если город установлен, иначе false
+     * Sets the city name using WeatherUtils
      */
-    private suspend fun ensureCityNameIsSet(): Boolean {
-        if (cityName.isNullOrBlank()) {
-            initializeCityName()
-        }
-        return !cityName.isNullOrBlank()
+    override suspend fun setCityName(city: String) {
+        WeatherUtils.saveCityName(contextProvider.provideContext(), city)
+        if (BuildConfig.DEBUG) Log.d("City set", " $city")
     }
 
     /**
@@ -90,20 +72,6 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
-
-    /**
-     * Получает название города устройства с использованием DefineDeviceLocation.
-     * @return Название города или пустую строку, если город не найден.
-     */
-    override suspend fun getDeviceCity(): String = withContext(Dispatchers.IO) {
-        val defineLocation = DefineDeviceLocation(contextProvider.provideContext())
-        val locationArray = defineLocation.getLocation()
-        if (locationArray.isNotEmpty() && locationArray.size == 3) {
-            locationArray[2] ?: ""
-        } else {
-            ""
-        }
     }
 
     /**
@@ -136,7 +104,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     moonPhase = dailyWeather.moonPhase,
                     dew=dailyWeather.dew,              //point of dew (точка росы)
                     uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
-                    cityName = cityName ?: "Unknown"
+                    cityName = WeatherUtils.getCityName(contextProvider.provideContext()) ?: "Unknown"
                 )
 
                 val hourlyEntities = dailyWeather.hours?.map { hour ->
@@ -284,13 +252,17 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @return Resource<WeatherResponse> с текущей погодой.
      */
     override suspend fun getCurrentWeather(city: String, forceRefresh: Boolean): Resource<WeatherResponse> {
-        // Проверяем, установлен ли город
-        if (!ensureCityNameIsSet()) {
+        // If a specific city is passed, use it directly
+        val targetCity = if (city.isNotBlank()) {
+            city
+        } else {
+            // If no city is passed, get from WeatherUtils
+            val cityFromUtils = WeatherUtils.getCityName(contextProvider.provideContext())
+            if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }
-
-        // Используем установленный город, если не передан конкретный
-        val targetCity = if (city.isBlank()) cityName!! else city
+            cityFromUtils
+        }
 
         return fetchWeather(
             city = targetCity,
@@ -329,13 +301,17 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @return Resource<ForecastResponse> с прогнозом.
      */
     override suspend fun getForecastWeather(city: String, forceRefresh: Boolean): Resource<ForecastResponse> {
-        // Проверяем, установлен ли город
-        if (!ensureCityNameIsSet()) {
+        // Если передан конкретный город, используем его напрямую
+        val targetCity = if (city.isNotBlank()) {
+            city
+        } else {
+            // Если город не передан, проверяем установленный город
+            val cityFromUtils = WeatherUtils.getCityName(contextProvider.provideContext())
+            if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }
-
-        // Используем установленный город, если не передан конкретный
-        val targetCity = if (city.isBlank()) cityName!! else city
+            cityFromUtils
+        }
 
         return fetchWeather(
             city = targetCity,
@@ -380,15 +356,5 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             lang = devLocaleLanguage
         )
         insertWeatherData(response)
-    }
-
-    /**
-     * Устанавливает название города и сохраняет его в настройках
-     * @param city Название города
-     */
-    override suspend fun setCityName(city: String) {
-        cityName = city
-        DataStoreManager.updateCityName(contextProvider.provideContext(), city)
-        if (BuildConfig.DEBUG) Log.d("City set", " $cityName")
     }
 }

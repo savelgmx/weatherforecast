@@ -34,14 +34,16 @@ class OpenWeatherMapViewModel @Inject constructor(
     private suspend fun initializeWeather() {
         try {
             currentCity = getDeviceCityUseCase.execute()
-            if (currentCity.isNotBlank()) {
-                getCurrentWeather(currentCity)
-            } else {
-                // If no city is available, show the city selection dialog
+
+            if (currentCity.isEmpty()) {
+                // No city available, show dialog
                 showCitySelectionDialog.value = true
+            } else {
+                // City available, load weather
+                getCurrentWeather(currentCity)
             }
         } catch (e: Exception) {
-            // If there's an error getting the city, show the dialog
+            // Error getting city, show dialog
             showCitySelectionDialog.value = true
         }
     }
@@ -51,7 +53,7 @@ class OpenWeatherMapViewModel @Inject constructor(
      * @param city Название города.
      * @param forceRefresh Если true, игнорирует кэш.
      */
-    fun getCurrentWeather(city: String = currentCity, forceRefresh: Boolean = false) {
+    fun getCurrentWeather(city: String=currentCity,forceRefresh: Boolean = false) {
         if (!isWeatherLoaded || forceRefresh) {
             viewModelScope.launch {
                 weatherLiveData.value = Resource.Loading()
@@ -69,19 +71,11 @@ class OpenWeatherMapViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Принудительно обновляет данные о погоде.
-     * @param city Название города.
-     */
     fun refreshWeather(city: String = currentCity) {
-        isWeatherLoaded = false // Сбрасываем флаг для принудительного обновления
+        isWeatherLoaded = false
         getCurrentWeather(city, forceRefresh = true)
     }
 
-    /**
-     * Обрабатывает выбор города пользователем
-     * @param cityName Название выбранного города
-     */
     fun onCitySelected(cityName: String) {
         viewModelScope.launch {
             try {
@@ -90,15 +84,12 @@ class OpenWeatherMapViewModel @Inject constructor(
                 showCitySelectionDialog.value = false
                 getCurrentWeather(cityName, forceRefresh = true)
             } catch (e: Exception) {
-                // Handle error if needed
+                weatherLiveData.value = Resource.Error(null, "Failed to set city: ${e.message}")
             }
         }
     }
 
-    /**
-     * Закрывает диалог выбора города
-     */
     fun dismissCitySelectionDialog() {
         showCitySelectionDialog.value = false
     }
-}
+ }
