@@ -1,17 +1,16 @@
 package com.example.weatherforecast.presentation.viewmodels
 
-import android.util.Log
+import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecast.BuildConfig
-import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
+import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.ForecastResponse
-import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,48 +19,64 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OpenWeatherForecastViewModel @Inject constructor(
-    private val getWeatherUseCase: GetWeatherUseCase,
-    private val getDeviceCityUseCase: GetDeviceCityUseCase
-):ViewModel(){
+    application: Application,
+    private val getWeatherUseCase: GetWeatherUseCase
+) : AndroidViewModel(application) {
 
     val forecastLiveData: MutableState<Resource<ForecastResponse>> = mutableStateOf(Resource.Loading())
-    private var isForecastLoaded = false // Flag to track if forecast data is already loaded
-    private var currentCity:String= AppConstants.CITY_FORECAST
+    private var currentCity: String = ""
+    private var isForecastLoaded = false
 
     init {
-        viewModelScope.launch {
-            currentCity=getDeviceCityUseCase.execute()
-            getForecastWeather(currentCity)
-        }
+        observeCityAndFetchForecast()
     }
 
     /**
-     * Запрашивает прогноз погоды для указанного города.
-     * @param city Название города.
-     * @param forceRefresh Если true, игнорирует кэш.
+     * Observes the city from DataStore and fetches forecast when available.
      */
-    fun getForecastWeather(city: String = currentCity, forceRefresh: Boolean = false) {
+    private fun observeCityAndFetchForecast() {
+        viewModelScope.launch {
+            DataStoreManager.cityNamePrefFlow(getApplication())
+                .collectLatest { city ->
+                    if (!city.isNullOrBlank()) {
+                        currentCity = city
+                        getForecast(city, forceRefresh = true)
+                    }
+                }
+        }
+        }
+
+
+    /**
+     * Fetches forecast weather for the current city.
+     */
+    private fun getForecast(city: String, forceRefresh: Boolean = false) {
         if(!isForecastLoaded||forceRefresh){
             viewModelScope.launch {
                 forecastLiveData.value = Resource.Loading()
-                val result = getWeatherUseCase.getForecastWeather(city)
+                try {
+                    val result = getWeatherUseCase.getForecastWeather(city, forceRefresh)
                 forecastLiveData.value = result
                 if (result is Resource.Success) {
-                    if(BuildConfig.DEBUG) Log.d("Map view model response", result.data.toString())
-                    isForecastLoaded = true // Set only on success
+                        isForecastLoaded = true
                     currentCity=city
                 }
+                } catch (e: Exception) {
+                    forecastLiveData.value = Resource.Error(null, "Forecast error: ${e.message}")
             }
         }
     }
+    }
     /**
-     * Принудительно обновляет данные прогноза.
-     * @param city Название города.
+     * Refreshes forecast manually (e.g., swipe-to-refresh).
+     */
+
+    /**
+     * Public method to refresh forecast manually.
      */
     fun refreshWeather(city: String = currentCity) {
-        isForecastLoaded = false // Сбрасываем флаг для принудительного обновления
-        getForecastWeather(city, forceRefresh = true)
+        isForecastLoaded = false
+        getForecast(city, forceRefresh = true)
     }
-
 }
 

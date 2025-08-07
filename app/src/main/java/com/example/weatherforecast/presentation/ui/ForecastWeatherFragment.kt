@@ -27,8 +27,9 @@ class ForecastWeatherFragment : Fragment() {
      in both ForecastWeatherFragment and ForecastDetailFragment.
      This ensures both fragments share the same ViewModel instance.
      This way, data fetched in ForecastWeatherFragment (e.g., the 15-day forecast)
-     is already available when navigating to ForecastDetailFragment, eliminating the need for a new API call.
-
+     is already available when navigating to ForecastDetailFragment,
+      eliminating the need for a new API call.
+    Shared ViewModels across Activity scope (ensures no re-fetch on nav)
     */
     private val viewModel: OpenWeatherForecastViewModel by activityViewModels()
     private val currentViewModel: OpenWeatherMapViewModel by activityViewModels()
@@ -37,7 +38,7 @@ class ForecastWeatherFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return ComposeView(requireContext()).apply {
             setContent {
                 val navController = findNavController()
@@ -45,17 +46,20 @@ class ForecastWeatherFragment : Fragment() {
                 val forecastState = viewModel.forecastLiveData.value
                 val showCityDialog = currentViewModel.showCitySelectionDialog.value
 
+                // Drawer + Main UI
                 DrawerContent()
                 MainScreen(
                     navController = navController,
                     currentState = currentState,
                     forecastState = forecastState,
                     onRefresh = {
+                        // Manual refresh triggered by user
                         currentViewModel.refreshWeather()
                         viewModel.refreshWeather()
                     },
                     showCitySelectionDialog = showCityDialog,
                     onCitySelected = { cityName ->
+                        // Called when user selects a city in the dialog
                         currentViewModel.onCitySelected(cityName)
                     },
                     onDismissCityDialog = {
