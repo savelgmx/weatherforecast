@@ -210,12 +210,12 @@ class WeatherUtils {
                 R.drawable.moon_new
             )
 
-           if (phase < 0.0 || phase > 1.0) {
+            if (phase < 0.0 || phase > 1.0) {
                 return R.drawable.moon_crescent
             }
-  /*          val index = (phase * (moonIcons.size - 1)).toInt()
-            return moonIcons[index]*/
-              return when {
+            /*          val index = (phase * (moonIcons.size - 1)).toInt()
+                      return moonIcons[index]*/
+            return when {
                 //phase < 0.0 || phase > 1.0 -> wrongValue
                 phase == 0.0 -> moonIcons[0]
                 phase < 0.25 -> moonIcons[1]
@@ -338,10 +338,6 @@ class WeatherUtils {
         suspend fun saveCityName(context: Context, cityName: String) {
             DataStoreManager.updateCityName(context, cityName)
         }
-    }
-    @Composable
-    fun enteredCityNameSignature(text: String):String{
-       return text
     }
 
 }

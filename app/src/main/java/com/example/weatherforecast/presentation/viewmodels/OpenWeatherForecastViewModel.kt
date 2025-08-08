@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.utils.Resource
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OpenWeatherForecastViewModel @Inject constructor(
     application: Application,
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val getDeviceCityUseCase: GetDeviceCityUseCase // ✅ Added fallback use case
 ) : AndroidViewModel(application) {
 
     val forecastLiveData: MutableState<Resource<ForecastResponse>> = mutableStateOf(Resource.Loading())
@@ -32,7 +34,8 @@ class OpenWeatherForecastViewModel @Inject constructor(
     }
 
     /**
-     * Observes the city from DataStore and fetches forecast when available.
+     * Observes the city from DataStore and fetches forecast.
+     * If city is not set, tries to detect device location and save it.
      */
     private fun observeCityAndFetchForecast() {
         viewModelScope.launch {
@@ -41,14 +44,24 @@ class OpenWeatherForecastViewModel @Inject constructor(
                     if (!city.isNullOrBlank()) {
                         currentCity = city
                         getForecast(city, forceRefresh = true)
+                    } else {
+                        // Try to get device location if no city is saved
+                        try {
+                            val autoCity = getDeviceCityUseCase.execute()
+                            if (autoCity.isNotBlank()) {
+                                DataStoreManager.updateCityName(getApplication(), autoCity)
+                                // No need to call getForecast(), as flow will emit again
+                            }
+                        } catch (e: Exception) {
+                            // Silently ignore or log the error
+                        }
                     }
                 }
         }
-        }
-
+    }
 
     /**
-     * Fetches forecast weather for the current city.
+     * Fetches forecast weather for the given city.
      */
     private fun getForecast(city: String, forceRefresh: Boolean = false) {
         if(!isForecastLoaded||forceRefresh){
@@ -56,16 +69,16 @@ class OpenWeatherForecastViewModel @Inject constructor(
                 forecastLiveData.value = Resource.Loading()
                 try {
                     val result = getWeatherUseCase.getForecastWeather(city, forceRefresh)
-                forecastLiveData.value = result
-                if (result is Resource.Success) {
+                    forecastLiveData.value = result
+                    if (result is Resource.Success) {
                         isForecastLoaded = true
-                    currentCity=city
-                }
+                        currentCity=city
+                    }
                 } catch (e: Exception) {
                     forecastLiveData.value = Resource.Error(null, "Forecast error: ${e.message}")
+                }
             }
         }
-    }
     }
     /**
      * Refreshes forecast manually (e.g., swipe-to-refresh).

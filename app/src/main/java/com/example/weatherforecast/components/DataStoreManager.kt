@@ -31,7 +31,7 @@ object DataStoreManager {
                 }
             }
             .map { preferences ->
-                preferences[TEMP_SWITCH_PREF_KEY] ?: false
+                preferences[TEMP_SWITCH_PREF_KEY] ?: true
             }
     }
 

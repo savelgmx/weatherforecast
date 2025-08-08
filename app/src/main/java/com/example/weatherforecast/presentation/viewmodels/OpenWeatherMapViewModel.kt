@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val getDeviceCityUseCase: GetDeviceCityUseCase
 ) : AndroidViewModel(application) {
 
     val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
@@ -42,10 +44,22 @@ class OpenWeatherMapViewModel @Inject constructor(
                         currentCity = city
                         getCurrentWeather(city, forceRefresh = true)
                         showCitySelectionDialog.value = false
-            } else {
-            showCitySelectionDialog.value = true
-        }
-    }
+                    } else {
+                        // Attempt to define device city automatically
+                        try {
+                            val autoCity = getDeviceCityUseCase.execute()
+                            if (autoCity.isNotBlank()) {
+                                DataStoreManager.updateCityName(getApplication(), autoCity)
+                                // No need to call getCurrentWeather directly
+                                // Flow will re-emit and trigger the block again
+                            } else {
+                                showCitySelectionDialog.value = true
+                            }
+                        } catch (e: Exception) {
+                            showCitySelectionDialog.value = true
+                        }
+                    }
+                }
         }
     }
 
@@ -100,4 +114,4 @@ class OpenWeatherMapViewModel @Inject constructor(
     fun dismissCitySelectionDialog() {
         showCitySelectionDialog.value = false
     }
- }
+}

@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import com.example.weatherforecast.BuildConfig
-import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.data.db.DailyWeatherEntity
 import com.example.weatherforecast.data.db.HourlyWeatherEntity
 import com.example.weatherforecast.data.db.WeatherDao
@@ -18,11 +17,9 @@ import com.example.weatherforecast.di.ContextProvider
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.AppConstants
-import com.example.weatherforecast.utils.DefineDeviceLocation
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
