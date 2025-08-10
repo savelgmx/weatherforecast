@@ -1,8 +1,10 @@
 package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
+import android.content.pm.PackageManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
@@ -33,10 +35,12 @@ class OpenWeatherForecastViewModel @Inject constructor(
         observeCityAndFetchForecast()
     }
 
-    /**
-     * Observes the city from DataStore and fetches forecast.
-     * If city is not set, tries to detect device location and save it.
-     */
+    private fun hasLocationPermission(): Boolean {
+        val ctx = getApplication<Application>()
+        return ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun observeCityAndFetchForecast() {
         viewModelScope.launch {
             DataStoreManager.cityNamePrefFlow(getApplication())
@@ -45,18 +49,29 @@ class OpenWeatherForecastViewModel @Inject constructor(
                         currentCity = city
                         getForecast(city, forceRefresh = true)
                     } else {
-                        // Try to get device location if no city is saved
-                        try {
-                            val autoCity = getDeviceCityUseCase.execute()
-                            if (autoCity.isNotBlank()) {
-                                DataStoreManager.updateCityName(getApplication(), autoCity)
-                                // No need to call getForecast(), as flow will emit again
-                            }
-                        } catch (e: Exception) {
-                            // Silently ignore or log the error
+                        if (hasLocationPermission()) {
+                            fetchAndSaveDeviceCity()
                         }
                     }
                 }
+        }
+    }
+
+    private fun fetchAndSaveDeviceCity() {
+        viewModelScope.launch {
+            try {
+                val autoCity = getDeviceCityUseCase.execute()
+                if (autoCity.isNotBlank()) {
+                    DataStoreManager.updateCityName(getApplication(), autoCity)
+                    // No need to call getForecast(), as flow will emit again
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    fun retryDeviceLocation() {
+        if (currentCity.isBlank()) {
+            fetchAndSaveDeviceCity()
         }
     }
 

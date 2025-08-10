@@ -1,8 +1,10 @@
 package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
+import android.content.pm.PackageManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
@@ -31,11 +33,12 @@ class OpenWeatherMapViewModel @Inject constructor(
         observeCityFromDataStore()
     }
 
-    /**
-     * Observes city name from DataStoreManager.
-     * If a city is set, fetches weather.
-     * If no city is set, prompts user via city selection dialog.
-     */
+    private fun hasLocationPermission(): Boolean {
+        val ctx = getApplication<Application>()
+        return ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun observeCityFromDataStore() {
         viewModelScope.launch {
             DataStoreManager.cityNamePrefFlow(getApplication())
@@ -45,21 +48,36 @@ class OpenWeatherMapViewModel @Inject constructor(
                         getCurrentWeather(city, forceRefresh = true)
                         showCitySelectionDialog.value = false
                     } else {
-                        // Attempt to define device city automatically
-                        try {
-                            val autoCity = getDeviceCityUseCase.execute()
-                            if (autoCity.isNotBlank()) {
-                                DataStoreManager.updateCityName(getApplication(), autoCity)
-                                // No need to call getCurrentWeather directly
-                                // Flow will re-emit and trigger the block again
-                            } else {
-                                showCitySelectionDialog.value = true
-                            }
-                        } catch (e: Exception) {
+                        if (hasLocationPermission()) {
+                            fetchAndSaveDeviceCity()
+                        } else {
                             showCitySelectionDialog.value = true
                         }
                     }
                 }
+        }
+    }
+
+    private fun fetchAndSaveDeviceCity() {
+        viewModelScope.launch {
+            try {
+                val autoCity = getDeviceCityUseCase.execute()
+                if (autoCity.isNotBlank()) {
+                    DataStoreManager.updateCityName(getApplication(), autoCity)
+                    // No need to call getCurrentWeather directly
+                    // Flow will re-emit and trigger the block again
+                } else {
+                    showCitySelectionDialog.value = true
+                }
+            } catch (e: Exception) {
+                showCitySelectionDialog.value = true
+            }
+        }
+    }
+
+    fun retryDeviceLocation() {
+        if (currentCity.isBlank()) {
+            fetchAndSaveDeviceCity()
         }
     }
 

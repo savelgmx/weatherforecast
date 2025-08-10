@@ -5,11 +5,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.weatherforecast.presentation.viewmodels.OpenWeatherForecastViewModel
+import com.example.weatherforecast.presentation.viewmodels.OpenWeatherMapViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,19 +24,29 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
+    // Inject both ViewModels so we can notify them when location permission is granted
+    private val mapViewModel: OpenWeatherMapViewModel by viewModels()
+    private val forecastViewModel: OpenWeatherForecastViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
-        // Request location permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        requestLocationPermissionsIfNeeded()
+    }
+
+    private fun requestLocationPermissionsIfNeeded() {
+        if (!hasLocationPermission()) {
             ActivityCompat.requestPermissions(this, LOCATION_PERMISSIONS, PERMISSION_REQUEST_CODE)
         }
     }
 
-    // Handle permission request result
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -41,23 +54,12 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            var fineLocationGranted = false
-            var coarseLocationGranted = false
-
-            for (i in permissions.indices) {
-                when (permissions[i]) {
-                    Manifest.permission.ACCESS_FINE_LOCATION -> {
-                        fineLocationGranted = grantResults[i] == PackageManager.PERMISSION_GRANTED
-                    }
-                    Manifest.permission.ACCESS_COARSE_LOCATION -> {
-                        coarseLocationGranted = grantResults[i] == PackageManager.PERMISSION_GRANTED
-                    }
-                }
-            }
-
-            if (fineLocationGranted || coarseLocationGranted) {
-                // At least one permission granted, proceed with location operations
+            val granted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
+            if (granted) {
                 Toast.makeText(this, "Location permissions granted", Toast.LENGTH_SHORT).show()
+                // Notify both ViewModels to retry location detection
+                mapViewModel.retryDeviceLocation()
+                forecastViewModel.retryDeviceLocation()
             } else {
                 // No permissions granted, show explanation and disable location-based features
                 Toast.makeText(
