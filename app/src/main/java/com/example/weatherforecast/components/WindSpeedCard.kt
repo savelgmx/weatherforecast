@@ -76,9 +76,16 @@ fun WindDirectionShape(windDegree: Int) {
     Canvas(modifier = Modifier
         .size(64.dp)
         .padding(all = 6.dp)) {
-        // Draw compass circle
+
+        // Draw filled white background circle
         drawCircle(
             color = Color.White,
+            radius = size.minDimension * 0.6f
+        )
+
+        // Draw compass border
+        drawCircle(
+            color = Color.Black,
             radius = size.minDimension*0.6f,
             style = Stroke(width = 2f)
         )
@@ -87,7 +94,7 @@ fun WindDirectionShape(windDegree: Int) {
         drawContext.canvas.nativeCanvas.apply {
             val paint = android.graphics.Paint().apply {
                 textSize = 26f
-                color = android.graphics.Color.WHITE
+                color = android.graphics.Color.BLACK // Letters black
             }
             paint.textAlign = android.graphics.Paint.Align.CENTER
             drawText("N", size.width / 2, 15f, paint)
