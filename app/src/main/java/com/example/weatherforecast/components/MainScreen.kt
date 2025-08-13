@@ -205,6 +205,29 @@ fun MainScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                         }
 
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(all = 3.dp),
+                                horizontalArrangement = Arrangement.Center
+
+                            ) {
+                                forecastData.daily[0].sunrise?.let { sunrise ->
+                                    forecastData.daily[0].sunset?.let { sunset ->
+                                        val timeOfSunrise = WeatherUtils.updateTime(sunrise)
+                                        val timeOfSunset = WeatherUtils.updateTime(sunset)
+                                        SunriseSunsetArcCard(
+                                            sunrise = timeOfSunrise,
+                                            sunset = timeOfSunset
+                                        )
+
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
                         item{
                             Row(
                                 modifier = Modifier
