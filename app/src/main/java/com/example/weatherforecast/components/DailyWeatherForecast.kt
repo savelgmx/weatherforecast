@@ -4,8 +4,10 @@ package com.example.weatherforecast.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
@@ -25,9 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.weatherforecast.R
 import com.example.weatherforecast.response.Daily
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
@@ -35,6 +40,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 fun DailyWeatherForecast(
     navController: NavController,
     dailyList: List<Daily>,
+    hourlyList: List<Hourly>,
     startIndex: Int = 0
 ) {
     val pagerState = rememberPagerState(pageCount = { dailyList.size }, initialPage = startIndex)
@@ -62,12 +68,28 @@ fun DailyWeatherForecast(
         { page ->
             val daily = dailyList[page]
             LazyColumn(
-                modifier = Modifier.fillMaxSize().background(Blue500)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Blue500)
             ) {
                 item{
 
                     DailyWeatherCard(daily = daily)
                 }
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    WeatherHeader(text = localContext.resources.getString(R.string.weather_24_hour))
+                }
+
+                item {
+                    val next24Hours = daily.dt + 86400L
+                    val filteredHourlyWeatherList = hourlyList
+                        .filter { it.dt >= daily.dt && it.dt < next24Hours }
+                        .sortedBy { it.dt }
+                        .take(24)
+                    HourlyWeatherRow(filteredHourlyWeatherList)
+                }
+
                 item {
 
 

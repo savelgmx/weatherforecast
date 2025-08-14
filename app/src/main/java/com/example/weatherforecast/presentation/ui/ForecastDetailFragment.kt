@@ -43,11 +43,13 @@ class ForecastDetailFragment : Fragment() {
             setContent {
                 val forecastState by viewModel.forecastLiveData
                 val dailyList = forecastState.data?.daily ?: emptyList()
+                val hourlyList= forecastState.data?.hourly ?: emptyList()
                 val initialIndex = args.index
                 if (dailyList.isNotEmpty() && initialIndex in 0 until dailyList.size) {
                     DailyWeatherForecast(
                         navController = findNavController(),
                         dailyList = dailyList,
+                        hourlyList=hourlyList,
                         startIndex = initialIndex
                     )
                 } else {
