@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,20 +24,24 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.xr.runtime.math.toRadians
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import kotlinx.coroutines.delay
 import java.util.Calendar
-import kotlin.math.PI
 import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sin
+
+/*that's good.now please provide detailed comments to code above ,
+explaining how dynamic sun icon positioning works*/
 
 @Composable
 fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
     val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    val currentMinute = calendar.get(Calendar.MINUTE)
+    val currentMinutes = currentHour * 60 + currentMinute
 
     val sunriseParts = sunrise.split(":")
     val sunriseHour = sunriseParts[0].toInt()
@@ -52,21 +54,8 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
     val sunsetMinutes = sunsetHour * 60 + sunsetMinute
 
     val totalMinutes = sunsetMinutes - sunriseMinutes
-
-    val currentMinutes = remember { mutableStateOf(getCurrentMinutes()) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentMinutes.value = getCurrentMinutes()
-            delay(60000L) // Update every minute
-        }
-    }
-
-    var elapsedMinutes = currentMinutes.value - sunriseMinutes
-    var progress = 0f
-    if (totalMinutes > 0) {
-        progress = max(0f, min(1f, elapsedMinutes.toFloat() / totalMinutes))
-    }
+    val elapsedMinutes = currentMinutes - sunriseMinutes
+    val progress = if (totalMinutes > 0) (elapsedMinutes.coerceIn(0, totalMinutes).toFloat() / totalMinutes) else 0f
 
     Surface(
         modifier = Modifier
@@ -85,11 +74,9 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
             // Sun arc graphic
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
-                .padding(all=10.dp)
-            ) {
+                .height(100.dp)) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    // Filled arc sector from sunrise to current
+                    // Filled arc sector on left half
                     drawArc(
                         color = Color(0xFF64B5F6),
                         startAngle = 180f,
@@ -99,6 +86,8 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         topLeft = Offset(0f, 0f),
                         size = Size(size.width, size.height * 2)
                     )
+
+                    // Full arc outline
                     drawArc(
                         color = Color(0xFF64B5F6),
                         startAngle = 0f,
@@ -109,29 +98,33 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         size = Size(size.width, size.height * 2)
                     )
 
-                    // Horizontal connecting line (fixed the typo, assuming it's from 0 to width)
+                    // Horizontal connecting line - fixed typo, assuming horizon from 0 to width
                     drawLine(
-                        color = Color(0xFFFFFFFF),  // white
+                        color = Color(0xFF64B5F6),  // white0xFFFFFFFF
                         start = Offset(0f, size.height - 10f),
                         end = Offset(size.width, size.height - 10f),
                         strokeWidth = 4.dp.toPx()
                     )
 
-                    // Yellow sun at calculated position
-                    val centerX = size.width / 2
-                    val centerY = size.height
-                    val radiusX = size.width / 2
-                    val radiusY = size.height
-                    val theta = 180f - 180f * progress
-                    val angleRad = (theta * PI / 180).toDouble()
-                    val sunX = centerX + radiusX * cos(angleRad).toFloat()
-                    val sunY = centerY - radiusY * sin(angleRad).toFloat()
+/*
+
+                    // Yellow sun moving along the arc
+                    val cx = size.width / 2f
+                    val cy = size.height
+                    val rx = size.width / 2f
+                    val ry = size.height
+                    val theta = 180f + 180f * progress
+                    val radians = toRadians(theta.toDouble().toFloat())
+                    val sunX = cx + rx * cos(radians).toFloat()
+                    val sunY = cy + ry * sin(radians).toFloat()
                     drawCircle(
                         color = Color.Yellow,
                         radius = 12.dp.toPx(),
-                        center = Offset(sunX, 0f)
+                        center = Offset(sunX, sunY)
                     )
+*/
                 }
+
             }
 
             // Bottom labels: sunrise left,sunset right
