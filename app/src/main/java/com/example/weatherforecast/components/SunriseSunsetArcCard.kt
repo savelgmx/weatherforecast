@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -24,10 +23,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.xr.runtime.math.toRadians
+
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
+import java.lang.Math.toRadians
 import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.sin
@@ -66,15 +66,21 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
         color = Color(Blue800.value),  // Dark blue background (Blue800)
         elevation = 16.dp
     ) {
+
+
+
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+
             // Sun arc graphic
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)) {
+
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     // Filled arc sector on left half
                     drawArc(
@@ -101,12 +107,11 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                     // Horizontal connecting line - fixed typo, assuming horizon from 0 to width
                     drawLine(
                         color = Color(0xFF64B5F6),  // white0xFFFFFFFF
-                        start = Offset(0f, size.height - 10f),
-                        end = Offset(size.width, size.height - 10f),
-                        strokeWidth = 4.dp.toPx()
+                        start = Offset(0f, size.height - 7f),
+                        end = Offset(size.width, size.height - 7f),
+                        strokeWidth = 5.dp.toPx()
                     )
 
-/*
 
                     // Yellow sun moving along the arc
                     val cx = size.width / 2f
@@ -114,7 +119,7 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                     val rx = size.width / 2f
                     val ry = size.height
                     val theta = 180f + 180f * progress
-                    val radians = toRadians(theta.toDouble().toFloat())
+                    val radians = toRadians(theta.toDouble())
                     val sunX = cx + rx * cos(radians).toFloat()
                     val sunY = cy + ry * sin(radians).toFloat()
                     drawCircle(
@@ -122,7 +127,6 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         radius = 12.dp.toPx(),
                         center = Offset(sunX, sunY)
                     )
-*/
                 }
 
             }
@@ -154,9 +158,4 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
             }
         }
     }
-}
-
-private fun getCurrentMinutes(): Int {
-    val cal = Calendar.getInstance()
-    return cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
 }
