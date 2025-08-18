@@ -83,6 +83,8 @@
     <string name="cancel">cancel</string>
     <string name="select_city">Select City</string>
     <string name="city_selection_message">Please enter a city name to get weather information</string>
+    <string name="elapsed_day_time">Прошедшее время дня:</string>
+    <string name="day_duration_time">Продолжительность дня:</string>
 
 
 </resources>

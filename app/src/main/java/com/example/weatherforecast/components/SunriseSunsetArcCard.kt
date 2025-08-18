@@ -32,9 +32,13 @@ import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.sin
 
-/*that's good.now please provide detailed comments to code above ,
-explaining how dynamic sun icon positioning works*/
-
+/**
+ * Composable function to display a card showing sunrise and sunset times with a dynamic arc graphic
+ * representing the sun's position based on current time.
+ *
+ * @param sunrise Sunrise time in "HH:MM" format.
+ * @param sunset Sunset time in "HH:MM" format.
+ */
 @Composable
 fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
     val context = LocalContext.current
@@ -53,9 +57,21 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
     val sunsetMinute = sunsetParts[1].toInt()
     val sunsetMinutes = sunsetHour * 60 + sunsetMinute
 
+    // Calculate total day length in minutes and elapsed time since sunrise
     val totalMinutes = sunsetMinutes - sunriseMinutes
     val elapsedMinutes = currentMinutes - sunriseMinutes
+    // Compute progress as a fraction (0 to 1) of the day, clamped between 0 and 1
     val progress = if (totalMinutes > 0) (elapsedMinutes.coerceIn(0, totalMinutes).toFloat() / totalMinutes) else 0f
+
+    // Calculate day duration
+    val dayHours = totalMinutes / 60
+    val dayMinutes = totalMinutes % 60
+    val dayDuration = "$dayHours:$dayMinutes"
+
+    // Calculate elapsed day time
+    val elapsedHours = elapsedMinutes.coerceIn(0, totalMinutes) / 60
+    val elapsedMins = elapsedMinutes.coerceIn(0, totalMinutes) % 60
+    val elapsedDayTime = "$elapsedHours :$elapsedMins"
 
     Surface(
         modifier = Modifier
@@ -66,23 +82,53 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
         color = Color(Blue800.value),  // Dark blue background (Blue800)
         elevation = 16.dp
     ) {
-
-
-
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Main row: left column for sunrise/sunset, right box for arc
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+                // Column on left with two rows for sunrise and sunset times
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.height(100.dp)
+            ) {
+                Column {
+                    Text(
+                        context.getString(R.string.sunrise) + ":",
+                        color = Color.White,
+                        style = QuickSandTypography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(sunrise, color = Color.White, style = QuickSandTypography.bodyMedium)
+                }
+                Column {
+                    Text(
+                        context.getString(R.string.sunset) + ":",
+                        color = Color.White,
+                        style = QuickSandTypography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(sunset, color = Color.White, style = QuickSandTypography.bodyMedium)
+                }
+            }
 
-
-            // Sun arc graphic
+            // Sun arc graphic on right
             Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)) {
-
+                .weight(1f)
+                .height(100.dp)
+                .padding(start = 16.dp)
+            ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    // Filled arc sector on left half
+                    // Filled arc sector from left based on progress
                     drawArc(
                         color = Color(0xFF64B5F6),
                         startAngle = 180f,
@@ -93,7 +139,7 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         size = Size(size.width, size.height * 2)
                     )
 
-                    // Full arc outline
+                    // Full half-circle arc outline (ensured as semicircle by sizing)
                     drawArc(
                         color = Color(0xFF64B5F6),
                         startAngle = 0f,
@@ -104,16 +150,21 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         size = Size(size.width, size.height * 2)
                     )
 
-                    // Horizontal connecting line - fixed typo, assuming horizon from 0 to width
+                    // Horizontal horizon line
                     drawLine(
-                        color = Color(0xFF64B5F6),  // white0xFFFFFFFF
+                        color = Color(0xFF64B5F6),
                         start = Offset(0f, size.height - 7f),
                         end = Offset(size.width, size.height - 7f),
                         strokeWidth = 5.dp.toPx()
                     )
 
-
-                    // Yellow sun moving along the arc
+                    // Dynamic sun positioning:
+                    // Center of the arc oval is at (width/2, height), with radii rx = width/2, ry = height.
+                    // Theta starts at 180° (left) and increases to 360° (right) as progress goes from 0 to 1.
+                    // This maps to moving clockwise from left bottom, up to top (270°), down to right bottom.
+                    // Using trigonometric functions: x = cx + rx * cos(theta), y = cy + ry * sin(theta).
+                    // Since screen y increases downward, negative sin moves upward.
+                    // This ensures the sun follows exactly along the arc path.
                     val cx = size.width / 2f
                     val cy = size.height
                     val rx = size.width / 2f
@@ -128,10 +179,10 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
                         center = Offset(sunX, sunY)
                     )
                 }
-
             }
+        }
 
-            // Bottom labels: sunrise left,sunset right
+            // Bottom row with day duration and elapsed day time
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -139,21 +190,21 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
             ) {
                 Column(horizontalAlignment = Alignment.Start) {
                     Text(
-                        context.getString(R.string.sunrise) + ":",
+                        context.getString(R.string.day_duration_time),
                         color = Color.White,
                         style = QuickSandTypography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(sunrise, color = Color.White, style = QuickSandTypography.bodyMedium)
+                    Text(dayDuration, color = Color.White, style = QuickSandTypography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        context.getString(R.string.sunset) + ":",
+                        context.getString(R.string.elapsed_day_time),
                         color = Color.White,
                         style = QuickSandTypography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(sunset, color = Color.White, style = QuickSandTypography.bodyMedium)
+                    Text(elapsedDayTime, color = Color.White, style = QuickSandTypography.bodyMedium)
                 }
             }
         }
