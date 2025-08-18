@@ -199,56 +199,37 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             horizontalAlignment = Alignment.Start
         ) {
 
-            Row    (modifier = Modifier.padding(all=1.dp),
+            Row    (modifier = Modifier.padding(top=5.dp, start = 1.dp, bottom = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)         {
 
                 Text(context.getString(R.string.sunrise)+": ",
                     color =  Color.White, style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
+             //   Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
+             }
 
-            }
-
- /*           Row (modifier = Modifier.padding(all=1.dp),
+            Row (modifier = Modifier.padding(start=10.dp, top = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
 
                 Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
             }
-*/
-            Row    (modifier = Modifier.padding(all=10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center)         {
-                //Dawn
-                Text(context.getString(R.string.dawn)+": ",
-                    color =  Color.White, style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(dawn, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.titleMedium)
-            }
 
 
-
-
-            Row(modifier = Modifier.padding(all=1.dp),
+            Row    (modifier = Modifier.padding(top=5.dp, bottom = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
                 Text(context.getString(R.string.sunset)+": ",
-                    color = Color.White,style = QuickSandTypography.bodyMedium, fontWeight = FontWeight.Bold)
-                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.titleMedium)
-
+                    color = Color.White,style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
 
-
-
-            Row(modifier = Modifier.padding(all=1.dp),
+            Row(modifier = Modifier.padding(top=1.dp,start=10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
-                Text(context.getString(R.string.dusk)+": ",
-                    color = Color.White,style = QuickSandTypography.titleSmall, fontWeight = FontWeight.SemiBold)
-                Text(dusk, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.bodyMedium)
+                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.bodyMedium)
 
             }
-
 
         } //Column 1
 
