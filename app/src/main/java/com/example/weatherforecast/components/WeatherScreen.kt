@@ -194,21 +194,21 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
         elevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(all=10.dp),
+            modifier = Modifier.padding(all=5.dp),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.Start
         ) {
 
-            Row    (modifier = Modifier.padding(top=5.dp, start = 1.dp, bottom = 1.dp),
+            Row    (modifier = Modifier.padding(all = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)         {
 
                 Text(context.getString(R.string.sunrise)+": ",
                     color =  Color.White, style = QuickSandTypography.titleMedium, fontWeight = FontWeight.Bold)
-             //   Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
-             }
+                //   Text(sunrise, fontWeight = FontWeight.Bold, color =  Color.White, style = QuickSandTypography.bodyMedium)
+            }
 
-            Row (modifier = Modifier.padding(start=10.dp, top = 1.dp),
+            Row (modifier = Modifier.padding(all = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
 
@@ -216,7 +216,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             }
 
 
-            Row    (modifier = Modifier.padding(top=5.dp, bottom = 1.dp),
+            Row    (modifier = Modifier.padding(all = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
                 Text(context.getString(R.string.sunset)+": ",
@@ -224,15 +224,26 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
             }
 
 
-            Row(modifier = Modifier.padding(top=1.dp,start=10.dp),
+            Row(modifier = Modifier.padding(all=1.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center)  {
-                 Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.bodyMedium)
+                Text(sunset, fontWeight = FontWeight.Bold, color = Color.White, style = QuickSandTypography.bodyMedium)
+
+            }
+
+            Row (modifier = Modifier.padding(all=1.dp),
+                verticalAlignment=Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center)
+            {
+                Text(context.getString(R.string.day_duration_time)+" "
+                        +WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise, sunset)[0]+"\n",
+                    fontWeight = FontWeight.SemiBold, color = Color.White, style = QuickSandTypography.bodyMedium
+                )
+
 
             }
 
         } //Column 1
-
 
     }//surface
 }
@@ -268,7 +279,7 @@ fun MoonriseMoonsetCard(
                         .size(64.dp) // Define your desired width and height
                         .padding(all = 1.dp)
                 )
-          }
+            }
             Row(modifier = Modifier.padding(1.dp)){
                 androidx.compose.material3.Text(
                     text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),

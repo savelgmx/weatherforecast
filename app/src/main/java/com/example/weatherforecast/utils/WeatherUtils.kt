@@ -18,6 +18,7 @@ import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.theme.QuickSandTypography
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -280,6 +281,53 @@ class WeatherUtils {
 
             return arrayOf(dawnString, duskString)
         }
+
+        fun calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise: String,sunset:String): Array<String> {
+            //calculates day duration ,elapsed day time
+            //and progress(float coefficient) of sun icon movement for Sunrise sunset ARC card
+            /*
+                * @param sunrise Sunrise time in "HH:MM" format.
+                * @param sunset Sunset time in "HH:MM" format.
+                * @return array<Any>
+                *array[0]-dayDuration :String
+                * array[1]-elapsedDayTime:String
+                * array[2]-progress:Float
+              */
+
+            val calendar = Calendar.getInstance()
+            val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val currentMinute = calendar.get(Calendar.MINUTE)
+            val currentMinutes = currentHour * 60 + currentMinute
+
+            val sunriseParts = sunrise.split(":")
+            val sunriseHour = sunriseParts[0].toInt()
+            val sunriseMinute = sunriseParts[1].toInt()
+            val sunriseMinutes = sunriseHour * 60 + sunriseMinute
+
+            val sunsetParts = sunset.split(":")
+            val sunsetHour = sunsetParts[0].toInt()
+            val sunsetMinute = sunsetParts[1].toInt()
+            val sunsetMinutes = sunsetHour * 60 + sunsetMinute
+
+            // Calculate total day length in minutes and elapsed time since sunrise
+            val totalMinutes = sunsetMinutes - sunriseMinutes
+            val elapsedMinutes = currentMinutes - sunriseMinutes
+            // Compute progress as a fraction (0 to 1) of the day, clamped between 0 and 1
+            val progress = if (totalMinutes > 0) (elapsedMinutes.coerceIn(0, totalMinutes).toFloat() / totalMinutes) else 0f
+
+            // Calculate day duration
+            val dayHours = totalMinutes / 60
+            val dayMinutes = totalMinutes % 60
+            val dayDuration = "$dayHours:$dayMinutes"
+
+            // Calculate elapsed day time
+            val elapsedHours = elapsedMinutes.coerceIn(0, totalMinutes) / 60
+            val elapsedMins = elapsedMinutes.coerceIn(0, totalMinutes) % 60
+            val elapsedDayTime = "$elapsedHours:$elapsedMins"
+
+            return arrayOf(dayDuration,elapsedDayTime,progress.toString())
+        }
+
         @Composable
         fun WeatherText(
             text: String,
