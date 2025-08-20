@@ -77,6 +77,7 @@ fun MainScreen(
     AppTheme {
         Scaffold(
             scaffoldState=scaffoldState,
+            drawerElevation = 16.dp,
             topBar = {
                 TopAppBar(
                     title = {
