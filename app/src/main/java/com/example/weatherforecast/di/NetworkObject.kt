@@ -2,6 +2,7 @@ package com.example.weatherforecast.di
 
 
 
+import com.example.weatherforecast.data.remote.NominatimApiService
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -27,4 +28,26 @@ object NetworkObject {
             .build()
             .create(WeatherApiService::class.java)
     }
+
+    fun getNominatimAPIInstance(): NominatimApiService {
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("User-Agent", "WeatherApp/1.0 (savelgmx@gmail.com)")
+                    .build()
+                chain.proceed(request)
+            }
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl("https://nominatim.openstreetmap.org/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(NominatimApiService::class.java)
+    }
+
 }
