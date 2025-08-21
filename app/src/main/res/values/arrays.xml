@@ -68,4 +68,14 @@
         <item>@string/extreme</item>
     </string-array>
 
+    <string-array name="aqi_symbols_array">
+        <item>@drawable/pollution_good</item> <!-- AQI 0-50 -->
+        <item>@drawable/pollution_moderate</item> <!-- AQI 51-100 -->
+        <item>😷</item> <!-- Unhealthy for sensitive groups (emoji-mask) -->
+        <item>@drawable/pollution_unhealthly</item> <!-- Unhealthy -->
+        <item>🫁</item> <!-- Very Unhealthy (противогаз / лёгкие) -->
+        <item>☣️</item> <!-- Hazardous (биоопасность) -->
+    </string-array>
+
+
 </resources>

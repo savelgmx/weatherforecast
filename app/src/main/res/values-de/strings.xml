@@ -88,5 +88,12 @@
     <string name="elapsed_day_time">verstrichene Tageszeit:</string>
     <string name="day_duration_time">Tagesdauer:</string>
 
+    <string name="air_quality">Luftqualität</string>
+    <string name="aqi_good">Gut</string>
+    <string name="aqi_moderate">Mäßig</string>
+    <string name="aqi_unhealthy_sensitive">Ungesund (Sensibel)</string>
+    <string name="aqi_unhealthy">Ungesund</string>
+    <string name="aqi_very_unhealthy">Sehr ungesund</string>
+    <string name="aqi_hazardous">Gefährlich</string>
 
 </resources>

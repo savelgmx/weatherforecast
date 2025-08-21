@@ -86,5 +86,12 @@
     <string name="elapsed_day_time">Прошедшее время дня:</string>
     <string name="day_duration_time">Продолжительность дня:</string>
 
+    <string name="air_quality">Качество воздуха</string>
+    <string name="aqi_good">Хорошее</string>
+    <string name="aqi_moderate">Умеренное</string>
+    <string name="aqi_unhealthy_sensitive">Вредное (чувствительное)</string>
+    <string name="aqi_unhealthy">Вредное</string>
+    <string name="aqi_very_unhealthy">Очень вредное</string>
+    <string name="aqi_hazardous">Опасное</string>
 
 </resources>

@@ -390,34 +390,38 @@ class WeatherUtils {
         suspend fun saveCityName(context: Context, cityName: String) {
             DataStoreManager.updateCityName(context, cityName)
         }
-    }
-    suspend fun getCoordinatesFromCity(
-        context: Context,
-        cityName: String,
-        useCase: GetCoordinatesUseCase
-    ): Pair<Double, Double>? = withContext(Dispatchers.IO) {
-        try {
-            // 1. Сначала Geocoder
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocationName(cityName, 1)
 
-            if (!addresses.isNullOrEmpty()) {
-                val location = addresses[0]
-                return@withContext Pair(location.latitude, location.longitude)
+        suspend fun getCoordinatesFromCity(
+            context: Context,
+            cityName: String,
+            useCase: GetCoordinatesUseCase
+        ): Pair<Double, Double>? = withContext(Dispatchers.IO) {
+            try {
+                // 1. Сначала Geocoder
+                val geocoder = Geocoder(context, Locale.getDefault())
+                val addresses = geocoder.getFromLocationName(cityName, 1)
+
+                if (!addresses.isNullOrEmpty()) {
+                    val location = addresses[0]
+                    return@withContext Pair(location.latitude, location.longitude)
+                }
+
+                // 2. Fallback → Nominatim через UseCase
+                val result = useCase(cityName)
+                result?.let {
+                    return@withContext Pair(it.lat.toDouble(), it.lon.toDouble())
+                }
+
+                null
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-
-            // 2. Fallback → Nominatim через UseCase
-            val result = useCase(cityName)
-            result?.let {
-                return@withContext Pair(it.lat.toDouble(), it.lon.toDouble())
-            }
-
-            null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
+
+
     }
+
 
 
 }

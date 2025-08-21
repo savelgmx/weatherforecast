@@ -2,12 +2,16 @@ package com.example.weatherforecast.di;
 
 
 import com.example.weatherforecast.data.db.WeatherDao
+import com.example.weatherforecast.data.remote.AirVisualApiService
 import com.example.weatherforecast.data.remote.NominatimApiService
 import com.example.weatherforecast.data.remote.WeatherApiService
+import com.example.weatherforecast.data.repositories.AirVisualRepository
+import com.example.weatherforecast.data.repositories.AirVisualRepositoryImpl
 import com.example.weatherforecast.data.repositories.NominatimRepository
 import com.example.weatherforecast.data.repositories.NominatimRepositoryImpl
 import com.example.weatherforecast.data.repositories.VisualCrossingRepository
 import com.example.weatherforecast.data.repositories.VisualCrossingRepositoryImpl
+import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
 import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
 import dagger.Module
 import dagger.Provides
@@ -50,6 +54,23 @@ object RepositoryModule {
     @Singleton
     fun provideGetCoordinatesUseCase(repository: NominatimRepository): GetCoordinatesUseCase {
         return GetCoordinatesUseCase(repository)
+    }
+    @Provides
+    @Singleton
+    fun provideAirVisualApi(): AirVisualApiService {
+        return NetworkObject.getAirVisualAPIInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAirVisualRepository(api: AirVisualApiService): AirVisualRepository {
+        return AirVisualRepositoryImpl(api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAirVisualDataUseCase(repository: AirVisualRepository): GetAirVisualDataUseCase {
+        return GetAirVisualDataUseCase(repository)
     }
 
 

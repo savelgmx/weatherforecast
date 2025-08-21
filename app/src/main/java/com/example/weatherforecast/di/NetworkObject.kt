@@ -2,6 +2,7 @@ package com.example.weatherforecast.di
 
 
 
+import com.example.weatherforecast.data.remote.AirVisualApiService
 import com.example.weatherforecast.data.remote.NominatimApiService
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.google.gson.GsonBuilder
@@ -49,5 +50,20 @@ object NetworkObject {
             .build()
             .create(NominatimApiService::class.java)
     }
+    fun getAirVisualAPIInstance(): AirVisualApiService {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl("https://api.airvisual.com/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(AirVisualApiService::class.java)
+    }
+
 
 }
