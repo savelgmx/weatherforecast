@@ -48,12 +48,6 @@ class ForecastWeatherFragment : Fragment() {
                 val showCityDialog = currentViewModel.showCitySelectionDialog.value
                 val pollution = currentViewModel.airVisualLiveData.value?.data?.current?.pollution
 
-                // Автоматически загружаем данные при первом старте экрана
-                LaunchedEffect(Unit) {
-                    currentViewModel.refreshWeather()
-                    viewModel.refreshWeather()
-                }
-
                 DrawerContent()
                 MainScreen(
                     navController = navController,
