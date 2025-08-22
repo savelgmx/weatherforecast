@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.R
+import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppTheme
@@ -56,7 +57,8 @@ fun MainScreen(
     onRefresh: () -> Unit,
     showCitySelectionDialog: Boolean = false,
     onCitySelected: (String) -> Unit = {},
-    onDismissCityDialog: () -> Unit = {}
+    onDismissCityDialog: () -> Unit = {},
+    pollution: AirVisualPollution? = null // 🔹 новый параметр
 ) {
     val scaffoldState= rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -273,23 +275,12 @@ fun MainScreen(
                                     .padding(all = 3.dp),
                                 horizontalArrangement = Arrangement.SpaceAround
                             ) {
-                                forecastData.daily[0].sunrise?.let { sunrise ->
-                                    forecastData.daily[0].sunset?.let { sunset ->
-                                        val timeOfSunrise = WeatherUtils.updateTime(sunrise)
-                                        val timeOfSunset = WeatherUtils.updateTime(sunset)
-                                        val timeOfDawnAndDusk = WeatherUtils.calculateDawnAndDusk(sunrise, sunset)
-                                        timeOfDawnAndDusk[0]?.let { dawn ->
-                                            timeOfDawnAndDusk[1]?.let { dusk ->
-                                                SunriseSunsetCard(
-                                                    sunrise = timeOfSunrise,
-                                                    sunset = timeOfSunset,
-                                                    dawn = dawn,
-                                                    dusk = dusk
-                                                )
-                                            }
-                                        }
+                                pollution.let { pol->
+                                    if (pol != null) {
+                                        AirQualityCard(pollution = pol)
                                     }
                                 }
+
                                 forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
                                     val moonRise = WeatherUtils.updateTime(forecastData.daily[0].moonrise)
                                     val moonSet = WeatherUtils.updateTime(forecastData.daily[0].moonset)

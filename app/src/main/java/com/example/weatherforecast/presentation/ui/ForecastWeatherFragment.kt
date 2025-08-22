@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -45,8 +46,14 @@ class ForecastWeatherFragment : Fragment() {
                 val currentState = currentViewModel.weatherLiveData.value
                 val forecastState = viewModel.forecastLiveData.value
                 val showCityDialog = currentViewModel.showCitySelectionDialog.value
+                val pollution = currentViewModel.airVisualLiveData.value?.data?.current?.pollution
 
-                // Drawer + Main UI
+                // Автоматически загружаем данные при первом старте экрана
+                LaunchedEffect(Unit) {
+                    currentViewModel.refreshWeather()
+                    viewModel.refreshWeather()
+                }
+
                 DrawerContent()
                 MainScreen(
                     navController = navController,
@@ -61,10 +68,12 @@ class ForecastWeatherFragment : Fragment() {
                     onCitySelected = { cityName ->
                         // Called when user selects a city in the dialog
                         currentViewModel.onCitySelected(cityName)
+                        // pollution подтянется автоматически через refreshWeather()
                     },
                     onDismissCityDialog = {
                         currentViewModel.dismissCitySelectionDialog()
-                    }
+                    },
+                    pollution = pollution
                 )
 
             }

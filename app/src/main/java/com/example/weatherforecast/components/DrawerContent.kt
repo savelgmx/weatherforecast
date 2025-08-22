@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
@@ -80,11 +81,11 @@ fun DrawerContent() {
         )
         {
             Column( verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Outlined.Refresh, contentDescription = "wind speed Icon")
+                Icon(painter = painterResource(id = R.drawable.wind_24), contentDescription = "wind speed Icon")
             }
 
             Column {
-                Text(text = context.getString(R.string.measure_units_wind))
+                Text(text =" "+context.getString(R.string.measure_units_wind))
                 if (windSpeedUnitsPopup)
                 {
                     AlertDialog(
@@ -124,11 +125,11 @@ fun DrawerContent() {
         )
         {
             Column( verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Outlined.Star, contentDescription = "pressure Icon")
+                Icon(painter = painterResource(id = R.drawable.dashboard_24), contentDescription = "pressure Icon")
             }
 
             Column{
-                Text(context.getString(R.string.measure_units_pressure))
+                Text(" "+context.getString(R.string.measure_units_pressure))
                 if (pressureUnitsPopup)
                 {
                     AlertDialog(
@@ -169,7 +170,7 @@ fun DrawerContent() {
         ) {
 
             Column( verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Outlined.Face, contentDescription = "temperature Icon")
+                Icon(painter = painterResource(id = R.drawable.thermometer_half_24), contentDescription = "temperature Icon")
             }
 
             Column(
@@ -177,7 +178,7 @@ fun DrawerContent() {
                     .padding(3.dp)
                     .align(Alignment.CenterVertically)
             ) {
-                Text("Temperature")
+                Text(" Temperature")
 
             }
 

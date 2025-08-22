@@ -8,10 +8,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.data.remote.AirVisualResponse
+import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
+import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -21,9 +25,12 @@ import javax.inject.Inject
 class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
     private val getWeatherUseCase: GetWeatherUseCase,
-    private val getDeviceCityUseCase: GetDeviceCityUseCase
+    private val getDeviceCityUseCase: GetDeviceCityUseCase,
+    private val getCoordinatesUseCase: GetCoordinatesUseCase,
+    private val getAirVisualDataUseCase: GetAirVisualDataUseCase
 ) : AndroidViewModel(application) {
 
+    val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
     val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
     val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(false)
     private var isWeatherLoaded = false // Flag to track if weather data is already loaded
@@ -105,11 +112,26 @@ class OpenWeatherMapViewModel @Inject constructor(
     }
 
     /**
-     * Triggers a refresh of current weather for the current city.
+     * Получаем pollution по координатам города
+     */
+    private fun getAirVisualData(city: String) {
+        viewModelScope.launch {
+            val coords = WeatherUtils.getCoordinatesFromCity(getApplication(), city, getCoordinatesUseCase)
+            coords?.let { (lat, lon) ->
+                val result = getAirVisualDataUseCase(lat, lon, "f3324376-d944-44f4-bda6-e936f76bbbeb")
+                airVisualLiveData.value = result
+            }
+        }
+    }
+
+    /**
+     *  Унифицированный метод:
+     * обновляет и погоду, и pollution
      */
     fun refreshWeather(city: String = currentCity) {
         isWeatherLoaded = false
         getCurrentWeather(city, forceRefresh = true)
+        getAirVisualData(city)
     }
 
     /**
