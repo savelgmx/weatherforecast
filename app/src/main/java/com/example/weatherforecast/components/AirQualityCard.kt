@@ -19,28 +19,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.presentation.ui.theme.orange
 import com.example.weatherforecast.presentation.ui.theme.white
 import com.example.weatherforecast.theme.Blue800
+import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
 fun AirQualityCard(pollution: AirVisualPollution) {
     val context = LocalContext.current
 
     // Определяем индекс и уровень AQI
-    val (aqiLevel, symbolIndex) = when {
-        pollution.aqius <= 50 -> context.getString(R.string.aqi_good) to 0
-        pollution.aqius <= 100 -> context.getString(R.string.aqi_moderate) to 1
-        pollution.aqius <= 150 -> context.getString(R.string.aqi_unhealthy_sensitive) to 2
-        pollution.aqius <= 200 -> context.getString(R.string.aqi_unhealthy) to 3
-        pollution.aqius <= 300 -> context.getString(R.string.aqi_very_unhealthy) to 4
-        else -> context.getString(R.string.aqi_hazardous) to 5
+    val aqiLevel = when {
+        pollution.aqius <= 50 -> context.getString(R.string.aqi_good)
+        pollution.aqius <= 100 -> context.getString(R.string.aqi_moderate)
+        pollution.aqius <= 150 -> context.getString(R.string.aqi_unhealthy_sensitive)
+        pollution.aqius <= 200 -> context.getString(R.string.aqi_unhealthy)
+        pollution.aqius <= 300 -> context.getString(R.string.aqi_very_unhealthy)
+        else -> context.getString(R.string.aqi_hazardous)
     }
 
-    val aqiSymbols = context.resources.getStringArray(R.array.aqi_symbols_array)
-    val aqiSymbol = aqiSymbols[symbolIndex]
+    val aqiIconName= WeatherUtils.getAirQualityIconName(context,pollution.aqius)
 
     Surface(
         modifier = Modifier
@@ -57,26 +58,25 @@ fun AirQualityCard(pollution: AirVisualPollution) {
         ) {
             Text(
                 text = context.getString(R.string.air_quality),
-                fontSize = 16.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.White
             )
 
-            CustomCircularProgressIndicator(
+            AsyncImage(
+                model = aqiIconName,
+                contentDescription = "air quality icon",
                 modifier = Modifier
-                    .size(85.dp)
-                    .background(Blue800),
-                initialValue = pollution.aqius,
-                primaryColor = orange,
-                secondaryColor = white,
-                circleRadius = 80f,
-                minValue = 0,
-                maxValue = 500
+                    .size(64.dp) // Define your desired width and height
+                    .padding(all = 1.dp)
             )
 
+
             Text(
-                text = "${pollution.aqius} AQI\n$aqiLevel\n$aqiSymbol",
-                fontSize = 16.sp,
+
+               // $aqiSymbol
+                text = "${pollution.aqius} AQI\n$aqiLevel",
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 textAlign = TextAlign.Center

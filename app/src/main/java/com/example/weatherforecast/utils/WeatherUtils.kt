@@ -234,6 +234,26 @@ class WeatherUtils {
                 else -> R.drawable.moon_crescent
             }
         }
+        fun getAirQualityIconName(context: Context,aqiLevel:Int):Int{
+
+           val aiqAirIcons= arrayOf(
+                R.drawable.pollution_good,
+                R.drawable.pollution_moderate,
+                R.drawable.pollution_unhealthly,
+                R.drawable.pollution_very_unhealthly,
+                R.drawable.pollution_very_unhealthly
+            )
+
+            return when {
+                aqiLevel <= 50 -> aiqAirIcons[0]
+                aqiLevel <= 100 -> aiqAirIcons[1]
+                aqiLevel <= 150 -> aiqAirIcons[2]
+                aqiLevel <= 200 -> aiqAirIcons[3]
+                aqiLevel <= 300 -> aiqAirIcons[4]
+                else -> aiqAirIcons[5]
+            }
+
+        }
 
         @Composable
         fun selectionWindSignature(selection:Int): String {
