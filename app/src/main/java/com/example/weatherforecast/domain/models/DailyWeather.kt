@@ -24,6 +24,8 @@ data class DailyWeather(
     val sunrise: Long,          // Восход (sunriseEpoch)
     val sunset: Long,           // Закат (sunsetEpoch)
     val moonPhase: Double,      //фаза луны
-    val hours: List<HourlyWeather>? = null // Почасовые данные
+    val hours: List<HourlyWeather>? = null, // Почасовые данные
+    val timezone:String,
+    val tzOffset:Double
 )
 

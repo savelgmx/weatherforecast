@@ -6,7 +6,8 @@ import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
 //преобразует данные API в доменные модели.
 object WeatherMapper {
-    fun toDailyWeather(apiDay: ApiDay): DailyWeather {
+
+    fun toDailyWeather(apiDay: ApiDay, timezone: String, tzOffset: Double): DailyWeather {
         return DailyWeather(
             dew=apiDay.dew,              //point of dew (точка росы)
             uvindex=apiDay.uvIndex,             //UV index (УФ индекс)
@@ -27,7 +28,9 @@ object WeatherMapper {
             sunrise = apiDay.sunriseEpoch,
             sunset = apiDay.sunsetEpoch,
             moonPhase = apiDay.moonPhase,
-            hours = apiDay.hours?.map { toHourlyWeather(it) }
+            hours = apiDay.hours?.map { toHourlyWeather(it) },
+            timezone = timezone,             // ✅ new
+            tzOffset = tzOffset              // ✅ new
         )
     }
 

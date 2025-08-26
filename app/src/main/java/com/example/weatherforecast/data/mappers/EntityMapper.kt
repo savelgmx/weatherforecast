@@ -26,7 +26,9 @@ object EntityMapper {
             sunrise = entity.sunrise,
             sunset = entity.sunset,
             moonPhase = entity.moonPhase,
-            hours = null // Почасовые данные хранятся отдельно
+            hours = null, // Почасовые данные хранятся отдельно
+            timezone = entity.timezone,//propogate timezone
+            tzOffset = entity.tzOffset //propogate tzOffset
         )
     }
 }

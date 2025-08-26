@@ -1,5 +1,6 @@
 package com.example.weatherforecast.data.db
 
+
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -25,6 +26,7 @@ data class DailyWeatherEntity(
     val sunset: Long,
     val moonPhase: Double,
     val visibility:Double,
-    val cityName: String?
+    val cityName: String?,
+    val timezone: String,
+    val tzOffset: Double
 )
-
