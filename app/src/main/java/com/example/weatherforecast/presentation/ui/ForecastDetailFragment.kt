@@ -45,13 +45,17 @@ class ForecastDetailFragment : Fragment() {
                 val dailyList = forecastState.data?.daily ?: emptyList()
                 val hourlyList= forecastState.data?.hourly ?: emptyList()
                 val initialIndex = args.index
+                val timeZone=forecastState.data?.timezone
                 if (dailyList.isNotEmpty() && initialIndex in 0 until dailyList.size) {
-                    DailyWeatherForecast(
-                        navController = findNavController(),
-                        dailyList = dailyList,
-                        hourlyList=hourlyList,
-                        startIndex = initialIndex
-                    )
+                    if (timeZone != null) {
+                        DailyWeatherForecast(
+                            navController = findNavController(),
+                            dailyList = dailyList,
+                            hourlyList=hourlyList,
+                            startIndex = initialIndex,
+                            timeZone=timeZone
+                        )
+                    }
                 } else {
                    // Text("No data available")
                 }

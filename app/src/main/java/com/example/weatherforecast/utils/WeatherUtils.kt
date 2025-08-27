@@ -22,7 +22,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Locale
 
@@ -31,7 +35,7 @@ class WeatherUtils {
     companion object {
 
         fun updateTemperature(temperature: Int, switchState: Boolean): String {
-            val unitAbbreviation = if(switchState) "C° " else "F° "
+            val unitAbbreviation = if (switchState) "C° " else "F° "
 
             val temp = if (switchState) {
                 "$temperature$unitAbbreviation"
@@ -43,18 +47,20 @@ class WeatherUtils {
         }
 
         @Composable
-        fun updateMinMaxPressureValue(minMaxPressure:Int):Int{
+        fun updateMinMaxPressureValue(minMaxPressure: Int): Int {
             //this function returns max possible barometic pressure
             // , recalculating in chosen measurements unints
             //val maxPressure=1033 min pressure =870 //base max pressure value is constant in mbar units
-            val localcontext= LocalContext.current
-            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            val localcontext = LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext)
+                .collectAsState(initial = 0)
+            val pressureUnitsToSelect =
+                localcontext.resources.getStringArray(R.array.pressure_units)
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
                 return -1
             }
-            val minMaxPressureValue = when(selectedPressureOption){
+            val minMaxPressureValue = when (selectedPressureOption) {
                 0 -> minMaxPressure * 0.7500615613 // Conversion from mBar to mm Hg
                 1 -> minMaxPressure * 0.029529983071445 // Conversion from mBar to inches Hg
                 2 -> minMaxPressure // 1 mBar is equivalent to 1 hPa
@@ -65,10 +71,12 @@ class WeatherUtils {
         }
 
         @Composable
-        fun updatePressureUnit():String{
-            val localcontext= LocalContext.current
-            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+        fun updatePressureUnit(): String {
+            val localcontext = LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext)
+                .collectAsState(initial = 0)
+            val pressureUnitsToSelect =
+                localcontext.resources.getStringArray(R.array.pressure_units)
 
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
@@ -83,9 +91,11 @@ class WeatherUtils {
 
         @Composable
         fun updatePressure(pressureValue: Int): Int {
-            val localcontext= LocalContext.current
-            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext).collectAsState(initial = 0)
-            val pressureUnitsToSelect = localcontext.resources.getStringArray(R.array.pressure_units)
+            val localcontext = LocalContext.current
+            val selectedPressureOption by DataStoreManager.pressurePrefFlow(localcontext)
+                .collectAsState(initial = 0)
+            val pressureUnitsToSelect =
+                localcontext.resources.getStringArray(R.array.pressure_units)
 
             // Check for a valid index
             if (selectedPressureOption < 0 || selectedPressureOption >= pressureUnitsToSelect.size) {
@@ -108,8 +118,9 @@ class WeatherUtils {
         @Composable
         fun updateWind(windDirection: String, windSpeed: Int, context: Context): String {
             // Obtain the selected wind speed unit from preferences
-            val selectedWindOptions by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
-            val windSpeedUnitsToSelect=context.resources.getStringArray(R.array.wind_speed_units)
+            val selectedWindOptions by DataStoreManager.windPrefFlow(context)
+                .collectAsState(initial = 0)
+            val windSpeedUnitsToSelect = context.resources.getStringArray(R.array.wind_speed_units)
             // Ensure the selected index is valid
             if (selectedWindOptions < 0 || selectedWindOptions >= windSpeedUnitsToSelect.size) {
                 return "Invalid unit index"
@@ -121,12 +132,12 @@ class WeatherUtils {
             return windString
         }
 
-        fun convertWindSpeed(windSpeed:Int,selectedWindOptions:Int):String {
+        fun convertWindSpeed(windSpeed: Int, selectedWindOptions: Int): String {
             // Convert the wind speed to the selected unit using integer calculations
             val convertedWindSpeed = when (selectedWindOptions) {
-                0 ->  windSpeed  // km/h is the default unit
-                1 -> (windSpeed/3.6).toInt() // Conversion from km/h to m/s
-                2 -> (windSpeed*0.587).toInt() // Conversion from km/h to knots
+                0 -> windSpeed  // km/h is the default unit
+                1 -> (windSpeed / 3.6).toInt() // Conversion from km/h to m/s
+                2 -> (windSpeed * 0.587).toInt() // Conversion from km/h to knots
                 3 -> (windSpeed * 0.91).toInt()  // Conversion from km/h to ft/s
                 else -> {}
             }
@@ -234,9 +245,10 @@ class WeatherUtils {
                 else -> R.drawable.moon_crescent
             }
         }
-        fun getAirQualityIconName(context: Context,aqiLevel:Int):Int{
 
-           val aiqAirIcons= arrayOf(
+        fun getAirQualityIconName(context: Context, aqiLevel: Int): Int {
+
+            val aiqAirIcons = arrayOf(
                 R.drawable.pollution_good,
                 R.drawable.pollution_moderate,
                 R.drawable.pollution_unhealthly,
@@ -256,35 +268,41 @@ class WeatherUtils {
         }
 
         @Composable
-        fun selectionWindSignature(selection:Int): String {
-            val context= LocalContext.current
-            val windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
+        fun selectionWindSignature(selection: Int): String {
+            val context = LocalContext.current
+            val windSpeedUnitsToSelect =
+                context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
             // Get the chosen unit
             val selectedSignature = windSpeedUnitsToSelect[selection]
             return selectedSignature
         }
 
         @Composable
-        fun selectionPressureSignature(selection:Int): String {
-            val context= LocalContext.current
-            val pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
-            val selectedSignature=pressureUnitsToSelect[selection]
+        fun selectionPressureSignature(selection: Int): String {
+            val context = LocalContext.current
+            val pressureUnitsToSelect =
+                context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
+            val selectedSignature = pressureUnitsToSelect[selection]
             return selectedSignature
         }
 
-        fun updateUVLevel(context: Context,uvLevel:Int):String{
+        fun updateUVLevel(context: Context, uvLevel: Int): String {
 
-            val UVDescriptions= context.resources.getStringArray(R.array.uv_index_values)
+            val UVDescriptions = context.resources.getStringArray(R.array.uv_index_values)
             // Check for a valid index
-            if (uvLevel < 0 ) { return "Invalid unit index"}
+            if (uvLevel < 0) {
+                return "Invalid unit index"
+            }
             //now choose right uv value from array
-            return when{
-                uvLevel <=2             -> UVDescriptions[0] // low 2 or less
-                uvLevel in(3..5)  -> UVDescriptions[1]//average 3-5
-                uvLevel in(6..7)  -> UVDescriptions[2]//high 6-7
-                uvLevel in(8..10) -> UVDescriptions[3]//very high 8-10
-                uvLevel >=11            -> UVDescriptions[4]//extreme 11 and higher
-                else -> {context.resources.getString(R.string.wrong_value)}
+            return when {
+                uvLevel <= 2 -> UVDescriptions[0] // low 2 or less
+                uvLevel in (3..5) -> UVDescriptions[1]//average 3-5
+                uvLevel in (6..7) -> UVDescriptions[2]//high 6-7
+                uvLevel in (8..10) -> UVDescriptions[3]//very high 8-10
+                uvLevel >= 11 -> UVDescriptions[4]//extreme 11 and higher
+                else -> {
+                    context.resources.getString(R.string.wrong_value)
+                }
             }
         }
 
@@ -305,51 +323,68 @@ class WeatherUtils {
 
             return arrayOf(dawnString, duskString)
         }
+        /**
+         * Calculates total day duration, elapsed day time and sun progress
+         * for SunriseSunsetArcCard.
+         *
+         * @param sunrise Sunrise time in "HH:mm" format (local to city).
+         * @param sunset Sunset time in "HH:mm" format (local to city).
+         * @param timezone IANA timezone string from API (e.g. "Europe/Berlin").
+         * @return arrayOf(dayDuration:String, elapsedDayTime:String, progress:Float as String)
+         */
+        fun calculateDayDurationElapsedDayTimeAndSunIconProgress(
+            sunrise: String,
+            sunset: String,
+            timezone: String
+        ): Array<String> {
+            return try {
+                val zoneId = try {
+                    ZoneId.of(timezone)   // e.g. "Europe/Berlin"
+                } catch (e: Exception) {
+                    ZoneId.systemDefault() // fallback if invalid zone
+                }
 
-        fun calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise: String,sunset:String): Array<String> {
-            //calculates day duration ,elapsed day time
-            //and progress(float coefficient) of sun icon movement for Sunrise sunset ARC card
-            /*
-                * @param sunrise Sunrise time in "HH:MM" format.
-                * @param sunset Sunset time in "HH:MM" format.
-                * @return array<Any>
-                *array[0]-dayDuration :String
-                * array[1]-elapsedDayTime:String
-                * array[2]-progress:Float
-              */
+                val today = LocalDate.now(zoneId)
 
-            val calendar = Calendar.getInstance()
-            val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-            val currentMinute = calendar.get(Calendar.MINUTE)
-            val currentMinutes = currentHour * 60 + currentMinute
+                val sunriseTime = LocalTime.parse(sunrise)
+                val sunsetTime = LocalTime.parse(sunset)
 
-            val sunriseParts = sunrise.split(":")
-            val sunriseHour = sunriseParts[0].toInt()
-            val sunriseMinute = sunriseParts[1].toInt()
-            val sunriseMinutes = sunriseHour * 60 + sunriseMinute
+                val sunriseDateTime = ZonedDateTime.of(today, sunriseTime, zoneId)
+                val sunsetDateTime = ZonedDateTime.of(today, sunsetTime, zoneId)
 
-            val sunsetParts = sunset.split(":")
-            val sunsetHour = sunsetParts[0].toInt()
-            val sunsetMinute = sunsetParts[1].toInt()
-            val sunsetMinutes = sunsetHour * 60 + sunsetMinute
+                val nowCity = ZonedDateTime.now(zoneId)
 
-            // Calculate total day length in minutes and elapsed time since sunrise
-            val totalMinutes = sunsetMinutes - sunriseMinutes
-            val elapsedMinutes = currentMinutes - sunriseMinutes
-            // Compute progress as a fraction (0 to 1) of the day, clamped between 0 and 1
-            val progress = if (totalMinutes > 0) (elapsedMinutes.coerceIn(0, totalMinutes).toFloat() / totalMinutes) else 0f
+                // --- Day duration ---
+                var totalMinutes =
+                    Duration.between(sunriseDateTime, sunsetDateTime).toMinutes().toInt()
+                if (totalMinutes < 0) totalMinutes = 0   // defensive
 
-            // Calculate day duration
-            val dayHours = totalMinutes / 60
-            val dayMinutes = totalMinutes % 60
-            val dayDuration = "$dayHours:$dayMinutes"
+                // --- Elapsed time since sunrise ---
+                var elapsedMinutes = Duration.between(sunriseDateTime, nowCity).toMinutes().toInt()
+                if (elapsedMinutes < 0) elapsedMinutes = 0
+                if (elapsedMinutes > totalMinutes) elapsedMinutes = totalMinutes
 
-            // Calculate elapsed day time
-            val elapsedHours = elapsedMinutes.coerceIn(0, totalMinutes) / 60
-            val elapsedMins = elapsedMinutes.coerceIn(0, totalMinutes) % 60
-            val elapsedDayTime = "$elapsedHours:$elapsedMins"
+                // --- Progress (0..1) ---
+                val progress = if (totalMinutes > 0) {
+                    elapsedMinutes.toFloat() / totalMinutes.toFloat()
+                } else {
+                    0f
+                }
 
-            return arrayOf(dayDuration,elapsedDayTime,progress.toString())
+                // --- Format results ---
+                val dayHours = totalMinutes / 60
+                val dayMinutes = totalMinutes % 60
+                val dayDuration = String.format("%d:%02d", dayHours, dayMinutes)
+
+                val elapsedHours = elapsedMinutes / 60
+                val elapsedMins = elapsedMinutes % 60
+                val elapsedDayTime = String.format("%d:%02d", elapsedHours, elapsedMins)
+
+                arrayOf(dayDuration, elapsedDayTime, progress.toString())
+            } catch (e: Exception) {
+                // Fallback in case of parsing/zone error
+                arrayOf("0:00", "0:00", "0.0")
+            }
         }
 
         @Composable
@@ -439,9 +474,11 @@ class WeatherUtils {
             }
         }
 
-
     }
-
-
-
 }
+
+
+
+
+
+

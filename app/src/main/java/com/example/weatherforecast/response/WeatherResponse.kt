@@ -13,7 +13,7 @@ data class WeatherResponse(
     val clouds: Clouds,
     val dt: Long,
     val sys: Sys,
-    val timezone: Int,
+    val timezone: Double,
     val id: Int,
     val name: String,
     val cod: Int

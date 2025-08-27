@@ -1,6 +1,5 @@
 package com.example.weatherforecast.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -22,8 +21,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
-import com.example.weatherforecast.presentation.ui.theme.orange
-import com.example.weatherforecast.presentation.ui.theme.white
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.utils.WeatherUtils
 

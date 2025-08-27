@@ -18,7 +18,7 @@ data class ForecastResponse(
     @SerializedName("timezone")
     val timezone: String,
     @SerializedName("timezone_offset")
-    val timezoneOffset: Int
+    val timezoneOffset: Double
 )
 data class Current(
     @SerializedName("clouds")

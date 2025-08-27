@@ -14,7 +14,6 @@ import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
-import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -222,7 +222,9 @@ fun MainScreen(
                                         val timeOfSunset = WeatherUtils.updateTime(sunset)
                                         SunriseSunsetArcCard(
                                             sunrise = timeOfSunrise,
-                                            sunset = timeOfSunset
+                                            sunset = timeOfSunset,
+                                            timezone=forecastData.timezone,
+                                            timezoneOffest=forecastData.timezoneOffset
                                         )
 
                                     }

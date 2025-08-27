@@ -37,12 +37,13 @@ import kotlin.math.sin
  *
  * @param sunrise Sunrise time in "HH:MM" format.
  * @param sunset Sunset time in "HH:MM" format.
+ * @param
  */
 @Composable
-fun SunriseSunsetArcCard(sunrise: String, sunset: String) {
+fun SunriseSunsetArcCard(sunrise: String, sunset: String, timezone: String, timezoneOffest: Double) {
     val context = LocalContext.current
 
-    val dayProgressArray=WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise,sunset)
+    val dayProgressArray=WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise,sunset, timezone)
     val dayDuration= dayProgressArray[0]
     val elapsedDayTime= dayProgressArray[1]
     val progress=dayProgressArray[2].toFloat()

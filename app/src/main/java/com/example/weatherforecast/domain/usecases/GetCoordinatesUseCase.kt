@@ -1,8 +1,8 @@
 package com.example.weatherforecast.domain.usecases
 
 
-import com.example.weatherforecast.data.repositories.NominatimRepository
 import com.example.weatherforecast.data.remote.NominatimResponse
+import com.example.weatherforecast.data.repositories.NominatimRepository
 
 /*
     A simple use-case class in a clean architecture style,

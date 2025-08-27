@@ -41,11 +41,13 @@ fun DailyWeatherForecast(
     navController: NavController,
     dailyList: List<Daily>,
     hourlyList: List<Hourly>,
-    startIndex: Int = 0
+    startIndex: Int = 0,
+    timeZone: String
 ) {
     val pagerState = rememberPagerState(pageCount = { dailyList.size }, initialPage = startIndex)
     val localContext = LocalContext.current
     val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+    val timeZone=timeZone
 
     Scaffold(
         topBar = {
@@ -133,7 +135,8 @@ fun DailyWeatherForecast(
                                     sunrise = WeatherUtils.updateTime(daily.sunrise),
                                     sunset = WeatherUtils.updateTime(daily.sunset),
                                     dawn = dawn,
-                                    dusk = dusk
+                                    dusk = dusk,
+                                    timeZone
                                 )
                             }
                         }

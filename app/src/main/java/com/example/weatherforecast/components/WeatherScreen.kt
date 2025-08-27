@@ -61,7 +61,13 @@ fun WeatherScreen() {
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             MoonriseMoonsetCard( moonPhase = 0.43)
-            SunriseSunsetCard(sunrise = "04:04", sunset = "21:39", dawn = "03:02", dusk = "22:41")
+            SunriseSunsetCard(
+                sunrise = "04:04",
+                sunset = "21:39",
+                dawn = "03:02",
+                dusk = "22:41",
+                timeZone =""
+            )
         }
     }
 }
@@ -183,7 +189,13 @@ fun PressureCard(pressure: Int) {
 }
 
 @Composable
-fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: String) {
+fun SunriseSunsetCard(
+    sunrise: String,
+    sunset: String,
+    dawn: String,
+    dusk: String,
+    timeZone: String
+) {
     val context= LocalContext.current
     Surface(
         modifier = Modifier
@@ -236,7 +248,7 @@ fun SunriseSunsetCard(sunrise: String, sunset: String, dawn: String, dusk: Strin
                 horizontalArrangement = Arrangement.Center)
             {
                 Text(context.getString(R.string.day_duration_time)+" "
-                        +WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise, sunset)[0]+"\n",
+                        +WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise, sunset, timeZone)[0]+"\n",
                     fontWeight = FontWeight.SemiBold, color = Color.White, style = QuickSandTypography.bodyMedium
                 )
 

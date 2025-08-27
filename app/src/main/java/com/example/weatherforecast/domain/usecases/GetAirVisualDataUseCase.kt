@@ -1,7 +1,7 @@
 package com.example.weatherforecast.domain.usecases
 
-import com.example.weatherforecast.data.repositories.AirVisualRepository
 import com.example.weatherforecast.data.remote.AirVisualResponse
+import com.example.weatherforecast.data.repositories.AirVisualRepository
 
 class GetAirVisualDataUseCase(
     private val repository: AirVisualRepository

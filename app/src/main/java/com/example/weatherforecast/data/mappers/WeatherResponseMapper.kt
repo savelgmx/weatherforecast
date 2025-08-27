@@ -35,7 +35,7 @@ object WeatherResponseMapper {
             clouds = Clouds(dailyWeather.cloudiness),
             dt = dailyWeather.dt ,
             sys = Sys(0, 0, "N/A", dailyWeather.sunrise, dailyWeather.sunset),
-            timezone = dailyWeather.tzOffset.toInt(),
+            timezone = dailyWeather.tzOffset,
             id = 0,
             name = cityName,  // Используйте переданный cityName
             cod = 200
@@ -107,8 +107,8 @@ object WeatherResponseMapper {
             hourly = allHourly,
             lat = 0.0,
             lon = 0.0,
-            timezone = "",
-            timezoneOffset = 0
+            timezone = dailyWeathers[0].timezone,
+            timezoneOffset = dailyWeathers[0].tzOffset
         )
     }
 }
