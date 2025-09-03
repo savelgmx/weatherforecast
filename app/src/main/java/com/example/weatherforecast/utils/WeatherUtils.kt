@@ -167,7 +167,14 @@ class WeatherUtils {
 
             return today
         }
-
+    /**
+     * Converts an epoch timestamp (seconds) into "HH:mm" string,
+     * formatted in the given city's timezone.
+     *
+     * @param epochSeconds Epoch timestamp in seconds (API gives sunrise/sunset).
+     * @param timezone IANA timezone string from API (e.g. "Europe/Berlin").
+     * @return formatted time string in "HH:mm", or "--:--" if invalid.
+     */
         fun updateTime(epochSeconds: Int?, timezone: String): String {
             if (epochSeconds == null) return "--:--"
 

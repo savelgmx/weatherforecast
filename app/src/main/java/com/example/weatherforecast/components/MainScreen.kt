@@ -47,6 +47,9 @@ import com.example.weatherforecast.utils.WeatherUtils
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -177,13 +180,22 @@ fun MainScreen(
                             WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
                         }
                         item {
+
                             forecastData.hourly?.let { hourlyWeatherList ->
-                                val currentTime=System.currentTimeMillis()
-                                val next24Hours = currentTime + (24 * 60 * 60 * 1000)
-                                //filter list to display next 24 hours relatively to current time
-                                //sort items by dt and take only first 24 items in list
+                                val zoneId = try {
+                                    ZoneId.of(forecastData.timezone)
+                                } catch (e: Exception) {
+                                    ZoneId.systemDefault()
+                                }
+
+                                val nowCity = ZonedDateTime.now(zoneId)
+                                val next24City = nowCity.plusHours(24)
+
                                 val filteredHourlyWeatherList = hourlyWeatherList
-                                    .filter { it.dt * 1000L in currentTime..next24Hours }
+                                    .filter { hour ->
+                                        val hourTime = Instant.ofEpochSecond(hour.dt.toLong()).atZone(zoneId)
+                                        hourTime.isAfter(nowCity) && hourTime.isBefore(next24City)
+                                    }
                                     .sortedBy { it.dt }
                                     .take(24)
 
