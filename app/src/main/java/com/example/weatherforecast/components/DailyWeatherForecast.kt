@@ -132,8 +132,8 @@ fun DailyWeatherForecast(
                         timeOfDawnAndDusk[0]?.let { dawn ->
                             timeOfDawnAndDusk[1]?.let { dusk ->
                                 SunriseSunsetCard(
-                                    sunrise = WeatherUtils.updateTime(daily.sunrise),
-                                    sunset = WeatherUtils.updateTime(daily.sunset),
+                                    sunrise = WeatherUtils.updateTime(daily.sunrise, timeZone),
+                                    sunset = WeatherUtils.updateTime(daily.sunset,timeZone),
                                     dawn = dawn,
                                     dusk = dusk,
                                     timeZone

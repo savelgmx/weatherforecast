@@ -23,10 +23,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -166,16 +168,20 @@ class WeatherUtils {
             return today
         }
 
-        fun updateTime(dt: Int?): String {
-            //API returns date/time as a UnixEpoc integer timestamp
-            //we must transform this with datetime format with time zone offset relatively to GMT into human readable date/time
+        fun updateTime(epochSeconds: Int?, timezone: String): String {
+            if (epochSeconds == null) return "--:--"
 
-            val simpleDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            var currentTime = "07:00"
-            if (dt != null) {
-                currentTime = simpleDateFormat.format(dt * 1000L)
+            val zoneId = try {
+                ZoneId.of(timezone)
+            } catch (e: Exception) {
+                ZoneId.systemDefault()
             }
-            return currentTime
+
+            val instant = Instant.ofEpochSecond(epochSeconds.toLong())
+            val zonedDateTime = instant.atZone(zoneId)
+
+            val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+            return zonedDateTime.format(formatter)
         }
 
         fun calculateMoonPhase(context: Context, phase: Double): String {

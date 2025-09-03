@@ -218,8 +218,9 @@ fun MainScreen(
                             ) {
                                 forecastData.daily[0].sunrise?.let { sunrise ->
                                     forecastData.daily[0].sunset?.let { sunset ->
-                                        val timeOfSunrise = WeatherUtils.updateTime(sunrise)
-                                        val timeOfSunset = WeatherUtils.updateTime(sunset)
+                                        val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
+                                        val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
+
                                         SunriseSunsetArcCard(
                                             sunrise = timeOfSunrise,
                                             sunset = timeOfSunset,
@@ -284,8 +285,8 @@ fun MainScreen(
                                 }
 
                                 forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
-                                    val moonRise = WeatherUtils.updateTime(forecastData.daily[0].moonrise)
-                                    val moonSet = WeatherUtils.updateTime(forecastData.daily[0].moonset)
+                                    val moonRise = WeatherUtils.updateTime(forecastData.daily[0].moonrise,forecastData.timezone)
+                                    val moonSet = WeatherUtils.updateTime(forecastData.daily[0].moonset,forecastData.timezone)
                                     MoonriseMoonsetCard(
                                         moonPhase = moonPhase
                                     )

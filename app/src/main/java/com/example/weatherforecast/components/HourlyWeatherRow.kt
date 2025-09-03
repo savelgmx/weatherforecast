@@ -82,7 +82,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
 
 
         Text(
-            text = WeatherUtils.updateTime(hourly.dt),
+            text = WeatherUtils.updateTime(hourly.dt, timezone = ""),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.titleMedium,
