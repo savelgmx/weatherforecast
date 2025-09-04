@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
+import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.QuickSandTypography
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -35,6 +36,45 @@ import java.util.Locale
 class WeatherUtils {
 
     companion object {
+
+        /**
+         * Filters and returns the next 24 hours of forecast for a given city timezone.
+         *
+         * @param hourlyList Full list of hourly forecasts.
+         * @param timezone IANA timezone string (e.g., "Europe/Berlin").
+         * @param startEpochSeconds Optional start time (epoch seconds UTC).
+         *                          Defaults to "now" in the city timezone.
+         * @return List of at most 24 items, sorted by dt ascending.
+         */
+        fun filterNext24Hours(
+            hourlyList: List<Hourly>,
+            timezone: String,
+            startEpochSeconds: Long? = null
+        ): List<Hourly> {
+            val zoneId = try {
+                ZoneId.of(timezone)
+            } catch (e: Exception) {
+                ZoneId.systemDefault()
+            }
+
+            // Start: now in city zone, or the provided epoch
+            val startDateTime = if (startEpochSeconds != null) {
+                Instant.ofEpochSecond(startEpochSeconds).atZone(zoneId)
+            } else {
+                ZonedDateTime.now(zoneId)
+            }
+
+            val endDateTime = startDateTime.plusHours(24)
+
+            return hourlyList
+                .filter { hour ->
+                    val hourTime = Instant.ofEpochSecond(hour.dt.toLong()).atZone(zoneId)
+                    !hourTime.isBefore(startDateTime) && hourTime.isBefore(endDateTime)
+                }
+                .sortedBy { it.dt }
+                .take(24)
+        }
+
 
         fun updateTemperature(temperature: Int, switchState: Boolean): String {
             val unitAbbreviation = if (switchState) "C° " else "F° "
@@ -188,14 +228,14 @@ class WeatherUtils {
             return zonedDateTime.format(formatter)
         }
 
-    /**
-     * Converts an epoch timestamp (seconds) into "HH:mm" string,
-     * formatted in the given city's timezone.
-     *
-     * @param epochSeconds Epoch timestamp in seconds (API gives sunrise/sunset).
-     * @param timezone IANA timezone string from API (e.g. "Europe/Berlin").
-     * @return formatted time string in "HH:mm", or "--:--" if invalid.
-     */
+        /**
+         * Converts an epoch timestamp (seconds) into "HH:mm" string,
+         * formatted in the given city's timezone.
+         *
+         * @param epochSeconds Epoch timestamp in seconds (API gives sunrise/sunset).
+         * @param timezone IANA timezone string from API (e.g. "Europe/Berlin").
+         * @return formatted time string in "HH:mm", or "--:--" if invalid.
+         */
         fun updateTime(epochSeconds: Int?, timezone: String): String {
             if (epochSeconds == null) return "--:--"
 

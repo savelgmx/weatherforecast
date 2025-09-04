@@ -84,11 +84,17 @@ fun DailyWeatherForecast(
                 }
 
                 item {
-                    val next24Hours = daily.dt + 86400L
-                    val filteredHourlyWeatherList = hourlyList
-                        .filter { it.dt >= daily.dt && it.dt < next24Hours }
-                        .sortedBy { it.dt }
-                        .take(24)
+                    val filteredHourlyWeatherList =
+                        WeatherUtils.filterNext24Hours(hourlyList = hourlyList, timezone = timeZone, startEpochSeconds = daily.dt.toLong())
+                    /*
+        hour.dt in the correct city ZoneId when checking if it falls in the next 24 hours.
+        But hour.dt itself is still just a raw epoch timestamp (seconds since 1970-01-01 UTC).
+        It doesn’t carry timezone information inside it.
+        So filteredHourlyWeatherList contains the right subset of hours,
+        but the items still need to be formatted with the city’s timezone before displaying.
+        That’s why HourlyWeatherRow (or HourlyWeatherItem)
+        still needs to know the timezone string in order to display the hour labels correctly.
+*/
                     HourlyWeatherRow(filteredHourlyWeatherList,timeZone)
                 }
 

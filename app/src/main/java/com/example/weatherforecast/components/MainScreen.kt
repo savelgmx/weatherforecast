@@ -47,9 +47,6 @@ import com.example.weatherforecast.utils.WeatherUtils
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -182,24 +179,19 @@ fun MainScreen(
                         item {
 
                             forecastData.hourly?.let { hourlyWeatherList ->
-                                val zoneId = try {
-                                    ZoneId.of(forecastData.timezone)
-                                } catch (e: Exception) {
-                                    ZoneId.systemDefault()
-                                }
-
-                                val nowCity = ZonedDateTime.now(zoneId)
-                                val next24City = nowCity.plusHours(24)
-
-                                val filteredHourlyWeatherList = hourlyWeatherList
-                                    .filter { hour ->
-                                        val hourTime = Instant.ofEpochSecond(hour.dt.toLong()).atZone(zoneId)
-                                        hourTime.isAfter(nowCity) && hourTime.isBefore(next24City)
-                                    }
-                                    .sortedBy { it.dt }
-                                    .take(24)
-
+                                val filteredHourlyWeatherList =
+                                    WeatherUtils.filterNext24Hours(hourlyList = hourlyWeatherList, timezone = forecastData.timezone)
+                                /*
+                                   hour.dt in the correct city ZoneId when checking if it falls in the next 24 hours.
+                                   But hour.dt itself is still just a raw epoch timestamp (seconds since 1970-01-01 UTC).
+                                   It doesn’t carry timezone information inside it.
+                                    So filteredHourlyWeatherList contains the right subset of hours,
+                                     but the items still need to be formatted with the city’s timezone before displaying.
+                                    That’s why HourlyWeatherRow (or HourlyWeatherItem)
+                                    still needs to know the timezone string in order to display the hour labels correctly.
+                                */
                                 HourlyWeatherRow(filteredHourlyWeatherList,forecastData.timezone)
+
                             }
                         }
                         item {
