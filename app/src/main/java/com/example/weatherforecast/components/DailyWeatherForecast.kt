@@ -89,7 +89,7 @@ fun DailyWeatherForecast(
                         .filter { it.dt >= daily.dt && it.dt < next24Hours }
                         .sortedBy { it.dt }
                         .take(24)
-                    HourlyWeatherRow(filteredHourlyWeatherList)
+                    HourlyWeatherRow(filteredHourlyWeatherList,timeZone)
                 }
 
                 item {

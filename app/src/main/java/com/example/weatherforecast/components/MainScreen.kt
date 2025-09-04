@@ -199,7 +199,7 @@ fun MainScreen(
                                     .sortedBy { it.dt }
                                     .take(24)
 
-                                HourlyWeatherRow(filteredHourlyWeatherList)
+                                HourlyWeatherRow(filteredHourlyWeatherList,forecastData.timezone)
                             }
                         }
                         item {

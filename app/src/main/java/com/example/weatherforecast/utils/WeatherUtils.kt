@@ -167,6 +167,27 @@ class WeatherUtils {
 
             return today
         }
+
+        // Existing updateTime() kept for sunrise/sunset
+
+        /**
+         * Formats an hourly forecast timestamp (epoch seconds) into "HH:mm"
+         * using the forecast city timezone.
+         */
+        fun formatHour(epochSeconds: Long, timezone: String): String {
+            val zoneId = try {
+                ZoneId.of(timezone)
+            } catch (e: Exception) {
+                ZoneId.systemDefault()
+            }
+
+            val instant = Instant.ofEpochSecond(epochSeconds)
+            val zonedDateTime = instant.atZone(zoneId)
+
+            val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+            return zonedDateTime.format(formatter)
+        }
+
     /**
      * Converts an epoch timestamp (seconds) into "HH:mm" string,
      * formatted in the given city's timezone.

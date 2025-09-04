@@ -32,8 +32,7 @@ import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
-fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
-{
+fun HourlyWeatherRow(hourlyForecast: List<Hourly>, timezone: String) {
     Box (
         modifier = Modifier
             .background(
@@ -55,13 +54,13 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>)
 
             ) {
             items(hourlyForecast) { hourly ->
-                HourlyWeatherItem(hourly = hourly)
+                HourlyWeatherItem(hourly = hourly, timezone = timezone)
             }
         }
     }
 }
 @Composable
-fun HourlyWeatherItem(hourly: Hourly) {
+fun HourlyWeatherItem(hourly: Hourly,timezone:String) {
 
 
 
@@ -82,7 +81,7 @@ fun HourlyWeatherItem(hourly: Hourly) {
 
 
         Text(
-            text = WeatherUtils.updateTime(hourly.dt, timezone = ""),
+            text = WeatherUtils.formatHour(hourly.dt.toLong(), timezone),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.titleMedium,
@@ -111,6 +110,6 @@ fun HourlyWeatherItem(hourly: Hourly) {
 @Composable
 fun HourlyUISuccessPreview() {
     val successState = UIUtils.getMockHourlylist()
-    HourlyWeatherRow(successState)
+    HourlyWeatherRow(successState,"Europe/Berlin")
 }
 
