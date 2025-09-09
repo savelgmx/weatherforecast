@@ -58,7 +58,7 @@ fun MainScreen(
     showCitySelectionDialog: Boolean = false,
     onCitySelected: (String) -> Unit = {},
     onDismissCityDialog: () -> Unit = {},
-    pollution: AirVisualPollution? = null // 🔹 новый параметр
+    pollution: AirVisualPollution? = null
 ) {
     val scaffoldState= rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -196,7 +196,7 @@ fun MainScreen(
                         }
                         item {
                             Spacer(modifier = Modifier.height(8.dp))
-                            WeatherHeader(text = context.resources.getString(R.string.weather_7_days))
+                            WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
                         }
                         item {
                             ForecastWeatherList(

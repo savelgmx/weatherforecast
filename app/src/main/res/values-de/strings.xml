@@ -37,7 +37,7 @@
     <string name="pref_unit_system_summary">Wählen Sie Ihr bevorzugtes Einheitensystem</string>
     <string name="weather_location_title">Einstellungen</string>
     <string name="weather_24_hour">24 Stunden Wetter</string>
-    <string name="weather_7_days">Wetter für eine Woche</string>
+    <string name="weather_15_days">Wetter für 15 Tagen</string>
 
     <string name="new_moon">Neumond</string>
     <string name="waxing_crescent">zunehmender Mond</string>

@@ -37,7 +37,7 @@
     <string name="pref_unit_system_summary">Select your preferred unit system</string>
     <string name="weather_location_title">Settings</string>
     <string name="weather_24_hour">24 Hour Weather</string>
-    <string name="weather_7_days">Weather for a week</string>
+    <string name="weather_15_days">Weather for a 15 days</string>
     <string name="new_moon">New Moon</string>
     <string name="waxing_crescent">Waxing crescent</string>
     <string name="first_quarter">First quarter</string>

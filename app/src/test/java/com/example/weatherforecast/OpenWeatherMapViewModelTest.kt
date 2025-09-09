@@ -53,12 +53,13 @@ class OpenWeatherMapViewModelTest {
     fun `init calls getCurrentWeather with city from getDeviceCityUseCase`() = runTest {
         // Arrange
         val city = "Hamburg"
-        val weatherResponse = WeatherResponse(name = city,id=0,
+        val weatherResponse = WeatherResponse(
+            name = city, id =0,
             base = "base", coord = Coord(9.99183,53.5537),
             weather = List<Weather(0,"main","Donnerwetter","rain")> ,
             main = Main(20.0,20.0,14.0,25.0,1024,50),
             clouds = Clouds(10),
-            wind = Wind(15.0,230), visibility = 10000, cod = 1,dt=1753567200,
+            wind = Wind(15.0,230), visibility = 10000, cod = 1, dt =1753567200,
             sys = Sys(1,1"Deutschland",1753586854,1753644279),
             timezone =2
         )
@@ -80,12 +81,13 @@ class OpenWeatherMapViewModelTest {
     fun `refreshWeather calls getCurrentWeather with city from getDeviceCityUseCase`() = runTest {
         // Arrange
         val city = "Hamburg"
-        val weatherResponse = WeatherResponse(name = city,id=0,
+        val weatherResponse = WeatherResponse(
+            name = city, id =0,
             base = "base", coord = Coord(9.99183,53.5537),
             weather = List<Weather(0,"main","Donnerwetter","rain")> ,
             main = Main(20.0,20.0,14.0,25.0,1024,50),
             clouds = Clouds(10),
-            wind = Wind(15.0,230), visibility = 10000, cod = 1,dt=1753567200,
+            wind = Wind(15.0,230), visibility = 10000, cod = 1, dt =1753567200,
             sys = Sys(1,1"Deutschland",1753586854,1753644279),
             timezone =2
         )
