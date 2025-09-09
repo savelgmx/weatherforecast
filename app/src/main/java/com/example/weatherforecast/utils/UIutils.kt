@@ -63,7 +63,7 @@ class UIUtils {
                         223, 2.2, 1.8
                     )
                 ),
-                56.0097, 92.79, "Asia/Krasnoyarsk", 25200.0
+                56.0097, 92.79, "Asia/Krasnoyarsk"
             )
         }
 

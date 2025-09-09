@@ -40,7 +40,7 @@ import kotlin.math.sin
  * @param
  */
 @Composable
-fun SunriseSunsetArcCard(sunrise: String, sunset: String, timezone: String, timezoneOffest: Double) {
+fun SunriseSunsetArcCard(sunrise: String, sunset: String, timezone: String) {
     val context = LocalContext.current
 
     val dayProgressArray=WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise,sunset, timezone)

@@ -28,5 +28,6 @@ data class DailyWeatherEntity(
     val visibility:Double,
     val cityName: String?,
     val timezone: String,
-    val tzOffset: Double
+    val latitude: Double,
+    val longitude: Double
 )

@@ -79,7 +79,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     private suspend fun insertWeatherData(response: WeatherApiResponse) {
         withContext(Dispatchers.IO) {
             response.days.forEach { day ->
-                val dailyWeather = WeatherMapper.toDailyWeather(day,response.timezone,response.tzOffset)
+                val dailyWeather = WeatherMapper.toDailyWeather(day,response.timezone,response.latitude,response.longitude)
                 val dailyEntity = DailyWeatherEntity(
                     id = 0, // Room auto-generates
                     date = dailyWeather.date,
@@ -103,7 +103,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
                     cityName = WeatherUtils.getCityName(contextProvider.provideContext()) ?: "Unknown",
                     timezone = dailyWeather.timezone,
-                    tzOffset = dailyWeather.tzOffset
+                    latitude = dailyWeather.latitude,
+                    longitude = dailyWeather.longitude
                 )
 
                 val hourlyEntities = dailyWeather.hours?.map { hour ->
@@ -287,7 +288,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 }
             },
             mapApiToResult = { apiResponse ->
-                val dailyWeather = WeatherMapper.toDailyWeather(apiResponse.days.first(), apiResponse.timezone,apiResponse.tzOffset)
+                val dailyWeather = WeatherMapper.toDailyWeather(apiResponse.days.first(), apiResponse.timezone,apiResponse.latitude,apiResponse.longitude)
                 WeatherResponseMapper.toWeatherResponse(dailyWeather, targetCity)
             }
         )
@@ -336,7 +337,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 }
             },
             mapApiToResult = { apiResponse ->
-                val dailyWeathers = apiResponse.days.map { WeatherMapper.toDailyWeather(it,apiResponse.timezone,apiResponse.tzOffset) }
+                val dailyWeathers = apiResponse.days.map { WeatherMapper.toDailyWeather(it,apiResponse.timezone,apiResponse.latitude,apiResponse.longitude) }
                 WeatherResponseMapper.toForecastResponse(dailyWeathers)
             }
         )

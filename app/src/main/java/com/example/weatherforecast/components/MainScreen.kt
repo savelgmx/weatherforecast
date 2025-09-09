@@ -228,8 +228,7 @@ fun MainScreen(
                                         SunriseSunsetArcCard(
                                             sunrise = timeOfSunrise,
                                             sunset = timeOfSunset,
-                                            timezone=forecastData.timezone,
-                                            timezoneOffest=forecastData.timezoneOffset
+                                            timezone=forecastData.timezone
                                         )
 
                                     }

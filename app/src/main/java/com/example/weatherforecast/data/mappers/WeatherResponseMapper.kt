@@ -19,7 +19,7 @@ import com.example.weatherforecast.response.Wind
 object WeatherResponseMapper {
     fun toWeatherResponse(dailyWeather: DailyWeather, cityName: String): WeatherResponse {
         return WeatherResponse(
-            coord = Coord(0.0, 0.0),
+            coord = Coord(dailyWeather.longitude, dailyWeather.latitude),
             weather = listOf(Weather(0, dailyWeather.description, dailyWeather.description, dailyWeather.icon)),
             base = "stations",
             main = Main(
@@ -105,10 +105,9 @@ object WeatherResponseMapper {
             ),
             daily = forecastItems,
             hourly = allHourly,
-            lat = 0.0,
-            lon = 0.0,
-            timezone = dailyWeathers[0].timezone,
-            timezoneOffset = dailyWeathers[0].tzOffset
+            lat = dailyWeathers[0].latitude,
+            lon = dailyWeathers[0].longitude,
+            timezone = dailyWeathers[0].timezone
         )
     }
 }
