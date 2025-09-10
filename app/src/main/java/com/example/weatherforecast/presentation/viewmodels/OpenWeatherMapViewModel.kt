@@ -10,12 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.data.remote.AirVisualResponse
 import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
-import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,14 +24,14 @@ class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getDeviceCityUseCase: GetDeviceCityUseCase,
-    private val getCoordinatesUseCase: GetCoordinatesUseCase,
     private val getAirVisualDataUseCase: GetAirVisualDataUseCase
 ) : AndroidViewModel(application) {
 
     val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
     val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
     val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(false)
-    private var isWeatherLoaded = false // Flag to track if weather data is already loaded
+
+    private var isWeatherLoaded = false
     private var currentCity: String = ""
 
     init {
@@ -52,8 +50,7 @@ class OpenWeatherMapViewModel @Inject constructor(
                 .collectLatest { city ->
                     if (!city.isNullOrBlank()) {
                         currentCity = city
-                        getCurrentWeather(city, forceRefresh = true)
-                        getAirVisualData(city)
+                        refreshWeather(city)
                         showCitySelectionDialog.value = false
                     } else {
                         if (hasLocationPermission()) {
@@ -89,62 +86,64 @@ class OpenWeatherMapViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Fetches current weather.
-     * @param city The city name.
-     * @param forceRefresh If true, ignores cache and forces API refresh.
+    /*
+     * Get current weather.
      */
-    fun getCurrentWeather(city: String=currentCity,forceRefresh: Boolean = false) {
-        if (!isWeatherLoaded || forceRefresh) {
-            viewModelScope.launch {
-                weatherLiveData.value = Resource.Loading()
-                try {
-                    val result = getWeatherUseCase.getCurrentWeather(city, forceRefresh)
-                    weatherLiveData.value = result
-                    if (result is Resource.Success) {
-                        isWeatherLoaded = true
-                        currentCity = city
-                    }
-                } catch (e: Exception) {
-                    weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
-                }
-            }
+    private suspend fun fetchWeather(city: String, forceRefresh: Boolean = false): Resource<WeatherResponse> {
+        return getWeatherUseCase.getCurrentWeather(city, forceRefresh)
+    }
+
+    /**
+     * Get air quality (AQI) for coordinates
+     * that are already in WeatherResponse.
+     */
+    private suspend fun fetchAirVisualData(lat: Double, lon: Double) {
+        try {
+            val result = getAirVisualDataUseCase(
+                lat,
+                lon,
+                "f3324376-d944-44f4-bda6-e936f76bbbeb"
+            )
+            airVisualLiveData.value = result
+        } catch (e: Exception) {
+            airVisualLiveData.value = null
         }
     }
 
     /**
-     * Получаем pollution по координатам города
-     */
-    private fun getAirVisualData(city: String) {
-        viewModelScope.launch {
-            val coords = WeatherUtils.getCoordinatesFromCity(getApplication(), city, getCoordinatesUseCase)
-            coords?.let { (lat, lon) ->
-                val result = getAirVisualDataUseCase(lat, lon, "f3324376-d944-44f4-bda6-e936f76bbbeb")
-                airVisualLiveData.value = result
-            }
-        }
-    }
-
-    /**
-     *  Унифицированный метод:
-     * обновляет и погоду, и pollution
+     * Unified method:
+     * updates both weather and air pollution data.
      */
     fun refreshWeather(city: String = currentCity) {
         isWeatherLoaded = false
-        getCurrentWeather(city, forceRefresh = true)
-        getAirVisualData(city)
+        viewModelScope.launch {
+            weatherLiveData.value = Resource.Loading()
+            try {
+                val result = fetchWeather(city, forceRefresh = true)
+                weatherLiveData.value = result
+                if (result is Resource.Success) {
+                    isWeatherLoaded = true
+                    currentCity = city
+
+                    // uses latitude / longitude from WeatherResponse
+                    val lat = result.data?.coord?.lat
+                    val lon = result.data?.coord?.lon
+                    if (lat != null && lon != null) {
+                        fetchAirVisualData(lat, lon)
+                    }
+                }
+            } catch (e: Exception) {
+                weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
+            }
+        }
     }
 
-    /**
-     * Called when user selects a city in dialog.
-     * Updates city in DataStore and triggers weather refresh automatically.
-     */
     fun onCitySelected(cityName: String) {
         viewModelScope.launch {
             try {
                 if (cityName.isNotBlank()) {
                     DataStoreManager.updateCityName(getApplication(), cityName)
-                    // Weather refresh will be triggered via DataStore observer
+                    // refreshWeather will be called via observer
                 }
             } catch (e: Exception) {
                 weatherLiveData.value = Resource.Error(null, "Failed to set city: ${e.message}")
