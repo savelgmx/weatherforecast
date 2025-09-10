@@ -2,7 +2,6 @@ package com.example.weatherforecast.utils
 
 
 import android.content.Context
-import android.location.Geocoder
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,12 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
-import com.example.weatherforecast.domain.usecases.GetCoordinatesUseCase
 import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.QuickSandTypography
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
@@ -519,35 +515,6 @@ class WeatherUtils {
         suspend fun saveCityName(context: Context, cityName: String) {
             DataStoreManager.updateCityName(context, cityName)
         }
-
-        suspend fun getCoordinatesFromCity(
-            context: Context,
-            cityName: String,
-            useCase: GetCoordinatesUseCase
-        ): Pair<Double, Double>? = withContext(Dispatchers.IO) {
-            try {
-                // 1. Сначала Geocoder
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocationName(cityName, 1)
-
-                if (!addresses.isNullOrEmpty()) {
-                    val location = addresses[0]
-                    return@withContext Pair(location.latitude, location.longitude)
-                }
-
-                // 2. Fallback → Nominatim через UseCase
-                val result = useCase(cityName)
-                result?.let {
-                    return@withContext Pair(it.lat.toDouble(), it.lon.toDouble())
-                }
-
-                null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-
     }
 }
 
