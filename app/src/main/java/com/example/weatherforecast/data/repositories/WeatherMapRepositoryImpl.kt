@@ -25,10 +25,10 @@ class WeatherMapRepositoryImpl @Inject constructor(
         )
         val points = mutableListOf<WeatherPoint>()
 
-        // Fake coordinates grid around the city (for visualization purposes)
-        // In production you would request grid data from API
-        val baseLat = 52.0
-        val baseLon = 5.0
+        // coordinates grid around the city (for visualization purposes)
+        // request grid data from API
+        val baseLat = response.latitude //52.0
+        val baseLon = response.longitude //5.0
 
         response.days.firstOrNull()?.hours?.forEachIndexed { index, hour ->
             val lat = baseLat + (index % 5) * 0.1
@@ -38,8 +38,8 @@ class WeatherMapRepositoryImpl @Inject constructor(
                     lat = lat,
                     lon = lon,
                     temperature = hour.temp,
-                    precipitation = 0.0, //hour.precip,
-                    cloudCover = 0.0//hour.cloudcover
+                    precipitation = hour.precipitation, //hour.precip,
+                    cloudCover = hour.cloudCover//hour.cloudcover
                 )
             )
         }
