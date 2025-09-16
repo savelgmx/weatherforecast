@@ -6,9 +6,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
 import com.example.weatherforecast.utils.WeatherLayer
 import com.google.android.gms.maps.model.CameraPosition
@@ -24,10 +31,12 @@ import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherMapScreen(
     city: String,
-    viewModel: WeatherMapViewModel = hiltViewModel()
+    viewModel: WeatherMapViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -36,8 +45,22 @@ fun WeatherMapScreen(
     }
 
     Column {
-        // Switcher for layers
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        TopAppBar(
+            title = { Text("Weather Map: $city") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            }
+        )
+
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             WeatherLayer.values().forEach { layer ->
                 Button(
                     onClick = { viewModel.loadWeather(city, layer) },

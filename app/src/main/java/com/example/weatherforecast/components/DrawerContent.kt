@@ -1,16 +1,20 @@
 package com.example.weatherforecast.components
 
+import android.content.ContextWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -32,6 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.NavHostFragment
 import com.example.weatherforecast.R
 
 import com.example.weatherforecast.theme.Blue300
@@ -43,6 +49,25 @@ import kotlinx.coroutines.launch
 fun DrawerContent() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    // Safe NavController extraction
+    val activity = remember(context) {
+        var ctx = context
+        while (ctx is ContextWrapper && ctx !is FragmentActivity) {
+            ctx = ctx.baseContext
+        }
+        ctx as? FragmentActivity
+    }
+
+    val navController = remember(activity) {
+        activity?.let {
+            val navHostFragment = it.supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            if (navHostFragment is NavHostFragment) {
+                navHostFragment.navController
+            } else null
+        }
+    }
+
     val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = true)
 
     val selectedWindOption by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
@@ -235,6 +260,7 @@ fun DrawerContent() {
     }
     HorizontalDivider()
 
+
     Row (
         Modifier
             .padding(all = 8.dp)
@@ -261,6 +287,26 @@ fun DrawerContent() {
                 )
             }
         }
+    }
+    HorizontalDivider()
+    // Weather Map menu item
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(enabled = navController != null && enteredCity!!.isNotBlank()) {
+                navController?.navigate(R.id.weatherMapFragment)
+            }
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Place,
+            contentDescription = "Weather Map Icon"
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Weather Map",
+            color = if (enteredCity?.isNotBlank() == true) Color.Unspecified else Color.Gray
+        )
     }
     HorizontalDivider()
 }

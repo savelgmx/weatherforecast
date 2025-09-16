@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.components.WeatherMapScreen
@@ -26,17 +27,21 @@ class WeatherMapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Используем ComposeView, так как экран карты у нас написан на Compose
         return ComposeView(requireContext()).apply {
             setContent {
-                val context = LocalContext.current
+                val city by DataStoreManager.cityNamePrefFlow(requireContext())
+                    .collectAsState(initial = "")
 
-                // Подписка на сохранённое название города из DataStore
-                val city by DataStoreManager.cityNamePrefFlow(context)
-                    .collectAsState(initial = "Amsterdam")
+                // Pass navController from findNavController()
+                val navController = findNavController()
 
-                // Встраиваем готовый Compose-экран WeatherMapScreen
-                city?.let { WeatherMapScreen(city = it, viewModel = viewModel) }
+                city?.let {
+                    WeatherMapScreen(
+                        city = it,
+                        viewModel = viewModel,
+                        navController = navController
+                    )
+                }
             }
         }
     }
