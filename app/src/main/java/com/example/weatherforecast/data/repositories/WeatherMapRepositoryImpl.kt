@@ -1,18 +1,18 @@
 package com.example.weatherforecast.data.repositories
-
+// =============================
+// data/repositories/WeatherMapRepositoryImpl.kt
+// =============================
 import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.utils.WeatherLayer
 import java.util.Locale
 import javax.inject.Inject
-import javax.inject.Named
 
 
 // Repository implementation
 class WeatherMapRepositoryImpl @Inject constructor(
-    private val api: WeatherApiService,
-    @Named("visualCrossingApiKey") private val apiKey: String
+    private val api: WeatherApiService
 ) : WeatherMapRepository {
 
     override suspend fun getWeatherPoints(city: String, layer: WeatherLayer): List<WeatherPoint> {

@@ -26,4 +26,9 @@
         android:name="index"
         app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/weatherMapFragment"
+        android:name="com.example.weatherforecast.presentation.ui.WeatherMapFragment"
+        android:label="WeatherMapFragment" />
 </navigation>
