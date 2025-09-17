@@ -7,10 +7,9 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.components.WeatherMapScreen
 import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel

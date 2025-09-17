@@ -78,7 +78,7 @@ fun DrawerContent() {
     var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
     var pressureUnitsPopup by remember { mutableStateOf(false) }
 
-    val enteredCity by DataStoreManager.cityNamePrefFlow(context).collectAsState(initial = "")//text field with entered city name
+    val enteredCity by DataStoreManager.cityNamePrefFlow(context).collectAsState(initial = null as String?)//text field with entered city name
     var enteredCityPopup by remember { mutableStateOf(false) }
 
 
@@ -289,11 +289,14 @@ fun DrawerContent() {
         }
     }
     HorizontalDivider()
-    // Weather Map menu item
+        // Weather Map menu item, safe with nullable enteredCity
     Row(
         Modifier
             .fillMaxWidth()
-            .clickable(enabled = navController != null && enteredCity!!.isNotBlank()) {
+                .clickable(
+                    enabled = navController != null && !enteredCity.isNullOrBlank()
+                ) {
+                    // only navigate if non-null and not blank
                 navController?.navigate(R.id.weatherMapFragment)
             }
             .padding(16.dp)
@@ -305,7 +308,7 @@ fun DrawerContent() {
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "Weather Map",
-            color = if (enteredCity?.isNotBlank() == true) Color.Unspecified else Color.Gray
+                color = if (!enteredCity.isNullOrBlank()) Color.Unspecified else Color.Gray
         )
     }
     HorizontalDivider()
