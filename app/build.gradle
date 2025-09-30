@@ -200,7 +200,9 @@ dependencies {
     implementation "com.google.maps.android:maps-compose:4.3.3"
 
     //maplibre analog of google maps
+// Existing MapLibre dependency
     implementation "org.maplibre.gl:android-sdk:11.13.5"
-   // implementation "org.maplibre.gl:android-compose:10.4.1"
-
+    // Add annotation plugin for circles
+    implementation "org.maplibre.gl:android-plugin-annotation-v9:3.0.2"
+    // Existing Compose and other dependencies...
 }
