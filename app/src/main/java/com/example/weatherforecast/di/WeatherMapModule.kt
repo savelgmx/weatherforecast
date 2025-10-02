@@ -16,6 +16,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Named
 import javax.inject.Singleton
 
+
 @Module
 @InstallIn(SingletonComponent::class)
 object WeatherMapModule {
@@ -43,4 +44,15 @@ object WeatherMapModule {
     ): GetWeatherMapDataUseCase {
         return GetWeatherMapDataUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    @Named("weatherTileBaseUrl")
+    fun provideTileBaseUrl(): String = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/tile"
+
+    @Provides
+    @Singleton
+    @Named("currentTime")
+    fun provideCurrentTime(): String = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDate.now())
 }
+

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 data class WeatherMapUiState(
     val city: String = "",
@@ -24,12 +25,16 @@ data class WeatherMapUiState(
     val centerLat: Double? = null,
     val centerLon: Double? = null,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val tileUrl: String?=null
 )
 
 @HiltViewModel
 class WeatherMapViewModel @Inject constructor(
-    private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase
+    private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase,
+    @Named("visualCrossingApiKey") private val apiKey: String,
+    @Named("weatherTileBaseUrl") private val tileBaseUrl: String,
+    @Named("currentTime") private val currentTime: String  // Inject current for simplicity
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherMapUiState())
@@ -40,10 +45,17 @@ class WeatherMapViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, selectedLayer = layer, error = null)
             try {
                 val data = getWeatherMapDataUseCase(city, layer)
+                val layerName = when (layer) {
+                    WeatherLayer.TEMPERATURE -> "temperature"
+                    WeatherLayer.CLOUDS -> "cloudcover"
+                    WeatherLayer.PRECIPITATION -> "precipitation"
+                }
+                val tileUrl = "$tileBaseUrl/$layerName/MapServer/tile/{z}/{y}/{x}.png?key=$apiKey&time=$currentTime"
                 _uiState.value = _uiState.value.copy(
-                    points = data.points,
+                    points = data.points,  // Keep for fallback if needed
                     centerLat = data.centerLat,
                     centerLon = data.centerLon,
+                    tileUrl = tileUrl,
                     isLoading = false
                 )
             } catch (t: Throwable) {

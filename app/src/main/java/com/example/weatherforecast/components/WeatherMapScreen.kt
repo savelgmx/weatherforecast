@@ -21,20 +21,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
 import com.example.weatherforecast.utils.WeatherLayer
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.Circle
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
+import org.maplibre.android.MapLibre
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.maps.Style.OnStyleLoaded
+import org.maplibre.android.style.layers.RasterLayer
+import org.maplibre.android.style.sources.RasterSource
+import org.maplibre.android.style.sources.TileSet
 
 private const val TAG = "WeatherMapScreenDebug"
+private const val SOURCE_ID = "weather-source"
+private const val LAYER_ID = "weather-layer"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +55,8 @@ fun WeatherMapScreen(
     navController: NavController
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val mapState = remember { mutableStateOf<MapLibreMap?>(null) }
 
     // Trigger loading when city or layer changes
     LaunchedEffect(city, state.selectedLayer) {
@@ -52,12 +65,35 @@ fun WeatherMapScreen(
 
     // Debug logs
     LaunchedEffect(state) {
-        Log.d(TAG, "City: $city")
-        Log.d(TAG, "Selected layer: ${state.selectedLayer}")
-        Log.d(TAG, "CenterLat: ${state.centerLat}, CenterLon: ${state.centerLon}")
-        Log.d(TAG, "Points size: ${state.points.size}")
-        state.points.firstOrNull()?.let { p ->
-            Log.d(TAG, "First point coords: lat=${p.lat}, lon=${p.lon}")
+        Log.d(TAG, "City: $city, Layer: ${state.selectedLayer}, TileUrl: ${state.tileUrl}")
+    }
+
+    // Update layers when tileUrl changes
+    LaunchedEffect(state.tileUrl) {
+        mapState.value?.getStyle(object : OnStyleLoaded {
+            override fun onStyleLoaded(style: Style) {
+                style.removeLayer(LAYER_ID)
+                style.removeSource(SOURCE_ID)
+                state.tileUrl?.let { url ->
+                    val tileSet = TileSet("2.1.0", url)
+                    val source = RasterSource(SOURCE_ID, tileSet, 256)
+                    style.addSource(source)
+                    style.addLayer(RasterLayer(LAYER_ID, SOURCE_ID))
+                }
+            }
+        })
+    }
+    // Update camera when center changes
+    LaunchedEffect(state.centerLat, state.centerLon) {
+        mapState.value?.let { map ->
+            val lat = state.centerLat ?: 40.7128
+            val lon = state.centerLon ?: -74.0060
+            map.setCameraPosition(
+                CameraPosition.Builder()
+                    .target(LatLng(lat, lon))
+                    .zoom(8.0)
+                    .build()
+            )
         }
     }
 
@@ -94,83 +130,35 @@ fun WeatherMapScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Camera initial position
-        val cameraPositionState = rememberCameraPositionState {
-            val lat = state.centerLat ?: 0.0
-            val lon = state.centerLon ?: 0.0
-            val hasCenter = (lat != 0.0 || lon != 0.0)
-            position = if (hasCenter) {
-                CameraPosition.fromLatLngZoom(LatLng(lat, lon), 8f)
-            } else {
-                // fallback to first point if exists
-                state.points.firstOrNull()?.let { p ->
-                    CameraPosition.fromLatLngZoom(LatLng(p.lat, p.lon), 8f)
-                } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
-            }
-        }
-
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
-        ) {
-            state.points.forEach { point ->
-                val colorInt = when (state.selectedLayer) {
-                    WeatherLayer.TEMPERATURE -> tempColor(point.temperature)
-                    WeatherLayer.CLOUDS -> cloudColor(point.cloudCover)
-                    WeatherLayer.PRECIPITATION -> precipColor(point.precipitation)
+        AndroidView(
+            factory = { ctx ->
+                MapLibre.getInstance(ctx)
+                val mapView = MapView(ctx)
+                mapView.getMapAsync { mapLibreMap ->
+                    mapState.value = mapLibreMap
+                    mapLibreMap.setStyle("https://demotiles.maplibre.org/style.json") { style ->
+                        // Initial layer setup
+                        state.tileUrl?.let { url ->
+                            val tileSet = TileSet("2.1.0", listOf(url).toString())
+                            val source = RasterSource(SOURCE_ID, tileSet, 256)
+                            style.addSource(source)
+                            style.addLayer(RasterLayer(LAYER_ID, SOURCE_ID))
+                        }
+                        // Initial camera
+                        val lat = state.centerLat ?: 40.7128
+                        val lon = state.centerLon ?: -74.0060
+                        mapLibreMap.setCameraPosition(
+                            CameraPosition.Builder()
+                                .target(LatLng(lat, lon))
+                                .zoom(8.0)
+                                .build()
+                        )
+                    }
                 }
-                val fill = intToComposeColor(colorInt)
-
-                Circle(
-                    center = LatLng(point.lat, point.lon),
-                    radius = 4000.0,
-                    fillColor = fill,
-                    strokeColor = Color.Black,
-                    strokeWidth = 1f
-                )
-            }
-        }
+                mapView
+            },
+            modifier = Modifier.fillMaxSize()
+            // No update block needed; use LaunchedEffects
+        )
     }
-}
-/*
-White = 0xffffff
-Black = 0x000000
-A "perfect" Blue = 0x0000ff
-A "prefect" Red = 0xff0000
-A "middle" Gray = 0x7a7a7a
-Aqua = 0x00ffff
-Gold = 0xffd700
-Indigo = 0x4b0082
- */
-
-// helper to convert ARGB int to Compose Color
-fun intToComposeColor(argb: Int): Color {
-    val a = ((argb shr 24) and 0xFF) / 255f
-    val r = ((argb shr 16) and 0xFF) / 255f
-    val g = ((argb shr 8) and 0xFF) / 255f
-    val b = (argb and 0xFF) / 255f
-    return Color(red = r, green = g, blue = b, alpha = a)
-}
-
-// Color helpers
-fun tempColor(temp: Double?): Int = when {
-    temp == null -> 0x55000000
-    temp < 0 -> 0x5500FFFF
-    temp < 15 -> 0x550000FF
-    temp < 25 -> 0x5500FF00
-    else -> 0x55FF0000
-}
-
-fun cloudColor(cloud: Double?): Int = when {
-    cloud == null -> 0x55000000
-    cloud < 30 -> 0x55FFFF00
-    cloud < 70 -> 0x55AAAAAA
-    else -> 0xFF555555.toInt()
-}
-
-fun precipColor(precip: Double?): Int = when {
-    precip == null -> 0x55000000
-    precip == 0.0 -> 0x55FFFF00
-    precip < 5 -> 0x550000FF
-    else -> 0x55FF00FF
 }
