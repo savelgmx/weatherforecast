@@ -28,6 +28,7 @@ android {
         buildConfigField "String", "MAP_API_KEY", "\"${project.findProperty("MAP_API_KEY") ?: ""}\""
         buildConfigField "String", "OWM_API_KEY", "\"${project.findProperty("OWM_API_KEY") ?: ""}\""
 
+        buildConfigField("String", "MAPTILER_API_KEY", "\"${MAPTILER_API_KEY}\"")
 
         manifestPlaceholders = [googleMapsKey: "${googleMapsKey}"]
     }
