@@ -5,8 +5,10 @@ package com.example.weatherforecast.presentation.viewmodels
 // =============================
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.domain.usecases.GetWeatherMapDataUseCase
 import com.example.weatherforecast.utils.WeatherLayer
@@ -16,25 +18,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
-
-data class WeatherMapUiState(
-    val city: String = "",
-    val points: List<WeatherPoint> = emptyList(),
-    val selectedLayer: WeatherLayer = WeatherLayer.CLOUDS,
-    val centerLat: Double? = null,
-    val centerLon: Double? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val tileUrl: String?=null
-)
 
 @HiltViewModel
 class WeatherMapViewModel @Inject constructor(
-    private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase,
-    @Named("visualCrossingApiKey") private val apiKey: String,
-    @Named("weatherTileBaseUrl") private val tileBaseUrl: String,
-    @Named("currentTime") private val currentTime: String  // Inject current for simplicity
+    private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherMapUiState())
@@ -42,26 +29,29 @@ class WeatherMapViewModel @Inject constructor(
 
     fun loadWeather(city: String, layer: WeatherLayer) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, selectedLayer = layer, error = null)
             try {
-                val data = getWeatherMapDataUseCase(city, layer)
-                val layerName = when (layer) {
-                    WeatherLayer.TEMPERATURE -> "temperature"
-                    WeatherLayer.CLOUDS -> "cloudcover"
-                    WeatherLayer.PRECIPITATION -> "precipitation"
-                }
-                val tileUrl = "$tileBaseUrl/$layerName/MapServer/tile/{z}/{y}/{x}.png?key=$apiKey&time=$currentTime"
-                _uiState.value = _uiState.value.copy(
-                    points = data.points,  // Keep for fallback if needed
-                    centerLat = data.centerLat,
-                    centerLon = data.centerLon,
+                val mapData = getWeatherMapDataUseCase(city, layer)
+                val tileUrl =
+                    "https://api.maptiler.com/tiles/${layer.tilePath}/256/{z}/{x}/{y}.png?key=${BuildConfig.MAPTILER_API_KEY}"
+
+                _uiState.value = WeatherMapUiState(
+                    selectedLayer = layer,
                     tileUrl = tileUrl,
-                    isLoading = false
+                    centerLat = mapData.centerLat ?: 0.0,
+                    centerLon = mapData.centerLon ?: 0.0,
+                    points = mapData.points
                 )
-            } catch (t: Throwable) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = t.message ?: "Unknown error")
+            } catch (e: Exception) {
+                Log.e("WeatherMapViewModel", "Error loading weather map: ${e.message}")
             }
         }
     }
 }
 
+data class WeatherMapUiState(
+    val selectedLayer: WeatherLayer = WeatherLayer.Temperature,
+    val tileUrl: String? = null,
+    val centerLat: Double = 0.0,
+    val centerLon: Double = 0.0,
+    val points: List<WeatherPoint> = emptyList()
+)
