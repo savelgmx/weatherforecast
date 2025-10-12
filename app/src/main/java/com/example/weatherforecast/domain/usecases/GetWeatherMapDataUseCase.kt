@@ -5,6 +5,7 @@
 package com.example.weatherforecast.domain.usecases
 
 import com.example.weatherforecast.data.repositories.WeatherMapRepository
+import com.example.weatherforecast.domain.models.WeatherMapData
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.utils.WeatherLayer
 import javax.inject.Inject
@@ -12,11 +13,6 @@ import javax.inject.Inject
 /**
  * UseCase provides both points + center coords by calling repository
  */
-data class WeatherMapData(
-    val centerLat: Double?,
-    val centerLon: Double?,
-    val points: List<WeatherPoint>
-)
 
 class GetWeatherMapDataUseCase @Inject constructor(
     private val repository: WeatherMapRepository
@@ -24,10 +20,14 @@ class GetWeatherMapDataUseCase @Inject constructor(
     suspend operator fun invoke(city: String, layer: WeatherLayer): WeatherMapData {
         val points = repository.getWeatherPoints(city, layer)
         val center = repository.getCityCenter(city)
+        val styleUrl = repository.getMapStyleUrl()
+        val tileUrl = repository.getWeatherTileUrl(layer)
         return WeatherMapData(
             centerLat = center?.first,
             centerLon = center?.second,
-            points = points
+            points = points,
+            styleUrl = styleUrl,
+            tileUrlTemplate = tileUrl
         )
     }
 }

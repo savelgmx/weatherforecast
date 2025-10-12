@@ -28,14 +28,16 @@ object WeatherMapModule {
         return BuildConfig.API_KEY
     }
 
-    @Provides
-    @Singleton
-    fun provideWeatherMapRepository(
-        api: WeatherApiService,
-        @Named("visualCrossingApiKey") apiKey: String
-    ): WeatherMapRepository {
-        return WeatherMapRepositoryImpl(api, apiKey)
-    }
+@Provides
+@Singleton
+fun provideWeatherMapRepository(
+    api: WeatherApiService,
+    @Named("visualCrossingApiKey") apiKey: String,
+    @Named("weatherTileBaseUrl") tileBaseUrl: String,
+    @Named("currentTime") currentTime: String
+): WeatherMapRepository {
+    return WeatherMapRepositoryImpl(api, apiKey, tileBaseUrl, currentTime)
+}
 
     @Provides
     @Singleton

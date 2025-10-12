@@ -19,39 +19,44 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class WeatherMapUiState(
+    val city: String = "",
+    val points: List<WeatherPoint> = emptyList(),
+    val selectedLayer: WeatherLayer = WeatherLayer.CLOUDS,
+    val centerLat: Double? = null,
+    val centerLon: Double? = null,
+    val styleUrl: String? = null,
+    val tileUrlTemplate: String? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
+
 @HiltViewModel
 class WeatherMapViewModel @Inject constructor(
     private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherMapUiState())
-    val uiState: StateFlow<WeatherMapUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<WeatherMapUiState> = _uiState
 
     fun loadWeather(city: String, layer: WeatherLayer) {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, city = city)
             try {
-                val mapData = getWeatherMapDataUseCase(city, layer)
-                val tileUrl =
-                    "https://api.maptiler.com/tiles/${layer.tilePath}/256/{z}/{x}/{y}.png?key=${BuildConfig.MAPTILER_API_KEY}"
-
-                _uiState.value = WeatherMapUiState(
+                val data = getWeatherMapDataUseCase(city, layer)
+                _uiState.value = _uiState.value.copy(
+                    points = data.points,
+                    centerLat = data.centerLat,
+                    centerLon = data.centerLon,
+                    styleUrl = data.styleUrl,
+                    tileUrlTemplate = data.tileUrlTemplate,
                     selectedLayer = layer,
-                    tileUrl = tileUrl,
-                    centerLat = mapData.centerLat ?: 0.0,
-                    centerLon = mapData.centerLon ?: 0.0,
-                    points = mapData.points
+                    isLoading = false
                 )
-            } catch (e: Exception) {
-                Log.e("WeatherMapViewModel", "Error loading weather map: ${e.message}")
+            } catch (t: Throwable) {
+                _uiState.value = _uiState.value.copy(isLoading = false, error = t.message ?: "Unknown error")
             }
         }
     }
 }
 
-data class WeatherMapUiState(
-    val selectedLayer: WeatherLayer = WeatherLayer.Temperature,
-    val tileUrl: String? = null,
-    val centerLat: Double = 0.0,
-    val centerLon: Double = 0.0,
-    val points: List<WeatherPoint> = emptyList()
-)

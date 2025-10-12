@@ -4,5 +4,6 @@ package com.example.weatherforecast.utils
 enum class WeatherLayer(val displayName: String, val tilePath: String) {
     Temperature("Temperature", "temperature"),
     Precipitation("Precipitation", "precipitation"),
-    Wind("Wind", "wind")
+    Wind("Wind", "wind"),
+    CLOUDS("Clouds","CLOUDS")
 }

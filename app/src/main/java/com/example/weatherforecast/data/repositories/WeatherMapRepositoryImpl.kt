@@ -2,7 +2,7 @@ package com.example.weatherforecast.data.repositories
 // =============================
 // data/repositories/WeatherMapRepositoryImpl.kt
 // =============================
-import com.example.weatherforecast.data.remote.WeatherApiResponse
+import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.utils.WeatherLayer
@@ -19,13 +19,30 @@ data class WeatherMapResponseWithCenter(
 // Repository implementation
 class WeatherMapRepositoryImpl @Inject constructor(
     private val api: WeatherApiService,
-    @Named("visualCrossingApiKey") private val apiKey: String
+    @Named("visualCrossingApiKey") private val apiKey: String,
+    @Named("weatherTileBaseUrl") private val tileBaseUrl: String,
+    @Named("currentTime") private val currentTime: String
 ) : WeatherMapRepository {
 
     private var lastCenter: Pair<Double, Double>? = null
 
+    // styleUrl вынесён сюда — использует MAPTILER_API_KEY из BuildConfig
+    override fun getMapStyleUrl(): String {
+        // MapTiler style URL — ключ в BuildConfig (устанавливается через build.gradle)
+        return "https://api.maptiler.com/maps/streets/style.json?key=${BuildConfig.MAPTILER_API_KEY}"
+    }
+
+    // Формируем шаблон тайл-URL для погодного слоя.
+    // Важно: точный формат url для вашего tile-провайдера может отличаться;
+    // используйте tileBaseUrl и необходимые параметры.
+    override fun getWeatherTileUrl(layer: WeatherLayer): String {
+        // Пример: https://weather.visualcrossing.com/.../{layer}/{z}/{x}/{y}.png?key=API&time=YYYY-MM-DD
+        val layerPath = layer.name.lowercase(Locale.getDefault())
+        return "${tileBaseUrl.trimEnd('/')}/$layerPath/{z}/{x}/{y}.png?key=${apiKey}&time=${currentTime}"
+    }
+
     override suspend fun getWeatherPoints(city: String, layer: WeatherLayer): List<WeatherPoint> {
-        val response: WeatherApiResponse =
+        val response =
             api.getWeather(
                 location = city,
                 unitGroup = "metric",
@@ -43,23 +60,15 @@ class WeatherMapRepositoryImpl @Inject constructor(
         // build points
         val points = mutableListOf<WeatherPoint>()
         val hours = response.days?.flatMap { it.hours ?: emptyList() } ?: emptyList()
-        if (hours.isEmpty()) return emptyList()
-
-        // maybe display subset
-        hours.forEachIndexed { idx, hour ->
-            // here using center for all points (or small offset if desired)
-            points.add(
-                WeatherPoint(
-                    lat = centerLat,
-                    lon = centerLon,
-                    temperature = hour.temp,
-                    precipitation = hour.precipitation ?: 0.0,
-                    cloudCover = hour.cloudCover ?: 0.0
-                )
+        return hours.map { hour ->
+            WeatherPoint(
+                lat = centerLat,
+                lon = centerLon,
+                temperature = hour.temp,
+                precipitation = hour.precipitation ?: 0.0,
+                cloudCover = hour.cloudCover ?: 0.0
             )
         }
-
-        return points
     }
 
     override suspend fun getCityCenter(city: String): Pair<Double, Double>? {
