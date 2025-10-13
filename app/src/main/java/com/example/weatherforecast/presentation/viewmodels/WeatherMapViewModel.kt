@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.BuildConfig
+import com.example.weatherforecast.domain.models.WeatherMapData
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.domain.usecases.GetWeatherMapDataUseCase
 import com.example.weatherforecast.utils.WeatherLayer
@@ -36,25 +37,23 @@ class WeatherMapViewModel @Inject constructor(
     private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WeatherMapUiState())
-    val uiState: StateFlow<WeatherMapUiState> = _uiState
+    private val _mapData = MutableStateFlow<WeatherMapData?>(null)
+    val mapData: StateFlow<WeatherMapData?> = _mapData.asStateFlow()
 
-    fun loadWeather(city: String, layer: WeatherLayer) {
+    private val _selectedLayer = MutableStateFlow(WeatherLayer.Precipitation)
+    val selectedLayer: StateFlow<WeatherLayer> = _selectedLayer.asStateFlow()
+
+    fun onLayerSelected(layer: WeatherLayer) {
+        _selectedLayer.value = layer
+    }
+
+    fun loadWeatherData(city: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null, city = city)
             try {
-                val data = getWeatherMapDataUseCase(city, layer)
-                _uiState.value = _uiState.value.copy(
-                    points = data.points,
-                    centerLat = data.centerLat,
-                    centerLon = data.centerLon,
-                    styleUrl = data.styleUrl,
-                    tileUrlTemplate = data.tileUrlTemplate,
-                    selectedLayer = layer,
-                    isLoading = false
-                )
-            } catch (t: Throwable) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = t.message ?: "Unknown error")
+                val result = getWeatherMapDataUseCase(city, _selectedLayer.value)
+                _mapData.value = result
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

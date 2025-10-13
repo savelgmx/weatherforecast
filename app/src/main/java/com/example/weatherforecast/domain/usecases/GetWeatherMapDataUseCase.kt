@@ -20,14 +20,10 @@ class GetWeatherMapDataUseCase @Inject constructor(
     suspend operator fun invoke(city: String, layer: WeatherLayer): WeatherMapData {
         val points = repository.getWeatherPoints(city, layer)
         val center = repository.getCityCenter(city)
-        val styleUrl = repository.getMapStyleUrl()
-        val tileUrl = repository.getWeatherTileUrl(layer)
         return WeatherMapData(
             centerLat = center?.first,
             centerLon = center?.second,
-            points = points,
-            styleUrl = styleUrl,
-            tileUrlTemplate = tileUrl
+            points = points
         )
     }
 }
