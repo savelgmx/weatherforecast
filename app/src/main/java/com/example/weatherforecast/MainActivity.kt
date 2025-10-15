@@ -14,6 +14,8 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.weatherforecast.presentation.viewmodels.OpenWeatherForecastViewModel
 import com.example.weatherforecast.presentation.viewmodels.OpenWeatherMapViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import org.maplibre.android.MapLibre
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -27,6 +29,9 @@ class MainActivity : AppCompatActivity() {
     // Inject both ViewModels so we can notify them when location permission is granted
     private val mapViewModel: OpenWeatherMapViewModel by viewModels()
     private val forecastViewModel: OpenWeatherForecastViewModel by viewModels()
+
+    @Inject
+    lateinit var mapLibre: MapLibre   // <— this forces Hilt to call your provider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

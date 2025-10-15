@@ -7,6 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +49,16 @@ fun WeatherMapScreen(
     }
 
     Column(Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("WeatherMap: $city")},
+            navigationIcon = {
+                IconButton(onClick = {navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack, contentDescription ="Back"
+                    )
+                }
+            }
+        )
         // Layer selector
         Row(
             modifier = Modifier
@@ -110,7 +125,7 @@ private fun updateMapLibreContent(map: org.maplibre.android.maps.MapLibreMap, ma
     mapData?.points?.forEach { point ->
         val marker = MarkerOptions()
             .position(LatLng(point.lat, point.lon))
-            .title((point.temperature ?: "Point").toString()) // ✅ use .name not .label
+            .title((point.temperature ?: "Point").toString()) // use .name not .label
         map.addMarker(marker)
     }
 }
