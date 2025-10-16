@@ -32,10 +32,12 @@ import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
 import com.example.weatherforecast.utils.WeatherLayer
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 
+private const val TAG = "WeatherMapScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +83,7 @@ fun WeatherMapScreen(
                             MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Text(layer.name)
+                    Text(layer.displayName)
                 }
             }
         }
@@ -93,13 +95,21 @@ fun WeatherMapScreen(
             factory = { ctx ->
                 MapView(ctx).apply {
                     getMapAsync { map ->
-                        map.setStyle(Style.Builder().fromUri(styleUrl))
+                        map.setStyle(Style.Builder().fromUri(styleUrl)) {
+                            Log.d(TAG, "MapLibre style loaded: $styleUrl")
+                            // When style first loads, center map if data already available
+                            updateMapLibreContent(map, mapData)
+                        }
                     }
                 }
             },
             update = { mapView ->
-                mapView.getMapAsync { map ->
-                    updateMapLibreContent(map, mapData)
+                if (mapData != null) {
+                    mapView.getMapAsync { map ->
+                        map.getStyle { _ ->
+                            updateMapLibreContent(map, mapData)
+                        }
+                    }
                 }
             }
         )
@@ -112,22 +122,47 @@ fun WeatherMapScreen(
 private fun updateMapLibreContent(map: org.maplibre.android.maps.MapLibreMap, mapData: WeatherMapData?) {
     if (mapData == null) return
 
-    val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
-    val camera = CameraPosition.Builder()
-        .target(center)
-        .zoom(7.0)
-        .build()
+    map.getStyle { _ ->
+        // Remove previous markers
+        map.clear()
 
-    map.cameraPosition = camera
+        // Move camera to city center
+        val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
+        val camera = CameraPosition.Builder()
+            .target(center)
+            .zoom(8.5)
+            .build()
 
-    // Clear old markers first
-    map.clear()
-    mapData.points.forEach { point ->
-        val marker = MarkerOptions()
-            .position(LatLng(point.lat, point.lon))
-            .title("Temp: ${point.temperature ?: "?"}°C")
-        map.addMarker(marker)
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(camera), 1200)
+
+        // Add markers — if many, they’ll overlap; center marker remains visible
+        if (mapData.points.isNotEmpty()) {
+            map.addMarker(
+                MarkerOptions()
+                    .position(center)
+                    .title("Center: ${mapData.centerLat?.format(3)}, ${mapData.centerLon?.format(3)}")
+            )
+        }
+
+        mapData.points.forEachIndexed { idx, point ->
+            map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(point.lat, point.lon))
+                    .title(
+                        "T: ${point.temperature ?: "?"}°C " +
+                                "P: ${point.precipitation ?: 0.0}mm"
+                    )
+            )
+        }
+
+        Log.d(
+            TAG,
+            "Added ${mapData.points.size} markers, centered at (${mapData.centerLat}, ${mapData.centerLon})"
+        )
     }
-
-    Log.d("WeatherMapScreen", "Updated map with ${mapData.points.size} markers")
 }
+
+/**
+ * Utility: format double nicely for logs / titles.
+ */
+private fun Double.format(digits: Int) = "%.${digits}f".format(this)
