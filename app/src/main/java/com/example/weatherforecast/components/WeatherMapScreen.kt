@@ -1,6 +1,7 @@
 package com.example.weatherforecast.components
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.weatherforecast.domain.models.WeatherMapData
 import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
@@ -33,15 +34,19 @@ import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherMapScreen(
     city: String,
-    viewModel: WeatherMapViewModel = hiltViewModel(),
+    viewModel: WeatherMapViewModel,
     navController: NavController
 ) {
     val mapData by viewModel.mapData.collectAsState()
     val selectedLayer by viewModel.selectedLayer.collectAsState()
+    val styleUrl by viewModel.styleUrl.collectAsState()
 
     // When city or selectedLayer changes, reload data
     LaunchedEffect(city, selectedLayer) {
@@ -88,7 +93,7 @@ fun WeatherMapScreen(
             factory = { ctx ->
                 MapView(ctx).apply {
                     getMapAsync { map ->
-                        map.setStyle("https://demotiles.maplibre.org/style.json")  // ✅ correct style constant
+                        map.setStyle(Style.Builder().fromUri(styleUrl))
                     }
                 }
             },
@@ -105,27 +110,24 @@ fun WeatherMapScreen(
  * Updates the MapLibre map camera & markers safely
  */
 private fun updateMapLibreContent(map: org.maplibre.android.maps.MapLibreMap, mapData: WeatherMapData?) {
-    val center = if (mapData?.centerLat != null && mapData.centerLon != null) {
-        LatLng(mapData.centerLat, mapData.centerLon)
-    } else {
-        LatLng(0.0, 0.0)
-    }
+    if (mapData == null) return
 
+    val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
     val camera = CameraPosition.Builder()
         .target(center)
-        .zoom(6.0)
+        .zoom(7.0)
         .build()
 
     map.cameraPosition = camera
 
     // Clear old markers first
     map.clear()
-
-    // Add weather point markers
-    mapData?.points?.forEach { point ->
+    mapData.points.forEach { point ->
         val marker = MarkerOptions()
             .position(LatLng(point.lat, point.lon))
-            .title((point.temperature ?: "Point").toString()) // use .name not .label
+            .title("Temp: ${point.temperature ?: "?"}°C")
         map.addMarker(marker)
     }
+
+    Log.d("WeatherMapScreen", "Updated map with ${mapData.points.size} markers")
 }
