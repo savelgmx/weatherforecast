@@ -22,7 +22,7 @@ import javax.inject.Inject
 data class WeatherMapUiState(
     val city: String = "",
     val points: List<WeatherPoint> = emptyList(),
-    val selectedLayer: WeatherLayer = WeatherLayer.CLOUDS,
+    val selectedLayer: WeatherLayer = WeatherLayer.Temperature,
     val centerLat: Double? = null,
     val centerLon: Double? = null,
     val styleUrl: String? = null,
@@ -65,4 +65,3 @@ class WeatherMapViewModel @Inject constructor(
 
     fun getTileUrl(layer: WeatherLayer): String = repository.getWeatherTileUrl(layer)
 }
-

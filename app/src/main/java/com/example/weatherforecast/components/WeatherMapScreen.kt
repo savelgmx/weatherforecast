@@ -22,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -36,8 +39,12 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.layers.RasterLayer
+import org.maplibre.android.style.sources.RasterSource
 
 private const val TAG = "WeatherMapScreen"
+private const val WEATHER_LAYER_ID = "weather-layer"
+private const val WEATHER_SOURCE_ID = "weather-source"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +56,7 @@ fun WeatherMapScreen(
     val mapData by viewModel.mapData.collectAsState()
     val selectedLayer by viewModel.selectedLayer.collectAsState()
     val styleUrl by viewModel.styleUrl.collectAsState()
+    var mapViewState by remember { mutableStateOf<MapView?>(null) }
 
     // When city or selectedLayer changes, reload data
     LaunchedEffect(city, selectedLayer) {
@@ -94,11 +102,12 @@ fun WeatherMapScreen(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
                 MapView(ctx).apply {
+                    mapViewState = this
                     getMapAsync { map ->
-                        map.setStyle(Style.Builder().fromUri(styleUrl)) {
+                        map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
                             Log.d(TAG, "MapLibre style loaded: $styleUrl")
                             // When style first loads, center map if data already available
-                            updateMapLibreContent(map, mapData)
+                            updateMapLibreContent(map, mapData, selectedLayer, viewModel)
                         }
                     }
                 }
@@ -106,8 +115,8 @@ fun WeatherMapScreen(
             update = { mapView ->
                 if (mapData != null) {
                     mapView.getMapAsync { map ->
-                        map.getStyle { _ ->
-                            updateMapLibreContent(map, mapData)
+                        map.getStyle { style ->
+                            updateMapLibreContent(map, mapData, selectedLayer, viewModel)
                         }
                     }
                 }
@@ -119,10 +128,23 @@ fun WeatherMapScreen(
 /**
  * Updates the MapLibre map camera & markers safely
  */
-private fun updateMapLibreContent(map: org.maplibre.android.maps.MapLibreMap, mapData: WeatherMapData?) {
+private fun updateMapLibreContent(
+    map: org.maplibre.android.maps.MapLibreMap, 
+    mapData: WeatherMapData?, 
+    selectedLayer: WeatherLayer,
+    viewModel: WeatherMapViewModel
+) {
     if (mapData == null) return
 
-    map.getStyle { _ ->
+    map.getStyle { style ->
+        // Remove previous weather layer if exists
+        if (style.getLayer(WEATHER_LAYER_ID) != null) {
+            style.removeLayer(WEATHER_LAYER_ID)
+        }
+        if (style.getSource(WEATHER_SOURCE_ID) != null) {
+            style.removeSource(WEATHER_SOURCE_ID)
+        }
+        
         // Remove previous markers
         map.clear()
 
@@ -135,7 +157,16 @@ private fun updateMapLibreContent(map: org.maplibre.android.maps.MapLibreMap, ma
 
         map.animateCamera(CameraUpdateFactory.newCameraPosition(camera), 1200)
 
-        // Add markers — if many, they’ll overlap; center marker remains visible
+        // Add weather raster layer
+        val tileUrl = viewModel.getTileUrl(selectedLayer)
+        val source = RasterSource(WEATHER_SOURCE_ID, tileUrl, 256)
+        style.addSource(source)
+        
+        val rasterLayer = RasterLayer(WEATHER_LAYER_ID, WEATHER_SOURCE_ID)
+     //   rasterLayer.setOpacity(0.7f) // Set some transparency to see the base map
+        style.addLayerBelow(rasterLayer, "waterway-label")
+
+        // Add markers — if many, they'll overlap; center marker remains visible
         if (mapData.points.isNotEmpty()) {
             map.addMarker(
                 MarkerOptions()

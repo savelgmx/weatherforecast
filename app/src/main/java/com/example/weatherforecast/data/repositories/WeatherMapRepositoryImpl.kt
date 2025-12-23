@@ -44,19 +44,21 @@ class WeatherMapRepositoryImpl @Inject constructor(
 
         // build points
         val points = mutableListOf<WeatherPoint>()
-        val hours = response.days?.flatMap { it.hours ?: emptyList() } ?: emptyList()
-        if (hours.isEmpty()) return emptyList()
+        val days = response.days ?: emptyList()
+        if (days.isEmpty()) return emptyList()
 
-        hours.forEach { hour ->
-            points.add(
-                WeatherPoint(
-                    lat = centerLat,
-                    lon = centerLon,
-                    temperature = hour.temp,
-                    precipitation = hour.precipitation ?: 0.0,
-                    cloudCover = hour.cloudCover ?: 0.0
+        days.forEach { day ->
+            day.hours?.forEach { hour ->
+                points.add(
+                    WeatherPoint(
+                        lat = centerLat,
+                        lon = centerLon,
+                        temperature = hour.temp,
+                        precipitation = hour.precipitation ?: 0.0,
+                        cloudCover = hour.cloudCover ?: 0.0
+                    )
                 )
-            )
+            }
         }
 
         Log.d("WeatherMapRepo", "Returning ${points.size} points for $city ($centerLat,$centerLon)")
