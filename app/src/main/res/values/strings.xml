@@ -91,5 +91,6 @@
     <string name="aqi_unhealthy">Unhealthy</string>
     <string name="aqi_very_unhealthy">Very Unhealthy</string>
     <string name="aqi_hazardous">Hazardous</string>
+    <string name="weather_map">Weather map</string>
 
 </resources>

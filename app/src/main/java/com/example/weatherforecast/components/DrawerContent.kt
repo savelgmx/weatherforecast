@@ -299,7 +299,7 @@ fun DrawerContent() {
                     // only navigate if non-null and not blank
                 navController?.navigate(R.id.weatherMapFragment)
             }
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Place,
@@ -307,7 +307,7 @@ fun DrawerContent() {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Weather Map",
+            text = context.getString(R.string.weather_map),
                 color = if (!enteredCity.isNullOrBlank()) Color.Unspecified else Color.Gray
         )
     }
