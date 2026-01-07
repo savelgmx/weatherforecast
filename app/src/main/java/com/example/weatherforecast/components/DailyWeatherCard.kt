@@ -76,21 +76,11 @@ fun DailyWeatherCard(
         ) {
 
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-
-            ) {
-
-            }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height = 160.dp),
+                    .height(height = 100.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
 
@@ -103,8 +93,8 @@ fun DailyWeatherCard(
                         model = imageModel, //"${UIUtils.iconurl}${daily.weather[0].icon}.png",
                         contentDescription = "Weather icon",
                         modifier = Modifier
-                            .size(150.dp)
-                            .padding(all = 3.dp)
+                            .size(100.dp)
+                            .padding(top = 8.dp, start = 8.dp, bottom = 3.dp)
                     )
                 }//column# weather icon
 
@@ -118,15 +108,8 @@ fun DailyWeatherCard(
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
                             style = QuickSandTypography.bodyMedium,
-                            modifier = Modifier.padding(all = 3.dp)
+                            modifier = Modifier.padding(top = 26.dp, start  =3.dp,bottom = 3.dp)
                         )
-                        Text(
-                            text = feelsLike,
-                            color = Color.White,
-                            style = QuickSandTypography.titleMedium,
-                            modifier = Modifier.padding(all = 3.dp)
-                        )
-
                     }
 
                     Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
@@ -140,32 +123,31 @@ fun DailyWeatherCard(
                             style = QuickSandTypography.bodyMedium,
                             modifier = Modifier.padding(all = 3.dp)
                         )
-
-                        Text(
-                            text = feelsLikeNight,
-                            color = Color.White,
-                            style = QuickSandTypography.titleMedium,
-                            modifier = Modifier.padding(all = 3.dp)
-                        )
-                    }
-
-                    Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top)  {
-
-                        Text(
-                            text = daily.weather[0].description,
-                            color = Color.White,
-                            style = QuickSandTypography.titleSmall,
-                            modifier = Modifier.padding(all = 3.dp)
-                        )
-
                     }
 
                 }
-
             }
+
         }
 
-    }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Top
+        )  {
+
+            Text(
+                text = daily.weather[0].description,
+                color = Color.White,
+                style = QuickSandTypography.titleSmall,
+                modifier = Modifier.padding(all = 8.dp)
+            )
+
+        }
+
+     }
 
 
 }
