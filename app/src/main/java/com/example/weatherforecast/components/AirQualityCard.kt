@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +46,7 @@ fun AirQualityCard(pollution: AirVisualPollution) {
             .height(160.dp),
         shape = RoundedCornerShape(16.dp),
         color = Blue800,
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

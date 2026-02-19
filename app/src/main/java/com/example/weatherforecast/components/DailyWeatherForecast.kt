@@ -1,6 +1,8 @@
 package com.example.weatherforecast.components
 
 
+//import com.google.accompanist.pager.ExperimentalPagerApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -33,9 +35,8 @@ import com.example.weatherforecast.response.Hourly
 import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.utils.WeatherUtils
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
-import com.google.accompanist.pager.ExperimentalPagerApi
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DailyWeatherForecast(
     navController: NavController,
