@@ -64,7 +64,6 @@ fun CitySelectionDialog(
             ) {
                 Text(
                     text = context.getString(R.string.select_city),
-                    style = QuickSandTypography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp)

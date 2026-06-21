@@ -96,5 +96,6 @@
     <string name="aqi_very_unhealthy">Sehr ungesund</string>
     <string name="aqi_hazardous">Gefährlich</string>
     <string name="weather_map">Wetterkarte</string>
+    <string name="recent_cities">Recent cities</string>
 
 </resources>

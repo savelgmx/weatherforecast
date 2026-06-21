@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
@@ -20,6 +21,7 @@ object DataStoreManager {
     private val PRESSURE_PREF_KEY   = intPreferencesKey("pressure_preference")
     private val LOCATED_CITY_NAME_KEY  = stringPreferencesKey("located_city_preference")
     private val USE_DEVICE_LOCATION_KEY = booleanPreferencesKey("use_dev_location_preference")
+    private val RECENT_CITIES_KEY = stringPreferencesKey("recent_cities")
 
     fun tempSwitchPrefFlow(context: Context): Flow<Boolean> {
         return context.dataStore.data
@@ -75,6 +77,20 @@ object DataStoreManager {
             }
     }
 
+    fun recentCitiesPrefFlow(context: Context): Flow<List<String>> {
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
+            }
+    }
+
     suspend fun updateSwitchPref(context: Context, isOn: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[TEMP_SWITCH_PREF_KEY] = isOn
@@ -98,4 +114,47 @@ object DataStoreManager {
         }
     }
 
+    suspend fun addRecentCity(context: Context, city: String) {
+        val recentCities = getRecentCities(context)
+
+        // Remove if already exists
+        val updatedCities = recentCities.toMutableList()
+        updatedCities.remove(city)
+
+        // Add to front
+        updatedCities.add(0, city)
+
+        // Keep only last 5
+        if (updatedCities.size > 5) {
+            updatedCities.subList(0, 5)
+        }
+
+        saveRecentCities(context, updatedCities)
+    }
+
+    suspend fun getRecentCities(context: Context): List<String> {
+    return context.dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
+        }.firstOrNull() ?: emptyList()
+}
+
+    suspend fun saveRecentCities(context: Context, cities: List<String>) {
+        context.dataStore.edit { preferences ->
+            preferences[RECENT_CITIES_KEY] = cities.joinToString(",")
+        }
+    }
+
+    suspend fun clearRecentCities(context: Context) {
+        context.dataStore.edit { preferences ->
+            preferences.remove(RECENT_CITIES_KEY)
+        }
+    }
 }
