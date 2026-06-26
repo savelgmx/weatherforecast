@@ -1,0 +1,49 @@
+{
+  "initialized": true,
+  "topology": "hierarchical",
+  "workers": [
+    "hive-worker-1782202578528-bsph",
+    "hive-worker-1782202617395-ocvr",
+    "hive-worker-1782202681455-4uhh",
+    "hive-worker-1782204353346-mk5v",
+    "hive-worker-1782204474859-96fy",
+    "hive-worker-1782363771144-09ye",
+    "hive-worker-1782363771144-to6p",
+    "hive-worker-1782363771144-deth",
+    "hive-worker-1782363771145-piyc",
+    "hive-worker-1782363771145-908v",
+    "hive-worker-1782364040728-ze67",
+    "hive-worker-1782364040728-agfk",
+    "hive-worker-1782364040728-1bc5",
+    "hive-worker-1782364040728-x5gv",
+    "hive-worker-1782364040728-ontr",
+    "hive-worker-1782364227332-4ntp",
+    "hive-worker-1782364227332-lvhx",
+    "hive-worker-1782364227332-uwkl",
+    "hive-worker-1782364227332-nt48",
+    "hive-worker-1782364227332-qpc2",
+    "hive-worker-1782371089615-3i08",
+    "hive-worker-1782371089615-nuoz",
+    "hive-worker-1782371089615-1up3",
+    "hive-worker-1782371089615-xe7t",
+    "hive-worker-1782371089615-9ekf",
+    "hive-worker-1782371154232-akso",
+    "hive-worker-1782371154232-d4x5",
+    "hive-worker-1782371154232-g7vh",
+    "hive-worker-1782371154232-husn",
+    "hive-worker-1782371154232-d00h"
+  ],
+  "consensus": {
+    "pending": [],
+    "history": []
+  },
+  "sharedMemory": {},
+  "createdAt": "2026-06-25T06:31:10.669Z",
+  "updatedAt": "2026-06-25T07:05:54.233Z",
+  "consensusStrategy": "raft",
+  "queen": {
+    "agentId": "queen-1782369070669",
+    "electedAt": "2026-06-25T06:31:10.669Z",
+    "term": 1
+  }
+}
