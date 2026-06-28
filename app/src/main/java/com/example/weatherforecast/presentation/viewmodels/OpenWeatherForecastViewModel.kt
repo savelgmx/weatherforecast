@@ -106,5 +106,18 @@ class OpenWeatherForecastViewModel @Inject constructor(
         isForecastLoaded = false
         getForecast(city, forceRefresh = true)
     }
+
+    /**
+     * Saves the selected city to recent history and triggers forecast fetch.
+     * Call this from the Select City dialog's onCitySelected callback.
+     */
+    fun selectCity(city: String) {
+        viewModelScope.launch {
+            // 1. Save to recent history (drives the dropdown suggestions)
+            DataStoreManager.addRecentCity(getApplication(), city)
+            // 2. Persist as current city — the cityNamePrefFlow collector will fetch forecast
+            DataStoreManager.updateCityName(getApplication(), city)
+        }
+    }
 }
 

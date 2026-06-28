@@ -2,20 +2,29 @@ package com.example.weatherforecast.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.weatherforecast.R
@@ -40,6 +50,19 @@ fun CitySelectionDialog(
 ) {
     var cityName by remember { mutableStateOf("") }
     val context = LocalContext.current
+
+    val recentCities by DataStoreManager.recentCitiesPrefFlow(context)
+        .collectAsState(initial = emptyList())
+
+    var showSuggestions by remember { mutableStateOf(false) }
+
+    val filteredSuggestions = remember(cityName, recentCities) {
+        if (cityName.isBlank()) {
+            recentCities
+        } else {
+            recentCities.filter { it.contains(cityName.trim(), ignoreCase = true) }
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -76,51 +99,102 @@ fun CitySelectionDialog(
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
-                OutlinedTextField(
-                    value = cityName,
-                    onValueChange = { cityName = it },
-                    label = {
-                        Text(
-                            text = context.getString(R.string.entered_city_name),
-                            color = Color.White.copy(alpha = 0.7f)
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Blue800,
-                        unfocusedContainerColor = Blue800
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = cityName,
+                        onValueChange = {
+                            cityName = it
+                            showSuggestions = true
+                        },
+                        label = {
+                            Text(
+                                text = context.getString(R.string.entered_city_name),
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Blue800,
+                            unfocusedContainerColor = Blue800
+                        ),
+                        singleLine = true
                     )
-                )
+
+                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 2.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 0.dp,
+                                topEnd = 0.dp,
+                                bottomStart = 8.dp,
+                                bottomEnd = 8.dp
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 200.dp)
+                                    .background(Color.White)
+                            ) {
+                                items(filteredSuggestions) { suggestion ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                cityName = suggestion
+                                                showSuggestions = false
+                                            }
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.LocationOn,
+                                            contentDescription = null,
+                                            tint = Blue800
+                                        )
+                                        Text(
+                                            text = suggestion,
+                                            color = Blue800,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    if (suggestion != filteredSuggestions.last()) {
+                                        HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
                         onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Gray
-                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier.weight(1f).padding(end = 8.dp)
                     ) {
-                        Text(
-                            text = context.getString(R.string.cancel),
-                            color = Color.White
-                        )
+                        Text(text = context.getString(R.string.cancel), color = Color.White)
                     }
 
                     Button(
                         onClick = {
                             if (cityName.isNotBlank()) {
                                 onCitySelected(cityName.trim())
+                                showSuggestions = false
                             }
                         },
                         enabled = cityName.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
-                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         modifier = Modifier.weight(1f).padding(start = 8.dp)
                     ) {
                         Text(
