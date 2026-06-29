@@ -123,15 +123,9 @@ object DataStoreManager {
 
         // Add to front
         updatedCities.add(0, city)
-
-        // Keep only last 5
-        if (updatedCities.size > 5) {
-            updatedCities.subList(0, 5)
+    val trimmedCities = if (updatedCities.size > 5) updatedCities.subList(0, 5) else updatedCities
+    saveRecentCities(context, trimmedCities)
         }
-
-        saveRecentCities(context, updatedCities)
-    }
-
     suspend fun getRecentCities(context: Context): List<String> {
     return context.dataStore.data
         .catch { exception ->
