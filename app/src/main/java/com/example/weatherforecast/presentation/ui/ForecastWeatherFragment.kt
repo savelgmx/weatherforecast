@@ -1,6 +1,7 @@
 package com.example.weatherforecast.presentation.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,10 +60,10 @@ class ForecastWeatherFragment : Fragment() {
                     },
                     showCitySelectionDialog = showCityDialog,
                     onCitySelected = { cityName ->
+                        Log.d("FragmentCB", "onCitySelected called: '$cityName'")
                         viewModel.selectCity(cityName)
-                        // Called when user selects a city in the dialog
                         currentViewModel.onCitySelected(cityName)
-                        // pollution подтянется автоматически через refreshWeather()
+                        Log.d("FragmentCB", "onCitySelected finished for: '$cityName'")
                     },
                     onDismissCityDialog = {
                         currentViewModel.dismissCitySelectionDialog()

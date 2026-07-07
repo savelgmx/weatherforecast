@@ -1,6 +1,7 @@
 package com.example.weatherforecast.components
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -115,30 +116,30 @@ object DataStoreManager {
     }
 
     suspend fun addRecentCity(context: Context, city: String) {
+        Log.d("DataStore", "addRecentCity called: $city")
         val recentCities = getRecentCities(context)
-
-        // Remove if already exists
+        Log.d("DataStore", "Current recent cities: $recentCities")
         val updatedCities = recentCities.toMutableList()
         updatedCities.remove(city)
-
-        // Add to front
         updatedCities.add(0, city)
-    val trimmedCities = if (updatedCities.size > 5) updatedCities.subList(0, 5) else updatedCities
-    saveRecentCities(context, trimmedCities)
-        }
+        val trimmedCities = if (updatedCities.size > 5) updatedCities.subList(0, 5) else updatedCities
+        Log.d("DataStore", "Saving recent cities: $trimmedCities")
+        saveRecentCities(context, trimmedCities)
+        Log.d("DataStore", "Recent cities saved successfully")
+    }
     suspend fun getRecentCities(context: Context): List<String> {
-    return context.dataStore.data
-        .catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
             }
-        }
-        .map { preferences ->
-            preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
-        }.firstOrNull() ?: emptyList()
-}
+            .map { preferences ->
+                preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
+            }.firstOrNull() ?: emptyList()
+    }
 
     suspend fun saveRecentCities(context: Context, cities: List<String>) {
         context.dataStore.edit { preferences ->

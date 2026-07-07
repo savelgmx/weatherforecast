@@ -277,6 +277,7 @@ fun DrawerContent() {
                     initialCity = enteredCity ?: "",
                     onCityChange = { newCity ->
                         scope.launch {
+                            DataStoreManager.addRecentCity(context, newCity)
                             DataStoreManager.updateCityName(context, newCity)
                             enteredCityPopup = false
                         }

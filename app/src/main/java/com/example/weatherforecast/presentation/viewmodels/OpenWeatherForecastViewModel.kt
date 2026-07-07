@@ -2,6 +2,7 @@ package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
@@ -112,11 +113,13 @@ class OpenWeatherForecastViewModel @Inject constructor(
      * Call this from the Select City dialog's onCitySelected callback.
      */
     fun selectCity(city: String) {
+        Log.d("ViewModel", "selectCity called: $city")
         viewModelScope.launch {
-            // 1. Save to recent history (drives the dropdown suggestions)
+            Log.d("ViewModel", "selectCity coroutine started")
             DataStoreManager.addRecentCity(getApplication(), city)
-            // 2. Persist as current city — the cityNamePrefFlow collector will fetch forecast
+            Log.d("ViewModel", "addRecentCity completed")
             DataStoreManager.updateCityName(getApplication(), city)
+            Log.d("ViewModel", "updateCityName completed")
         }
     }
 }

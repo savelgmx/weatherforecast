@@ -1,6 +1,6 @@
 package com.example.weatherforecast.components
 
-
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +42,6 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitySelectionDialog(
     onCitySelected: (String) -> Unit,
@@ -51,10 +50,13 @@ fun CitySelectionDialog(
     var cityName by remember { mutableStateOf("") }
     val context = LocalContext.current
 
+    // Reactive: collect DataStore flow as Compose state.
+    // This ensures the dropdown appears as soon as data is available,
+    // and stays in sync if the DataStore changes.
     val recentCities by DataStoreManager.recentCitiesPrefFlow(context)
         .collectAsState(initial = emptyList())
 
-    var showSuggestions by remember { mutableStateOf(false) }
+    Log.d("CityDialog", "Recent cities state: $recentCities (size=${recentCities.size})")
 
     val filteredSuggestions = remember(cityName, recentCities) {
         if (cityName.isBlank()) {
@@ -63,6 +65,9 @@ fun CitySelectionDialog(
             recentCities.filter { it.contains(cityName.trim(), ignoreCase = true) }
         }
     }
+
+    // Show dropdown whenever there are suggestions
+    val showSuggestions = filteredSuggestions.isNotEmpty()
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -102,10 +107,7 @@ fun CitySelectionDialog(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = cityName,
-                        onValueChange = {
-                            cityName = it
-                            showSuggestions = true
-                        },
+                        onValueChange = { cityName = it },
                         label = {
                             Text(
                                 text = context.getString(R.string.entered_city_name),
@@ -120,17 +122,12 @@ fun CitySelectionDialog(
                         singleLine = true
                     )
 
-                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                    if (showSuggestions) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 2.dp),
-                            shape = RoundedCornerShape(
-                                topStart = 0.dp,
-                                topEnd = 0.dp,
-                                bottomStart = 8.dp,
-                                bottomEnd = 8.dp
-                            ),
+                                .padding(top = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             LazyColumn(
@@ -144,8 +141,8 @@ fun CitySelectionDialog(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                cityName = suggestion
-                                                showSuggestions = false
+                                                Log.d("CityDialog", "Suggestion clicked: $suggestion")
+                                                onCitySelected(suggestion)
                                             }
                                             .padding(horizontal = 16.dp, vertical = 12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
@@ -189,8 +186,11 @@ fun CitySelectionDialog(
                     Button(
                         onClick = {
                             if (cityName.isNotBlank()) {
-                                onCitySelected(cityName.trim())
-                                showSuggestions = false
+                                val selectedCity = cityName.trim()
+                                Log.d("CityDialog", "Confirm clicked: $selectedCity")
+                                Log.d("CityDialog", "Calling onCitySelected callback...")
+                                onCitySelected(selectedCity)
+                                Log.d("CityDialog", "onCitySelected completed")
                             }
                         },
                         enabled = cityName.isNotBlank(),
