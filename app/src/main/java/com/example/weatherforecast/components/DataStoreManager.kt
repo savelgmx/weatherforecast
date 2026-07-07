@@ -88,7 +88,10 @@ object DataStoreManager {
                 }
             }
             .map { preferences ->
-                preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
+                val raw = preferences[RECENT_CITIES_KEY]
+                // BUGFIX: "".split(",") returns [""] not []. Filter blanks to prevent
+                // empty-string entries from leaking into the suggestions dropdown.
+                if (raw.isNullOrBlank()) emptyList() else raw.split(",").filter { it.isNotBlank() }
             }
     }
 
@@ -116,12 +119,20 @@ object DataStoreManager {
     }
 
     suspend fun addRecentCity(context: Context, city: String) {
-        Log.d("DataStore", "addRecentCity called: $city")
-        val recentCities = getRecentCities(context)
+        // BUGFIX: trim the city so "London " and "London" don't create duplicates.
+        val trimmedCity = city.trim()
+        if (trimmedCity.isBlank()) {
+            Log.d("DataStore", "addRecentCity rejected: blank city")
+            return
+        }
+        Log.d("DataStore", "addRecentCity called: $trimmedCity")
+        // BUGFIX: filter out any blank entries that may have been stored by a
+        // previous "".split(",") → [""] bug.
+        val recentCities = getRecentCities(context).filter { it.isNotBlank() }
         Log.d("DataStore", "Current recent cities: $recentCities")
         val updatedCities = recentCities.toMutableList()
-        updatedCities.remove(city)
-        updatedCities.add(0, city)
+        updatedCities.remove(trimmedCity)
+        updatedCities.add(0, trimmedCity)
         val trimmedCities = if (updatedCities.size > 5) updatedCities.subList(0, 5) else updatedCities
         Log.d("DataStore", "Saving recent cities: $trimmedCities")
         saveRecentCities(context, trimmedCities)
@@ -137,7 +148,9 @@ object DataStoreManager {
                 }
             }
             .map { preferences ->
-                preferences[RECENT_CITIES_KEY]?.split(",")?.toList() ?: emptyList()
+                // BUGFIX: same filter-blanks guard as recentCitiesPrefFlow
+                val raw = preferences[RECENT_CITIES_KEY]
+                if (raw.isNullOrBlank()) emptyList() else raw.split(",").filter { it.isNotBlank() }
             }.firstOrNull() ?: emptyList()
     }
 

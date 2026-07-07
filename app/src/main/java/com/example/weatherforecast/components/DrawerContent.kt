@@ -18,7 +18,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -273,12 +272,11 @@ fun DrawerContent() {
         Column {
             Text(context.getString(R.string.entered_city_name) + enteredCity.toString())
             if (enteredCityPopup) {
-                CityDialog(
-                    initialCity = enteredCity ?: "",
-                    onCityChange = { newCity ->
+                CitySelectionDialog(
+                    onCitySelected = { cityName ->
                         scope.launch {
-                            DataStoreManager.addRecentCity(context, newCity)
-                            DataStoreManager.updateCityName(context, newCity)
+                            DataStoreManager.addRecentCity(context, cityName)
+                            DataStoreManager.updateCityName(context, cityName)
                             enteredCityPopup = false
                         }
                     },
@@ -312,47 +310,3 @@ fun DrawerContent() {
     }
     HorizontalDivider()
 }
-
-@Composable
-fun CityDialog(initialCity: String, onCityChange: (String) -> Unit, onDismiss: () -> Unit) {
-    var enteredCity by remember { mutableStateOf(initialCity) }
-    val context = LocalContext.current
-
-                AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = context.getString(R.string.select_city),
-                style = QuickSandTypography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-        },
-                    text = {
-            OutlinedTextField(
-                value = enteredCity,
-                onValueChange = { enteredCity = it },
-                label = { Text(context.getString(R.string.entered_city_name)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-                            )
-                    },
-                    confirmButton = {
-            Button(onClick = {
-                if (enteredCity.isNotBlank()) {
-                        onCityChange(enteredCity.trim())
-                    }
-                onDismiss()
-                },
-                enabled = enteredCity.isNotBlank()
-            ) {
-                Text(context.getString(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(context.getString(R.string.cancel))
-        }
-    }
-    )
-}
-

@@ -142,7 +142,8 @@ fun CitySelectionDialog(
                                             .fillMaxWidth()
                                             .clickable {
                                                 Log.d("CityDialog", "Suggestion clicked: $suggestion")
-                                                onCitySelected(suggestion)
+                                                // BUGFIX: trim in case the stored data has leading/trailing spaces
+                                                onCitySelected(suggestion.trim())
                                             }
                                             .padding(horizontal = 16.dp, vertical = 12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
