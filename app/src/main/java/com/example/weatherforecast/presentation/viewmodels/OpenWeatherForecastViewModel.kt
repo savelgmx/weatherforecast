@@ -116,10 +116,16 @@ class OpenWeatherForecastViewModel @Inject constructor(
         Log.d("ViewModel", "selectCity called: $city")
         viewModelScope.launch {
             Log.d("ViewModel", "selectCity coroutine started")
-            DataStoreManager.addRecentCity(getApplication(), city)
-            Log.d("ViewModel", "addRecentCity completed")
+            // IMPORTANT: updateCityName must be called FIRST so cityNamePrefFlow
+            // emits the correct city name. addRecentCity writes a different key
+            // (RECENT_CITIES_KEY) to DataStore, which would trigger cityNamePrefFlow
+            // to re-emit the OLD value (null/blank) before the city is saved,
+            // causing the city-selection dialog to reappear or conflicting
+            // fetchAndSaveDeviceCity() calls (see distinctUntilChanged guard).
             DataStoreManager.updateCityName(getApplication(), city)
             Log.d("ViewModel", "updateCityName completed")
+            DataStoreManager.addRecentCity(getApplication(), city)
+            Log.d("ViewModel", "addRecentCity completed")
         }
     }
 }

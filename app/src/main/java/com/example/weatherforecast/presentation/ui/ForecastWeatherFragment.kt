@@ -61,8 +61,11 @@ class ForecastWeatherFragment : Fragment() {
                     showCitySelectionDialog = showCityDialog,
                     onCitySelected = { cityName ->
                         Log.d("FragmentCB", "onCitySelected called: '$cityName'")
+                        // selectCity calls updateCityName first (triggers both
+                        // ViewModels' DataStore observers reactively), then addRecentCity.
+                        // No need to call currentViewModel.onCitySelected() separately —
+                        // the DataStore flow observer does that automatically.
                         viewModel.selectCity(cityName)
-                        currentViewModel.onCitySelected(cityName)
                         Log.d("FragmentCB", "onCitySelected finished for: '$cityName'")
                     },
                     onDismissCityDialog = {
