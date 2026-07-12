@@ -63,26 +63,26 @@ class OpenWeatherMapViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAndSaveDeviceCity() {
-        viewModelScope.launch {
-            try {
-                val autoCity = getDeviceCityUseCase.execute()
-                if (autoCity.isNotBlank()) {
-                    DataStoreManager.updateCityName(getApplication(), autoCity)
-                    // No need to call getCurrentWeather directly
-                    // Flow will re-emit and trigger the block again
-                } else {
-                    showCitySelectionDialog.value = true
-                }
-            } catch (e: Exception) {
+    private suspend fun fetchAndSaveDeviceCity() {
+        try {
+            val autoCity = getDeviceCityUseCase.execute()
+            if (autoCity.isNotBlank()) {
+                DataStoreManager.updateCityName(getApplication(), autoCity)
+                // No need to call getCurrentWeather directly
+                // Flow will re-emit and trigger the block again
+            } else {
                 showCitySelectionDialog.value = true
             }
+        } catch (e: Exception) {
+            showCitySelectionDialog.value = true
         }
     }
 
     fun retryDeviceLocation() {
         if (currentCity.isBlank()) {
-            fetchAndSaveDeviceCity()
+            viewModelScope.launch {
+                fetchAndSaveDeviceCity()
+            }
         }
     }
 

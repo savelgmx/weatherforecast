@@ -275,8 +275,8 @@ fun DrawerContent() {
                 CitySelectionDialog(
                     onCitySelected = { cityName ->
                         scope.launch {
-                            DataStoreManager.addRecentCity(context, cityName)
                             DataStoreManager.updateCityName(context, cityName)
+                            DataStoreManager.addRecentCity(context, cityName)
                             enteredCityPopup = false
                         }
                     },

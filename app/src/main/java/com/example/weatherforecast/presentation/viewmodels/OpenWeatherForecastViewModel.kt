@@ -58,21 +58,21 @@ class OpenWeatherForecastViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAndSaveDeviceCity() {
-        viewModelScope.launch {
-            try {
-                val autoCity = getDeviceCityUseCase.execute()
-                if (autoCity.isNotBlank()) {
-                    DataStoreManager.updateCityName(getApplication(), autoCity)
-                    // No need to call getForecast(), as flow will emit again
-                }
-            } catch (_: Exception) { }
-        }
+    private suspend fun fetchAndSaveDeviceCity() {
+        try {
+            val autoCity = getDeviceCityUseCase.execute()
+            if (autoCity.isNotBlank()) {
+                DataStoreManager.updateCityName(getApplication(), autoCity)
+                // No need to call getForecast(), as flow will emit again
+            }
+        } catch (_: Exception) { }
     }
 
     fun retryDeviceLocation() {
         if (currentCity.isBlank()) {
-            fetchAndSaveDeviceCity()
+            viewModelScope.launch {
+                fetchAndSaveDeviceCity()
+            }
         }
     }
 
