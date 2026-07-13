@@ -58,6 +58,29 @@ class OpenWeatherForecastViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Auto-detects device location via GPS and saves the city name to DataStore.
+     *
+     * CRITICAL DESIGN DECISION: This is a suspend function (not fire-and-forget).
+     *
+     * It is called inside collectLatest {}. collectLatest cancels its lambda's
+     * coroutine whenever a new value is emitted before the previous one finishes.
+     * Making this a suspend function ensures the cancellation propagates into the
+     * GPS resolution:
+     *
+     *   BEFORE (broken):  viewModelScope.launch { fetchAndSaveDeviceCity() }
+     *   → launched a coroutine DISCONNECTED from collectLatest's scope.
+     *   → User selects a city → collectLatest cancels the lambda, but the
+     *     launched coroutine keeps running and overwrites the city choice.
+     *
+     *   AFTER (fixed):    suspend fun fetchAndSaveDeviceCity()
+     *   → Called directly in the collectLatest lambda.
+     *   → User selects a city → collectLatest cancels the lambda → coroutine
+     *     is cancelled immediately → GPS resolution stops.
+     *
+     * See also: retryDeviceLocation() for the explicit manual retry path,
+     * which correctly wraps this suspend function in viewModelScope.launch.
+     */
     private suspend fun fetchAndSaveDeviceCity() {
         try {
             val autoCity = getDeviceCityUseCase.execute()
@@ -68,6 +91,14 @@ class OpenWeatherForecastViewModel @Inject constructor(
         } catch (_: Exception) { }
     }
 
+    /**
+     * Public retry button for auto-detect (called from the UI when the
+     * user taps "Retry" after GPS failed or was denied).
+     *
+     * Wraps fetchAndSaveDeviceCity() in viewModelScope.launch because this
+     * is called from a non-coroutine context (UI event handler), NOT from
+     * inside collectLatest.
+     */
     fun retryDeviceLocation() {
         if (currentCity.isBlank()) {
             viewModelScope.launch {

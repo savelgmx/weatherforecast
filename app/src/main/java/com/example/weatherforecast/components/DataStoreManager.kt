@@ -65,6 +65,26 @@ object DataStoreManager {
                 preferences[PRESSURE_PREF_KEY] ?: 0
             }
     }
+    /**
+     * Flow that emits the currently-selected city name whenever it changes.
+     *
+     * BUGFIX (distinctUntilChanged):
+     * Without .distinctUntilChanged(), ANY write to ANY DataStore key — including
+     * writes to RECENT_CITIES_KEY by addRecentCity() — causes the underlying
+     * dataStore.data to emit a new Preferences instance, which re-evaluates
+     * .map { preferences[LOCATED_CITY_NAME_KEY] } and emits the SAME value again.
+     *
+     * This was the root cause of the auto-detect race:
+     *   1. selectCity() called addRecentCity() (writes RECENT_CITIES_KEY)
+     *   2. dataStore.data emits → cityNamePrefFlow re-maps LOCATED_CITY_NAME_KEY
+     *   3. LOCATED_CITY_NAME_KEY hasn't been written yet (or is still the old value)
+     *      → the observer sees null/blank → restarts the auto-detect flow
+     *      OR shows the city-selection dialog again
+     *   4. Then updateCityName() writes the correct value — too late
+     *
+     * .distinctUntilChanged() prevents this by comparing the new emission to the
+     * previous one and only propagating when the value ACTUALLY changes.
+     */
     fun cityNamePrefFlow(context: Context): Flow<String?> {
         return context.dataStore.data
             .catch { exception ->
@@ -80,6 +100,20 @@ object DataStoreManager {
             .distinctUntilChanged()
     }
 
+    /**
+     * Reactive Flow of the recent-cities list (max 5 entries).
+     * Used by CitySelectionDialog to show the dropdown suggestions.
+     *
+     * BUGFIX (blank filter):
+     * "".split(",") in Kotlin returns [""] (a list with one empty string), not [].
+     * This means if RECENT_CITIES_KEY was ever set to an empty string (or was
+     * never set → raw is null, which is handled by isNullOrBlank), the old code
+     * would produce ["", ""] (etc.) after repeated add → split cycles, causing
+     * blank rows to appear in the city-selection dropdown.
+     *
+     * The .filter { it.isNotBlank() } guard ensures empty entries are never
+     * exposed to the UI layer.
+     */
     fun recentCitiesPrefFlow(context: Context): Flow<List<String>> {
         return context.dataStore.data
             .catch { exception ->
@@ -120,6 +154,26 @@ object DataStoreManager {
         }
     }
 
+    /**
+     * Adds a city to the front of the recent-cities history (max 5 entries).
+     * If the city already exists in the list, it is moved to the front.
+     *
+     * BUGFIX 1 — trim:
+     * Without trimming, "London " and "London" would be treated as different cities,
+     * creating duplicate entries and consuming slots in the 5-city limit.
+     *
+     * BUGFIX 2 — filter blanks from loaded list:
+     * Entries that were stored by the old "".split(",") → [""] bug (before the
+     * .filter { it.isNotBlank() } guards were added) are cleaned up on every write.
+     *
+     * ORDERING (call-site responsibility):
+     * This function must be called AFTER updateCityName(). Writing RECENT_CITIES_KEY
+     * triggers a dataStore.data emission, which cityNamePrefFlow re-evaluates.
+     * If the city hasn't been saved to LOCATED_CITY_NAME_KEY yet, the flow emits
+     * the old (null/blank) value — restarting auto-detect or showing the dialog.
+     * .distinctUntilChanged() on cityNamePrefFlow guards against this, but keeping
+     * the calls ordered is the correct defensive approach.
+     */
     suspend fun addRecentCity(context: Context, city: String) {
         // BUGFIX: trim the city so "London " and "London" don't create duplicates.
         val trimmedCity = city.trim()
@@ -140,6 +194,14 @@ object DataStoreManager {
         saveRecentCities(context, trimmedCities)
         Log.d("DataStore", "Recent cities saved successfully")
     }
+    /**
+     * One-shot (non-reactive) read of the recent-cities list from DataStore.
+     * Used by addRecentCity() to read the current list before modifying it.
+     *
+     * BUGFIX: same filter-blanks guard as recentCitiesPrefFlow — ensures that
+     * any empty-string entries lingering from the old "".split(",") → [""] bug
+     * are filtered out on every read, not just on the reactive Flow path.
+     */
     suspend fun getRecentCities(context: Context): List<String> {
         return context.dataStore.data
             .catch { exception ->
@@ -156,6 +218,14 @@ object DataStoreManager {
             }.firstOrNull() ?: emptyList()
     }
 
+    /**
+     * Persists the recent-cities list to DataStore as a comma-separated string.
+     * The reactive Flow (recentCitiesPrefFlow) picks up the change automatically.
+     *
+     * Encoding: cities.joinToString(",") — simple CSV without escaping because
+     * city names are assumed not to contain commas. If that assumption changes,
+     * switch to a proper encoding (JSON, URL-encoded, etc.).
+     */
     suspend fun saveRecentCities(context: Context, cities: List<String>) {
         context.dataStore.edit { preferences ->
             preferences[RECENT_CITIES_KEY] = cities.joinToString(",")

@@ -275,6 +275,14 @@ fun DrawerContent() {
                 CitySelectionDialog(
                     onCitySelected = { cityName ->
                         scope.launch {
+                            // IMPORTANT: updateCityName must be called FIRST.
+                            // addRecentCity writes RECENT_CITIES_KEY to DataStore,
+                            // which triggers a data emission. If the city hasn't
+                            // been saved to LOCATED_CITY_NAME_KEY yet, cityNamePrefFlow
+                            // re-emits the old (null/blank) value — causing the
+                            // ViewModel observers to restart auto-detect or show
+                            // the dialog. This ordering matches selectCity() in
+                            // OpenWeatherForecastViewModel.
                             DataStoreManager.updateCityName(context, cityName)
                             DataStoreManager.addRecentCity(context, cityName)
                             enteredCityPopup = false
