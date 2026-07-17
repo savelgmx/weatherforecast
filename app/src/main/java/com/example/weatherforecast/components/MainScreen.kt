@@ -1,17 +1,19 @@
 package com.example.weatherforecast.components
 
-
-
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
@@ -28,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -60,7 +63,7 @@ fun MainScreen(
     onDismissCityDialog: () -> Unit = {},
     pollution: AirVisualPollution? = null
 ) {
-    val scaffoldState= rememberScaffoldState()
+    val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading = currentState is Resource.Loading || forecastState is Resource.Loading
@@ -69,7 +72,7 @@ fun MainScreen(
     val isStale = (currentState as? Resource.Success)?.isStale == true || (forecastState as? Resource.Success)?.isStale == true
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
-    val hourlyData= (forecastState as? Resource.Success)?.data?.hourly
+    val hourlyData = (forecastState as? Resource.Success)?.data?.hourly
 
     val refreshState = rememberPullRefreshState(
         refreshing = isLoading,
@@ -78,7 +81,7 @@ fun MainScreen(
 
     AppTheme {
         Scaffold(
-            scaffoldState=scaffoldState,
+            scaffoldState = scaffoldState,
             drawerElevation = 16.dp,
             topBar = {
                 TopAppBar(
@@ -91,7 +94,6 @@ fun MainScreen(
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
-
                                 scaffoldState.drawerState.open()
                             }
                         }) {
@@ -112,205 +114,390 @@ fun MainScreen(
             },
             contentColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
-            Box(
+            // ——— BoxWithConstraints: автоопределение ориентации ———
+            // maxWidth > maxHeight  → landscape  → две панели (Row: 50% / 50%)
+            // maxWidth <= maxHeight → portrait   → оригинальный одноколоночный LazyColumn
+            // Не используем ConfigurationChange или отдельный landscape layout —
+            // BoxWithConstraints адаптируется на лету при изменении размеров.
+            BoxWithConstraints(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .pullRefresh(refreshState)
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primary)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    if (hasError) {
-                        item {
-                            WeatherText(
-                                text = (currentState as? Resource.Error)?.msg
-                                    ?: (forecastState as? Resource.Error)?.msg
-                                    ?: "Error loading data",
-                                style = QuickSandTypography.bodyLarge,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    } else if (hasInternetError) {
-                        item {
-                            WeatherText(
-                                text = context.resources.getString(R.string.no_internet_connection),
-                                style = QuickSandTypography.bodyMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    } else if (weatherData != null && forecastData != null) {
-                        if (isStale) {
-                            item {
-                                WeatherText(
-                                    text = context.resources.getString(R.string.data_is_stale),
-                                    style = QuickSandTypography.bodyMedium,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                        }
-                        item {
-                            hourlyData?.let { hourlyWeatherList ->
-                                val currentTime = System.currentTimeMillis()
-                                val nextHour = currentTime + (60 * 60 * 1000)
-                                //filter list to display  current temperature
-                                //sort items by dt and take only first 24 items in list
-                                val filteredCurrentWeatherList = hourlyWeatherList
-                                    .filter { it.dt * 1000L in currentTime..nextHour }
-                                    .sortedBy { it.dt }
-                                    .take(1)
-
-                                if (BuildConfig.DEBUG) {
-                                    Log.d("current weather response", filteredCurrentWeatherList.toString())
-                                }
-
-                                CurrentWeatherCard(weatherState = currentState,filteredCurrentWeatherList)
-                            }
-
-
-
-
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
-                        }
-                        item {
-
-                            forecastData.hourly?.let { hourlyWeatherList ->
-                                val filteredHourlyWeatherList =
-                                    WeatherUtils.filterNext24Hours(hourlyList = hourlyWeatherList, timezone = forecastData.timezone)
-                                /*
-                                   hour.dt in the correct city ZoneId when checking if it falls in the next 24 hours.
-                                   But hour.dt itself is still just a raw epoch timestamp (seconds since 1970-01-01 UTC).
-                                   It doesn’t carry timezone information inside it.
-                                    So filteredHourlyWeatherList contains the right subset of hours,
-                                     but the items still need to be formatted with the city’s timezone before displaying.
-                                    That’s why HourlyWeatherRow (or HourlyWeatherItem)
-                                    still needs to know the timezone string in order to display the hour labels correctly.
-                                */
-                                HourlyWeatherRow(filteredHourlyWeatherList,forecastData.timezone)
-
-                            }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
-                        }
-                        item {
-                            ForecastWeatherList(
-                                forecastState = forecastState,
-                                navController = navController
-                            )
-                        }
-
-                        item{
-                            HorizontalDivider()
-                            Spacer(modifier = Modifier.height(8.dp))
-                            WeatherHeader(text = context.getString(R.string.daily_weather_forecast))
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        item {
-                            Row(
+                val isLandscape = maxWidth > maxHeight
+                if (isLandscape) {
+                    // ——— LANDSCAPE: двухпанельный режим (split-pane) ———
+                    // Левая  (weight 0.5f): CurrentWeatherCard + 24-hour почасовой прогноз
+                    // Правая (weight 0.5f): 15-day forecast + детали (Sunrise, Humidity,
+                    //                        Wind, UV, Pressure, AirQuality, MoonPhase)
+                    // PullRefreshIndicator один на обе панели — поверх Row по TopCenter
+                    Box(
+                        modifier = Modifier
+                            .pullRefresh(refreshState)
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                        // ——— Left pane: CurrentWeather + почасовой прогноз ———
+                            LazyColumn(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(all = 3.dp),
-                                horizontalArrangement = Arrangement.Center
-
+                                    .weight(0.5f)
+                                    .fillMaxHeight()
                             ) {
-                                forecastData.daily[0].sunrise?.let { sunrise ->
-                                    forecastData.daily[0].sunset?.let { sunset ->
-                                        val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
-                                        val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
-
-                                        SunriseSunsetArcCard(
-                                            sunrise = timeOfSunrise,
-                                            sunset = timeOfSunset,
-                                            timezone=forecastData.timezone
+                                if (hasError) {
+                                    item {
+                                        WeatherText(
+                                            text = (currentState as? Resource.Error)?.msg
+                                                ?: (forecastState as? Resource.Error)?.msg
+                                                ?: "Error loading data",
+                                            style = QuickSandTypography.bodyLarge,
+                                            modifier = Modifier.padding(16.dp)
                                         )
-
+                                    }
+                                } else if (hasInternetError) {
+                                    item {
+                                        WeatherText(
+                                            text = context.resources.getString(R.string.no_internet_connection),
+                                            style = QuickSandTypography.bodyMedium,
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+                                } else if (weatherData != null && forecastData != null) {
+                                    if (isStale) {
+                                        item {
+                                            WeatherText(
+                                                text = context.resources.getString(R.string.data_is_stale),
+                                                style = QuickSandTypography.bodyMedium,
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+                                        }
+                                    }
+                                    item {
+                                        hourlyData?.let { hourlyWeatherList ->
+                                            val currentTime = System.currentTimeMillis()
+                                            val nextHour = currentTime + (60 * 60 * 1000)
+                                            val filteredCurrentWeatherList = hourlyWeatherList
+                                                .filter { it.dt * 1000L in currentTime..nextHour }
+                                                .sortedBy { it.dt }
+                                                .take(1)
+                                            if (BuildConfig.DEBUG) {
+                                                Log.d("current weather response", filteredCurrentWeatherList.toString())
+                                            }
+                                            CurrentWeatherCard(weatherState = currentState, filteredCurrentWeatherList)
+                                        }
+                                    }
+                                    item {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
+                                    }
+                                    item {
+                                        forecastData.hourly?.let { hourlyWeatherList ->
+                                            val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
+                                                hourlyList = hourlyWeatherList,
+                                                timezone = forecastData.timezone
+                                            )
+                                            HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
+                                        }
+                                    }
+                                } else {
+                                    item {
+                                        WeatherText(
+                                            text = "Loading...",
+                                            style = QuickSandTypography.bodyMedium,
+                                            modifier = Modifier.padding(16.dp)
+                                        )
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
 
-                        item{
-                            Row(
+                            // ——— Vertical divider ———
+                            VerticalDivider(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(all = 3.dp),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                weatherData.main?.humidity?.let { humidity ->
-                                    forecastData.current?.dewPoint?.let { dewPoint ->
-                                        HumidityCard(humidity =humidity, dewPoint =dewPoint.toInt() )
-                                    }
-                                }
-                                weatherData.wind?.speed?.toInt()?.let { windSpeed ->
-                                    weatherData.wind.deg?.let { windDegree ->
-                                        WindSpeedCard(speed = windSpeed, windDegree =windDegree )
-                                    }
-                                }
+                                    .fillMaxHeight()
+                                    .width(1.dp)
+                            )
 
+                        // ——— Right pane: 15-day прогноз + детальные карточки ———
+                            LazyColumn(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .fillMaxHeight()
+                            ) {
+                                if (weatherData != null && forecastData != null) {
+                                    item {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
+                                    }
+                                    item {
+                                        ForecastWeatherList(
+                                            forecastState = forecastState,
+                                            navController = navController
+                                        )
+                                    }
+                                    // ——— Daily: Sunrise / Sunset ———
+                                    item {
+                                        HorizontalDivider()
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        WeatherHeader(text = context.getString(R.string.daily_weather_forecast))
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(all = 3.dp),
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            forecastData.daily[0].sunrise?.let { sunrise ->
+                                                forecastData.daily[0].sunset?.let { sunset ->
+                                                    val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
+                                                    val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
+                                                    SunriseSunsetArcCard(
+                                                        sunrise = timeOfSunrise,
+                                                        sunset = timeOfSunset,
+                                                        timezone = forecastData.timezone
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                    // ——— Humidity + Wind Speed ———
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(all = 3.dp),
+                                            horizontalArrangement = Arrangement.SpaceAround
+                                        ) {
+                                            weatherData.main?.humidity?.let { humidity ->
+                                                forecastData.current?.dewPoint?.let { dewPoint ->
+                                                    HumidityCard(humidity = humidity, dewPoint = dewPoint.toInt())
+                                                }
+                                            }
+                                            weatherData.wind?.speed?.toInt()?.let { windSpeed ->
+                                                weatherData.wind.deg?.let { windDegree ->
+                                                    WindSpeedCard(speed = windSpeed, windDegree = windDegree)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // ——— UV Index + Pressure ———
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(all = 3.dp),
+                                            horizontalArrangement = Arrangement.SpaceAround
+                                        ) {
+                                            forecastData.current?.uvi?.let { uvIndex ->
+                                                UVIndexCard(index = uvIndex.toInt())
+                                            }
+                                            weatherData.main?.pressure?.let { pressure ->
+                                                PressureCard(pressure = pressure)
+                                            }
+                                        }
+                                    }
+                                    // ——— Air Quality + Moon Phase ———
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(all = 3.dp),
+                                            horizontalArrangement = Arrangement.SpaceAround
+                                        ) {
+                                            pollution?.let { AirQualityCard(pollution = it) }
+                                            forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
+                                                MoonriseMoonsetCard(moonPhase = moonPhase)
+                                            }
+                                        }
+                                    }
+                                }
                             }
-
                         }
-
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(all = 3.dp),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                forecastData.current?.uvi?.let { uvIndex ->
-                                    UVIndexCard(index = uvIndex.toInt())
+                        // PullRefreshIndicator для landscape — один на обе панели,
+                        // выровнен по TopCenter внутри Box (над Row).
+                        PullRefreshIndicator(
+                            refreshing = isLoading,
+                            state = refreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
+                    }
+                } else {
+                    // ——— PORTRAIT: однопанельный режим (оригинальный скролл) ———
+                    // Тот же контент, но в одной LazyColumn — без изменений относительно
+                    // исходной логики до добавления split-pane.
+                    Box(
+                        modifier = Modifier
+                            .pullRefresh(refreshState)
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            if (hasError) {
+                                item {
+                                    WeatherText(
+                                        text = (currentState as? Resource.Error)?.msg
+                                            ?: (forecastState as? Resource.Error)?.msg
+                                            ?: "Error loading data",
+                                        style = QuickSandTypography.bodyLarge,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                 }
-                                weatherData.main?.pressure?.let { pressure ->
-                                    PressureCard(pressure = pressure)
+                            } else if (hasInternetError) {
+                                item {
+                                    WeatherText(
+                                        text = context.resources.getString(R.string.no_internet_connection),
+                                        style = QuickSandTypography.bodyMedium,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                 }
-                            }
-                        }
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(all = 3.dp),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                pollution.let { pol->
-                                    if (pol != null) {
-                                        AirQualityCard(pollution = pol)
+                            } else if (weatherData != null && forecastData != null) {
+                                if (isStale) {
+                                    item {
+                                        WeatherText(
+                                            text = context.resources.getString(R.string.data_is_stale),
+                                            style = QuickSandTypography.bodyMedium,
+                                            modifier = Modifier.padding(16.dp)
+                                        )
                                     }
                                 }
-
-                                forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
-                                    val moonRise = WeatherUtils.updateTime(forecastData.daily[0].moonrise,forecastData.timezone)
-                                    val moonSet = WeatherUtils.updateTime(forecastData.daily[0].moonset,forecastData.timezone)
-                                    MoonriseMoonsetCard(
-                                        moonPhase = moonPhase
+                                item {
+                                    hourlyData?.let { hourlyWeatherList ->
+                                        val currentTime = System.currentTimeMillis()
+                                        val nextHour = currentTime + (60 * 60 * 1000)
+                                        val filteredCurrentWeatherList = hourlyWeatherList
+                                            .filter { it.dt * 1000L in currentTime..nextHour }
+                                            .sortedBy { it.dt }
+                                            .take(1)
+                                        if (BuildConfig.DEBUG) {
+                                            Log.d("current weather response", filteredCurrentWeatherList.toString())
+                                        }
+                                        CurrentWeatherCard(weatherState = currentState, filteredCurrentWeatherList)
+                                    }
+                                }
+                                item {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
+                                }
+                                item {
+                                    forecastData.hourly?.let { hourlyWeatherList ->
+                                        val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
+                                            hourlyList = hourlyWeatherList,
+                                            timezone = forecastData.timezone
+                                        )
+                                        HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
+                                    }
+                                }
+                                item {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
+                                }
+                                item {
+                                    ForecastWeatherList(
+                                        forecastState = forecastState,
+                                        navController = navController
+                                    )
+                                }
+                                // ——— Daily: Sunrise / Sunset ———
+                                item {
+                                    HorizontalDivider()
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeatherHeader(text = context.getString(R.string.daily_weather_forecast))
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(all = 3.dp),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        forecastData.daily[0].sunrise?.let { sunrise ->
+                                            forecastData.daily[0].sunset?.let { sunset ->
+                                                val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
+                                                val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
+                                                SunriseSunsetArcCard(
+                                                    sunrise = timeOfSunrise,
+                                                    sunset = timeOfSunset,
+                                                    timezone = forecastData.timezone
+                                                )
+                                            }
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                                // ——— Humidity + Wind Speed ———
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(all = 3.dp),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    ) {
+                                        weatherData.main?.humidity?.let { humidity ->
+                                            forecastData.current?.dewPoint?.let { dewPoint ->
+                                                HumidityCard(humidity = humidity, dewPoint = dewPoint.toInt())
+                                            }
+                                        }
+                                        weatherData.wind?.speed?.toInt()?.let { windSpeed ->
+                                            weatherData.wind.deg?.let { windDegree ->
+                                                WindSpeedCard(speed = windSpeed, windDegree = windDegree)
+                                            }
+                                        }
+                                    }
+                                }
+                                // ——— UV Index + Pressure ———
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(all = 3.dp),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    ) {
+                                        forecastData.current?.uvi?.let { uvIndex ->
+                                            UVIndexCard(index = uvIndex.toInt())
+                                        }
+                                        weatherData.main?.pressure?.let { pressure ->
+                                            PressureCard(pressure = pressure)
+                                        }
+                                    }
+                                }
+                                // ——— Air Quality + Moon Phase ———
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(all = 3.dp),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    ) {
+                                        pollution?.let { AirQualityCard(pollution = it) }
+                                        forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
+                                            MoonriseMoonsetCard(moonPhase = moonPhase)
+                                        }
+                                    }
+                                }
+                            } else {
+                                item {
+                                    WeatherText(
+                                        text = "Loading...",
+                                        style = QuickSandTypography.bodyMedium,
+                                        modifier = Modifier.padding(16.dp)
                                     )
                                 }
                             }
                         }
-                    } else {
-                        item {
-                            WeatherText(
-                                text = "Loading...",
-                                style = QuickSandTypography.bodyMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        // PullRefreshIndicator для portrait — стандартный, над единственной
+                        // LazyColumn. refreshState общий с landscape-режимом.
+                        PullRefreshIndicator(
+                            refreshing = isLoading,
+                            state = refreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
                 }
-                PullRefreshIndicator(
-                    refreshing = isLoading,
-                    state = refreshState,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
             }
 
             // Show city selection dialog if needed
