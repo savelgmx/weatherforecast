@@ -1,11 +1,11 @@
 package com.example.weatherforecast.components
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -51,6 +51,7 @@ import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
@@ -127,9 +128,9 @@ fun MainScreen(
                 val isLandscape = maxWidth > maxHeight
                 if (isLandscape) {
                     // ——— LANDSCAPE: двухпанельный режим (split-pane) ———
-                    // Левая  (weight 0.5f): CurrentWeatherCard + 24-hour почасовой прогноз
-                    // Правая (weight 0.5f): 15-day forecast + детали (Sunrise, Humidity,
-                    //                        Wind, UV, Pressure, AirQuality, MoonPhase)
+                    // Левая  (weight 0.5f): CurrentWeatherCard + 24-hour почасовой прогноз + детали
+                    //                        (Sunrise/Sunset, Humidity/Wind, UV/Pressure, AirQuality/MoonPhase)
+                    // Правая (weight 0.5f): 15-day forecast
                     // PullRefreshIndicator один на обе панели — поверх Row по TopCenter
                     Box(
                         modifier = Modifier
@@ -138,7 +139,7 @@ fun MainScreen(
                             .background(MaterialTheme.colorScheme.primary)
                     ) {
                         Row(modifier = Modifier.fillMaxSize()) {
-                        // ——— Left pane: CurrentWeather + почасовой прогноз ———
+                            // ——— Left pane: CurrentWeather + почасовой прогноз + детали ———
                             LazyColumn(
                                 modifier = Modifier
                                     .weight(0.5f)
@@ -198,41 +199,6 @@ fun MainScreen(
                                             )
                                             HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
                                         }
-                                    }
-                                } else {
-                                    item {
-                                        WeatherText(
-                                            text = "Loading...",
-                                            style = QuickSandTypography.bodyMedium,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
-                            }
-
-                            // ——— Vertical divider ———
-                            VerticalDivider(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(1.dp)
-                            )
-
-                        // ——— Right pane: 15-day прогноз + детальные карточки ———
-                            LazyColumn(
-                                modifier = Modifier
-                                    .weight(0.5f)
-                                    .fillMaxHeight()
-                            ) {
-                                if (weatherData != null && forecastData != null) {
-                                    item {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
-                                    }
-                                    item {
-                                        ForecastWeatherList(
-                                            forecastState = forecastState,
-                                            navController = navController
-                                        )
                                     }
                                     // ——— Daily: Sunrise / Sunset ———
                                     item {
@@ -311,6 +277,41 @@ fun MainScreen(
                                                 MoonriseMoonsetCard(moonPhase = moonPhase)
                                             }
                                         }
+                                    }
+                                } else {
+                                    item {
+                                        WeatherText(
+                                            text = "Loading...",
+                                            style = QuickSandTypography.bodyMedium,
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            // ——— Vertical divider ———
+                            VerticalDivider(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(1.dp)
+                            )
+
+                            // ——— Right pane: 15-day прогноз ———
+                            LazyColumn(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .fillMaxHeight()
+                            ) {
+                                if (weatherData != null && forecastData != null) {
+                                    item {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
+                                    }
+                                    item {
+                                        ForecastWeatherList(
+                                            forecastState = forecastState,
+                                            navController = navController
+                                        )
                                     }
                                 }
                             }
