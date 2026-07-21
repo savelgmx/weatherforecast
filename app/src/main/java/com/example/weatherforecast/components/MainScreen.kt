@@ -1,16 +1,13 @@
 package com.example.weatherforecast.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,7 +21,6 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,15 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.theme.AppTheme
-import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
 import kotlinx.coroutines.launch
@@ -145,148 +138,20 @@ fun MainScreen(
                                     .weight(0.5f)
                                     .fillMaxHeight()
                             ) {
-                                if (hasError) {
-                                    item {
-                                        WeatherText(
-                                            text = (currentState as? Resource.Error)?.msg
-                                                ?: (forecastState as? Resource.Error)?.msg
-                                                ?: "Error loading data",
-                                            style = QuickSandTypography.bodyLarge,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                } else if (hasInternetError) {
-                                    item {
-                                        WeatherText(
-                                            text = context.resources.getString(R.string.no_internet_connection),
-                                            style = QuickSandTypography.bodyMedium,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                } else if (weatherData != null && forecastData != null) {
-                                    if (isStale) {
-                                        item {
-                                            WeatherText(
-                                                text = context.resources.getString(R.string.data_is_stale),
-                                                style = QuickSandTypography.bodyMedium,
-                                                modifier = Modifier.padding(16.dp)
-                                            )
-                                        }
-                                    }
-                                    item {
-                                        hourlyData?.let { hourlyWeatherList ->
-                                            val currentTime = System.currentTimeMillis()
-                                            val nextHour = currentTime + (60 * 60 * 1000)
-                                            val filteredCurrentWeatherList = hourlyWeatherList
-                                                .filter { it.dt * 1000L in currentTime..nextHour }
-                                                .sortedBy { it.dt }
-                                                .take(1)
-                                            if (BuildConfig.DEBUG) {
-                                                Log.d("current weather response", filteredCurrentWeatherList.toString())
-                                            }
-                                            CurrentWeatherCard(weatherState = currentState, filteredCurrentWeatherList)
-                                        }
-                                    }
-                                    item {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
-                                    }
-                                    item {
-                                        forecastData.hourly?.let { hourlyWeatherList ->
-                                            val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
-                                                hourlyList = hourlyWeatherList,
-                                                timezone = forecastData.timezone
-                                            )
-                                            HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
-                                        }
-                                    }
-                                    // ——— Daily: Sunrise / Sunset ———
-                                    item {
-                                        HorizontalDivider()
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        WeatherHeader(text = context.getString(R.string.daily_weather_forecast))
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    }
-                                    item {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(all = 3.dp),
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            forecastData.daily[0].sunrise?.let { sunrise ->
-                                                forecastData.daily[0].sunset?.let { sunset ->
-                                                    val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
-                                                    val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
-                                                    SunriseSunsetArcCard(
-                                                        sunrise = timeOfSunrise,
-                                                        sunset = timeOfSunset,
-                                                        timezone = forecastData.timezone
-                                                    )
-                                                }
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    }
-                                    // ——— Humidity + Wind Speed ———
-                                    item {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(all = 3.dp),
-                                            horizontalArrangement = Arrangement.SpaceAround
-                                        ) {
-                                            weatherData.main?.humidity?.let { humidity ->
-                                                forecastData.current?.dewPoint?.let { dewPoint ->
-                                                    HumidityCard(humidity = humidity, dewPoint = dewPoint.toInt())
-                                                }
-                                            }
-                                            weatherData.wind?.speed?.toInt()?.let { windSpeed ->
-                                                weatherData.wind.deg?.let { windDegree ->
-                                                    WindSpeedCard(speed = windSpeed, windDegree = windDegree)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    // ——— UV Index + Pressure ———
-                                    item {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(all = 3.dp),
-                                            horizontalArrangement = Arrangement.SpaceAround
-                                        ) {
-                                            forecastData.current?.uvi?.let { uvIndex ->
-                                                UVIndexCard(index = uvIndex.toInt())
-                                            }
-                                            weatherData.main?.pressure?.let { pressure ->
-                                                PressureCard(pressure = pressure)
-                                            }
-                                        }
-                                    }
-                                    // ——— Air Quality + Moon Phase ———
-                                    item {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(all = 3.dp),
-                                            horizontalArrangement = Arrangement.SpaceAround
-                                        ) {
-                                            pollution?.let { AirQualityCard(pollution = it) }
-                                            forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
-                                                MoonriseMoonsetCard(moonPhase = moonPhase)
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    item {
-                                        WeatherText(
-                                            text = "Loading...",
-                                            style = QuickSandTypography.bodyMedium,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
+                                weatherMainItems(
+                                    isLandscape = true,
+                                    hasError = hasError,
+                                    hasInternetError = hasInternetError,
+                                    isStale = isStale,
+                                    weatherData = weatherData,
+                                    forecastData = forecastData,
+                                    hourlyData = hourlyData,
+                                    currentState = currentState,
+                                    forecastState = forecastState,
+                                    pollution = pollution,
+                                    context = context,
+                                    navController = navController
+                                )
                             }
 
                             // ——— Vertical divider ———
@@ -309,7 +174,7 @@ fun MainScreen(
                                     }
                                     item {
                                         ForecastWeatherList(
-                                            forecastState = forecastState,
+                                            forecastState = requireNotNull(forecastState),
                                             navController = navController
                                         )
                                     }
@@ -325,9 +190,9 @@ fun MainScreen(
                         )
                     }
                 } else {
-                    // ——— PORTRAIT: однопанельный режим (оригинальный скролл) ———
-                    // Тот же контент, но в одной LazyColumn — без изменений относительно
-                    // исходной логики до добавления split-pane.
+                    // ——— PORTRAIT: однопанельный режим ———
+                    // Тот же контент, но в одной LazyColumn. isLandscape=false
+                    // включает 15-дневный прогноз (который в landscape уходит в правую панель).
                     Box(
                         modifier = Modifier
                             .pullRefresh(refreshState)
@@ -337,158 +202,20 @@ fun MainScreen(
                         LazyColumn(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            if (hasError) {
-                                item {
-                                    WeatherText(
-                                        text = (currentState as? Resource.Error)?.msg
-                                            ?: (forecastState as? Resource.Error)?.msg
-                                            ?: "Error loading data",
-                                        style = QuickSandTypography.bodyLarge,
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-                                }
-                            } else if (hasInternetError) {
-                                item {
-                                    WeatherText(
-                                        text = context.resources.getString(R.string.no_internet_connection),
-                                        style = QuickSandTypography.bodyMedium,
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-                                }
-                            } else if (weatherData != null && forecastData != null) {
-                                if (isStale) {
-                                    item {
-                                        WeatherText(
-                                            text = context.resources.getString(R.string.data_is_stale),
-                                            style = QuickSandTypography.bodyMedium,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
-                                item {
-                                    hourlyData?.let { hourlyWeatherList ->
-                                        val currentTime = System.currentTimeMillis()
-                                        val nextHour = currentTime + (60 * 60 * 1000)
-                                        val filteredCurrentWeatherList = hourlyWeatherList
-                                            .filter { it.dt * 1000L in currentTime..nextHour }
-                                            .sortedBy { it.dt }
-                                            .take(1)
-                                        if (BuildConfig.DEBUG) {
-                                            Log.d("current weather response", filteredCurrentWeatherList.toString())
-                                        }
-                                        CurrentWeatherCard(weatherState = currentState, filteredCurrentWeatherList)
-                                    }
-                                }
-                                item {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
-                                }
-                                item {
-                                    forecastData.hourly?.let { hourlyWeatherList ->
-                                        val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
-                                            hourlyList = hourlyWeatherList,
-                                            timezone = forecastData.timezone
-                                        )
-                                        HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
-                                    }
-                                }
-                                item {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    WeatherHeader(text = context.resources.getString(R.string.weather_15_days))
-                                }
-                                item {
-                                    ForecastWeatherList(
-                                        forecastState = forecastState,
-                                        navController = navController
-                                    )
-                                }
-                                // ——— Daily: Sunrise / Sunset ———
-                                item {
-                                    HorizontalDivider()
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    WeatherHeader(text = context.getString(R.string.daily_weather_forecast))
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(all = 3.dp),
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        forecastData.daily[0].sunrise?.let { sunrise ->
-                                            forecastData.daily[0].sunset?.let { sunset ->
-                                                val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
-                                                val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
-                                                SunriseSunsetArcCard(
-                                                    sunrise = timeOfSunrise,
-                                                    sunset = timeOfSunset,
-                                                    timezone = forecastData.timezone
-                                                )
-                                            }
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-                                // ——— Humidity + Wind Speed ———
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(all = 3.dp),
-                                        horizontalArrangement = Arrangement.SpaceAround
-                                    ) {
-                                        weatherData.main?.humidity?.let { humidity ->
-                                            forecastData.current?.dewPoint?.let { dewPoint ->
-                                                HumidityCard(humidity = humidity, dewPoint = dewPoint.toInt())
-                                            }
-                                        }
-                                        weatherData.wind?.speed?.toInt()?.let { windSpeed ->
-                                            weatherData.wind.deg?.let { windDegree ->
-                                                WindSpeedCard(speed = windSpeed, windDegree = windDegree)
-                                            }
-                                        }
-                                    }
-                                }
-                                // ——— UV Index + Pressure ———
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(all = 3.dp),
-                                        horizontalArrangement = Arrangement.SpaceAround
-                                    ) {
-                                        forecastData.current?.uvi?.let { uvIndex ->
-                                            UVIndexCard(index = uvIndex.toInt())
-                                        }
-                                        weatherData.main?.pressure?.let { pressure ->
-                                            PressureCard(pressure = pressure)
-                                        }
-                                    }
-                                }
-                                // ——— Air Quality + Moon Phase ———
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(all = 3.dp),
-                                        horizontalArrangement = Arrangement.SpaceAround
-                                    ) {
-                                        pollution?.let { AirQualityCard(pollution = it) }
-                                        forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
-                                            MoonriseMoonsetCard(moonPhase = moonPhase)
-                                        }
-                                    }
-                                }
-                            } else {
-                                item {
-                                    WeatherText(
-                                        text = "Loading...",
-                                        style = QuickSandTypography.bodyMedium,
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-                                }
-                            }
+                            weatherMainItems(
+                                isLandscape = false,
+                                hasError = hasError,
+                                hasInternetError = hasInternetError,
+                                isStale = isStale,
+                                weatherData = weatherData,
+                                forecastData = forecastData,
+                                hourlyData = hourlyData,
+                                currentState = currentState,
+                                forecastState = forecastState,
+                                pollution = pollution,
+                                context = context,
+                                navController = navController
+                            )
                         }
                         // PullRefreshIndicator для portrait — стандартный, над единственной
                         // LazyColumn. refreshState общий с landscape-режимом.
