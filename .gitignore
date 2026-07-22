@@ -1,3 +1,4 @@
+# --- Android / IDE ---
 .idea/
 *.iml
 .gradle
@@ -14,3 +15,23 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# --- Tooling & AI artifacts ---
+.claude/
+.claude-flow/
+.swarm/
+.mcp.json
+agentdb.rvf
+agentdb.rvf.lock
+ruvector.db
+docs/
+global_CLAUDE.md
+project_CLAUDE.md
+CLAUDE.md
+
+# --- Garbage / artifact files ---
+maxHeight*
+600
+Unit)
+,+
+,-
