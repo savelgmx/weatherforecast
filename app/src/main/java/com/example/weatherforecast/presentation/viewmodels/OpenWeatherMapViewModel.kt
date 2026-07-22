@@ -18,13 +18,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getDeviceCityUseCase: GetDeviceCityUseCase,
-    private val getAirVisualDataUseCase: GetAirVisualDataUseCase
+    private val getAirVisualDataUseCase: GetAirVisualDataUseCase,
+    @Named("iqAirApiKey") private val iqAirApiKey: String
 ) : AndroidViewModel(application) {
 
     val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
@@ -134,7 +136,7 @@ class OpenWeatherMapViewModel @Inject constructor(
             val result = getAirVisualDataUseCase(
                 lat,
                 lon,
-                "f3324376-d944-44f4-bda6-e936f76bbbeb"
+                iqAirApiKey
             )
             airVisualLiveData.value = result
         } catch (e: Exception) {

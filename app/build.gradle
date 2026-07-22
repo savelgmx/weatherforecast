@@ -25,6 +25,7 @@ android {
         buildConfigField "String", "MAP_API_KEY", "\"${project.findProperty("MAP_API_KEY") ?: ""}\""
         buildConfigField "String", "OWM_API_KEY", "\"${project.findProperty("OWM_API_KEY") ?: ""}\""
         buildConfigField "String", "MAPTILER_API_KEY", "\"${project.findProperty("MAPTILER_API_KEY") ?: ""}\""
+        buildConfigField "String", "IQAIR_API_KEY", "\"${project.findProperty("IQAIR_API_KEY") ?: ""}\""
 
         manifestPlaceholders = [
                 googleMapsKey: "${project.findProperty("googleMapsKey") ?: ""}"
@@ -91,9 +92,6 @@ dependencies {
 
 debugImplementation "androidx.compose.ui:ui-tooling"
 debugImplementation "androidx.compose.ui:ui-test-manifest"
-
-    debugImplementation "androidx.compose.ui:ui-tooling"
-    debugImplementation "androidx.compose.ui:ui-test-manifest"
 
     // ---------- Navigation ----------
     implementation "androidx.navigation:navigation-compose:2.8.0"

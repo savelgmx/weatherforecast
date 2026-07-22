@@ -13,7 +13,7 @@ import com.example.weatherforecast.data.mappers.WeatherMapper
 import com.example.weatherforecast.data.mappers.WeatherResponseMapper
 import com.example.weatherforecast.data.remote.WeatherApiResponse
 import com.example.weatherforecast.data.remote.WeatherApiService
-import com.example.weatherforecast.di.ContextProvider
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.AppConstants
@@ -32,7 +32,7 @@ import javax.inject.Inject
  */
 class VisualCrossingRepositoryImpl @Inject constructor(
     private val apiService: WeatherApiService, // Сервис для API-запросов
-    private val contextProvider: ContextProvider, // Провайдер контекста
+    @ApplicationContext private val context: Context,
     private val weatherDao: WeatherDao // DAO для работы с базой данных
 ) : VisualCrossingRepository {
 
@@ -48,14 +48,14 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * Gets the current city name from WeatherUtils
      */
     override suspend fun getDeviceCity(): String {
-        return WeatherUtils.getCityName(contextProvider.provideContext())
+        return WeatherUtils.getCityName(context)
     }
 
     /**
      * Sets the city name using WeatherUtils
      */
     override suspend fun setCityName(city: String) {
-        WeatherUtils.saveCityName(contextProvider.provideContext(), city)
+        WeatherUtils.saveCityName(context, city)
         if (BuildConfig.DEBUG) Log.d("City set", " $city")
     }
 
@@ -64,7 +64,6 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @return true, если интернет доступен, иначе false.
      */
     private fun isNetworkAvailable(): Boolean {
-        val context = contextProvider.provideContext()
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
@@ -101,7 +100,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     moonPhase = dailyWeather.moonPhase,
                     dew=dailyWeather.dew,              //point of dew (точка росы)
                     uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
-                    cityName = WeatherUtils.getCityName(contextProvider.provideContext()) ?: "Unknown",
+                    cityName = WeatherUtils.getCityName(context) ?: "Unknown",
                     timezone = dailyWeather.timezone,
                     latitude = dailyWeather.latitude,
                     longitude = dailyWeather.longitude
@@ -127,7 +126,6 @@ class VisualCrossingRepositoryImpl @Inject constructor(
 
                 // Используем транзакцию для атомарной вставки
                 weatherDao.insertWeatherTransaction(dailyEntity, hourlyEntities)
-                if (BuildConfig.DEBUG) Log.d("Inserted dailyId", weatherDao.insertDailyWeather(dailyEntity).toString())
             }
         }
     }
@@ -257,7 +255,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             city
         } else {
             // If no city is passed, get from WeatherUtils
-            val cityFromUtils = WeatherUtils.getCityName(contextProvider.provideContext())
+            val cityFromUtils = WeatherUtils.getCityName(context)
             if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }
@@ -306,7 +304,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             city
         } else {
             // Если город не передан, проверяем установленный город
-            val cityFromUtils = WeatherUtils.getCityName(contextProvider.provideContext())
+            val cityFromUtils = WeatherUtils.getCityName(context)
             if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }

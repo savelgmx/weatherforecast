@@ -56,7 +56,6 @@ object WeatherMapModule {
     fun provideTileBaseUrl(): String = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/tile"
 
     @Provides
-    @Singleton
     @Named("currentTime")
     fun provideCurrentTime(): String =
         java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDate.now())

@@ -2,8 +2,7 @@ package com.example.weatherforecast.utils
 
 object AppConstants {
 
-    const val API_KEY = "33cc710b4ef18155198d89c3b2033f56"
-
+    // API_KEY moved to BuildConfig.API_KEY (set in app/build.gradle via buildConfigField)
     const val WEATHER_API_IMAGE_ENDPOINT = "https://raw.githubusercontent.com/visualcrossing/WeatherIcons/refs/heads/main/PNG/1st%20Set%20-%20Color/"
     const val CITY_FORECAST="Krasnoyarsk"  //we set cityName constant and
     const val CITY_LAT="56.0097"  // latitude
@@ -13,7 +12,7 @@ object AppConstants {
 
     //https://dashboard.iqair.com/personal/api-keys
     //Air quality API key expires Jul 21, 2026
-    const val IQAir_API_KEY="f3324376-d944-44f4-bda6-e936f76bbbeb"
-    //https://api.airvisual.com/v2/nearest_city?lat=56.0097&lon=92.7917&key=f3324376-d944-44f4-bda6-e936f76bbbeb
+    const val IQAir_API_KEY="226974b9-ee71-4f28-bc4c-c75dfe5bf51f"
+//  "https://api.airvisual.com/v2/nearest_city?lat=56.0097&lon=92.7917&key=226974b9-ee71-4f28-bc4c-c75dfe5bf51f"
 
 }

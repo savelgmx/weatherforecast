@@ -25,7 +25,7 @@ object LocalModule {
         @Singleton
         fun provideRoomDatabase(@ApplicationContext context: Context): OpenWeatherMapDatabase =
             Room.databaseBuilder(
-                context.applicationContext,
+                context,
                 OpenWeatherMapDatabase::class.java,
                 "open_weather_map_database"
             ).fallbackToDestructiveMigration().build()

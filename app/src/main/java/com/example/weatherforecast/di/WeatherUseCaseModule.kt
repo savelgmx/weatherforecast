@@ -1,6 +1,8 @@
 package com.example.weatherforecast.di
 
+import com.example.weatherforecast.data.repositories.AirVisualRepository
 import com.example.weatherforecast.data.repositories.VisualCrossingRepository
+import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import dagger.Module
 import dagger.Provides
@@ -13,4 +15,8 @@ object  WeatherUseCaseModule {
 
     @Provides
     fun provideGetWeatherUseCase(repository: VisualCrossingRepository): GetWeatherUseCase = GetWeatherUseCase(repository)
+
+    @Provides
+    fun provideGetAirVisualDataUseCase(repository: AirVisualRepository): GetAirVisualDataUseCase =
+        GetAirVisualDataUseCase(repository)
 }

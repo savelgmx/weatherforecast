@@ -8,8 +8,9 @@ import com.example.weatherforecast.data.repositories.AirVisualRepository
 import com.example.weatherforecast.data.repositories.AirVisualRepositoryImpl
 import com.example.weatherforecast.data.repositories.VisualCrossingRepository
 import com.example.weatherforecast.data.repositories.VisualCrossingRepositoryImpl
-import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
+import android.content.Context
 import dagger.Module
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -28,10 +29,10 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideVisualCrossingRepository(
-        api: WeatherApiService,contextProvider:ContextProvider,weatherDao: WeatherDao
+        api: WeatherApiService,@ApplicationContext context: Context,weatherDao: WeatherDao
 
     ): VisualCrossingRepository {
-        return VisualCrossingRepositoryImpl(api,contextProvider,weatherDao)
+        return VisualCrossingRepositoryImpl(api,context,weatherDao)
     }
     @Provides
     @Singleton
@@ -44,13 +45,6 @@ object RepositoryModule {
     fun provideAirVisualRepository(api: AirVisualApiService): AirVisualRepository {
         return AirVisualRepositoryImpl(api)
     }
-
-    @Provides
-    @Singleton
-    fun provideGetAirVisualDataUseCase(repository: AirVisualRepository): GetAirVisualDataUseCase {
-        return GetAirVisualDataUseCase(repository)
-    }
-
 
 }
 
