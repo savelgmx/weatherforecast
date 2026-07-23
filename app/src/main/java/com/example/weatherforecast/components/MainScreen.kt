@@ -62,7 +62,7 @@ fun MainScreen(
     val context = LocalContext.current
     val isLoading = currentState is Resource.Loading || forecastState is Resource.Loading
     val hasError = currentState is Resource.Error || forecastState is Resource.Error
-    val hasInternetError = currentState is Resource.Internet || forecastState is Resource.Internet
+    val hasInternetError = currentState is Resource.Internet && forecastState is Resource.Internet
     val isStale = (currentState as? Resource.Success)?.isStale == true || (forecastState as? Resource.Success)?.isStale == true
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data

@@ -34,12 +34,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "API_KEY", "\"FS67QRY9G8HVLCANZJM6QBJJC\""
+            buildConfigField "String", "API_KEY", "\"${project.findProperty("API_KEY") ?: ""}\""
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            buildConfigField "String", "API_KEY", "\"FS67QRY9G8HVLCANZJM6QBJJC\""
+            buildConfigField "String", "API_KEY", "\"${project.findProperty("API_KEY") ?: ""}\""
         }
     }
     compileOptions {

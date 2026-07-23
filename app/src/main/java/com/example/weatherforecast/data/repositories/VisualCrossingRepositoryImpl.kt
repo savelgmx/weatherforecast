@@ -227,9 +227,9 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     // Если данные устарели и интернет есть, делаем запрос к API
                     val apiResult = fromApi(city)
                     if (apiResult is Resource.Success) {
-                        // Очищаем базу перед сохранением новых данных
-                        clearDatabase()
                         apiResult.data?.let { apiData ->
+                            // Очищаем базу перед сохранением новых данных
+                            clearDatabase()
                             insertWeatherData(apiData)
                             val mappedResult = mapApiToResult(apiData)
                             Resource.Success(mappedResult)

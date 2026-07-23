@@ -10,9 +10,7 @@ object AppConstants {
     const val CURRENT_WEATHER_UPDATE_INTERVAL = 15 * 60 * 1000L // 15 минут 3600L // 1 час в секундах
     const val FORECAST_UPDATE_INTERVAL = 6 * 60 * 60 * 1000L // 6 часов
 
-    //https://dashboard.iqair.com/personal/api-keys
-    //Air quality API key expires Jul 21, 2026
-    const val IQAir_API_KEY="226974b9-ee71-4f28-bc4c-c75dfe5bf51f"
-//  "https://api.airvisual.com/v2/nearest_city?lat=56.0097&lon=92.7917&key=226974b9-ee71-4f28-bc4c-c75dfe5bf51f"
+    // https://dashboard.iqair.com/personal/api-keys
+    // Air quality API key expires Jul 21, 2026
 
 }
