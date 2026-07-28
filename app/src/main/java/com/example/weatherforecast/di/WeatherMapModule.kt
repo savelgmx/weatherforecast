@@ -53,7 +53,7 @@ object WeatherMapModule {
     @Provides
     @Singleton
     @Named("weatherTileBaseUrl")
-    fun provideTileBaseUrl(): String = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/tile"
+    fun provideTileBaseUrl(): String = "https://maps.visualcrossing.com/VisualCrossingWebServices/rest/api/v1/map/tile"
 
     @Provides
     @Named("currentTime")

@@ -90,6 +90,6 @@ class WeatherMapRepositoryImpl @Inject constructor(
 
     override fun getWeatherTileUrl(layer: WeatherLayer): String {
         val path = layer.tilePath.lowercase(Locale.getDefault())
-        return "$tileBaseUrl/$path/{z}/{x}/{y}.png?key=$apiKey"
+        return "$tileBaseUrl/$path/{z}/{x}/{y}.webp?apikey=$apiKey&time=latest&unitGroup=metric"
     }
 }

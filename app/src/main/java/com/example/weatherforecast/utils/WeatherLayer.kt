@@ -2,8 +2,7 @@ package com.example.weatherforecast.utils
 
 // Enum to represent layer types
 enum class WeatherLayer(val displayName: String, val tilePath: String) {
-    Temperature("Temperature", "temperature"),
-    Precipitation("Precipitation", "precipitation"),
-    Wind("Wind", "wind"),
-    CLOUDS("Clouds","CLOUDS")
+    Temperature("Temperature", "temp"),
+    Precipitation("Precipitation", "precipcomposite"),
+    Wind("Wind", "windspeed"),
 }

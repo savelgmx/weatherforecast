@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,8 +40,10 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
+import org.maplibre.android.style.sources.TileSet
 
 private const val TAG = "WeatherMapScreen"
 private const val WEATHER_LAYER_ID = "weather-layer"
@@ -58,9 +61,45 @@ fun WeatherMapScreen(
     val styleUrl by viewModel.styleUrl.collectAsState()
     var mapViewState by remember { mutableStateOf<MapView?>(null) }
 
+    // ⚠ ДЕФЕКТ 2 (исправление): Сохраняем ссылки на MapLibreMap и Style,
+    // полученные из factory. В update-блоке используем их напрямую, чтобы
+    // НЕ вызывать `map.getStyle { }` повторно — этот callback может не
+    // сработать, если стиль уже загружен через setStyle().
+    var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
+    var styleRef by remember { mutableStateOf<Style?>(null) }
+
+    // ⚠ Флаг инициализации камеры+маркеров — предотвращает повторный
+    // animateCamera при переключении слоёв (ломало зум) и SIGSEGV
+    // от многократного вызова map.clear() в GLThread.
+    var isMapInitialized by remember { mutableStateOf(false) }
+
+    // ⚠ Счётчик для принудительного обновления слоя через LaunchedEffect.
+    // Каждый вызов onLayerSelected инкрементит его, триггеря перезагрузку.
+    var layerVersion by remember { mutableStateOf(0) }
+
+    // Lifecycle-aware MapView management — fixes ML-CRIT-001 (previous review finding)
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewState?.onDestroy()
+            mapViewState = null
+        }
+    }
+
     // When city or selectedLayer changes, reload data
     LaunchedEffect(city, selectedLayer) {
         viewModel.loadWeatherData(city)
+    }
+
+    // Reset camera+markers flag on city change (не на selectedLayer!)
+    LaunchedEffect(city) {
+        isMapInitialized = false
+    }
+
+    // ⚠ Переключение погодного слоя: запускается при изменении selectedLayer
+    // ИЛИ styleRef. Выполняется на Main (coroutine), НЕ в GLThread.
+    LaunchedEffect(styleRef, selectedLayer, layerVersion) {
+        val style = styleRef ?: return@LaunchedEffect
+        updateWeatherTileLayer(style, selectedLayer, viewModel)
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -83,7 +122,10 @@ fun WeatherMapScreen(
         ) {
             WeatherLayer.values().forEach { layer ->
                 Button(
-                    onClick = { viewModel.onLayerSelected(layer) },
+                    onClick = {
+                        viewModel.onLayerSelected(layer)
+                        layerVersion++
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (layer == selectedLayer)
                             MaterialTheme.colorScheme.primary
@@ -104,21 +146,30 @@ fun WeatherMapScreen(
                 MapView(ctx).apply {
                     mapViewState = this
                     getMapAsync { map ->
+                        // ⚠ ДЕФЕКТ 2 (исправление): Сохраняем ссылки для update-блока,
+                        // чтобы не вызывать map.getStyle() повторно.
+                        mapRef = map
                         map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
                             Log.d(TAG, "MapLibre style loaded: $styleUrl")
-                            // When style first loads, center map if data already available
-                            updateMapLibreContent(map, mapData, selectedLayer, viewModel)
+                            styleRef = style
+                            // ⚠ Слой добавляется через LaunchedEffect(styleRef, selectedLayer),
+                            // а НЕ здесь — чтобы избежать race condition с GLThread.
                         }
                     }
                 }
             },
-            update = { mapView ->
-                if (mapData != null) {
-                    mapView.getMapAsync { map ->
-                        map.getStyle { style ->
-                            updateMapLibreContent(map, mapData, selectedLayer, viewModel)
-                        }
-                    }
+            // ⚠ ДЕФЕКТ 2 (исправление): Используем сохранённые mapRef/styleRef
+            // из factory, без getMapAsync/getStyle — эти callback'и могут не
+            // сработать повторно после первичной загрузки стиля через setStyle().
+            // ⚠ update НЕ трогает стиль (addSource/addLayer) — все манипуляции
+            // со стилем идут через LaunchedEffect(styleRef, selectedLayer) выше,
+            // чтобы избежать SIGSEGV из GLThread.
+            // Здесь только камера + маркеры.
+            update = { _ ->
+                val map = mapRef ?: return@AndroidView
+                if (mapData != null && !isMapInitialized) {
+                    isMapInitialized = true
+                    initMapCameraAndMarkers(map, mapData!!)
                 }
             }
         )
@@ -126,71 +177,81 @@ fun WeatherMapScreen(
 }
 
 /**
- * Updates the MapLibre map camera & markers safely
+ * Section 1: Always update weather tile raster layer on top of the base map.
+ * Tile URL changes when selectedLayer changes — so this runs on every recomposition.
  */
-private fun updateMapLibreContent(
-    map: org.maplibre.android.maps.MapLibreMap, 
-    mapData: WeatherMapData?, 
+private fun updateWeatherTileLayer(
+    style: Style,
     selectedLayer: WeatherLayer,
     viewModel: WeatherMapViewModel
 ) {
-    if (mapData == null) return
+    // Remove previous weather layer/source (idempotent — only if exists)
+    if (style.getLayer(WEATHER_LAYER_ID) != null) {
+        style.removeLayer(WEATHER_LAYER_ID)
+    }
+    if (style.getSource(WEATHER_SOURCE_ID) != null) {
+        style.removeSource(WEATHER_SOURCE_ID)
+    }
 
-    map.getStyle { style ->
-        // Remove previous weather layer if exists
-        if (style.getLayer(WEATHER_LAYER_ID) != null) {
-            style.removeLayer(WEATHER_LAYER_ID)
-        }
-        if (style.getSource(WEATHER_SOURCE_ID) != null) {
-            style.removeSource(WEATHER_SOURCE_ID)
-        }
-        
-        // Remove previous markers
-        map.clear()
+    // Build tile URL and add raster source + layer on TOP of the style stack
+    val tileUrl = viewModel.getTileUrl(selectedLayer)
+    Log.d(TAG, "Weather tile URL: $tileUrl")
+    val source = RasterSource(WEATHER_SOURCE_ID, TileSet("tiles", tileUrl), 256)
+    style.addSource(source)
 
-        // Move camera to city center
-        val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
-        val camera = CameraPosition.Builder()
-            .target(center)
-            .zoom(8.5)
-            .build()
+    val rasterLayer = RasterLayer(WEATHER_LAYER_ID, WEATHER_SOURCE_ID)
+    rasterLayer.setProperties(PropertyFactory.rasterOpacity(0.7f))
 
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(camera), 1200)
+    // ⚠ ДЕФЕКТ 3: Раньше здесь была цепочка `addLayerBelow("waterway-label")`
+    // → `addLayerBelow("road-label")` → `addLayer(rasterLayer)`.
+    // MapTiler streets не содержит `"waterway-label"`, fallback на `"road-label"`
+    // вставлял слой ПОД дорогами/зданиями/POI — оверлей был перекрыт.
+    // Исправление: добавляем на САМЫЙ ВЕРХ стопки слоёв.
+    style.addLayer(rasterLayer)
+    Log.d(TAG, "Added weather layer '$WEATHER_LAYER_ID' for ${selectedLayer.displayName}")
+}
 
-        // Add weather raster layer
-        val tileUrl = viewModel.getTileUrl(selectedLayer)
-        val source = RasterSource(WEATHER_SOURCE_ID, tileUrl, 256)
-        style.addSource(source)
-        
-        val rasterLayer = RasterLayer(WEATHER_LAYER_ID, WEATHER_SOURCE_ID)
-     //   rasterLayer.setOpacity(0.7f) // Set some transparency to see the base map
-        style.addLayerBelow(rasterLayer, "waterway-label")
+/**
+ * Section 2: Animate camera to city center and add markers.
+ * Called ONLY once per city (tracked by isMapInitialized).
+ * NO map.clear() — deprecated native call caused SIGSEGV in GLThread.
+ */
+private fun initMapCameraAndMarkers(
+    map: org.maplibre.android.maps.MapLibreMap,
+    mapData: WeatherMapData
+) {
+    val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
+    val camera = CameraPosition.Builder()
+        .target(center)
+        .zoom(8.5)
+        .build()
 
-        // Add markers — if many, they'll overlap; center marker remains visible
-        if (mapData.points.isNotEmpty()) {
-            map.addMarker(
-                MarkerOptions()
-                    .position(center)
-                    .title("Center: ${mapData.centerLat?.format(3)}, ${mapData.centerLon?.format(3)}")
-            )
-        }
+    map.animateCamera(CameraUpdateFactory.newCameraPosition(camera), 1200)
 
-        mapData.points.forEachIndexed { idx, point ->
-            map.addMarker(
-                MarkerOptions()
-                    .position(LatLng(point.lat, point.lon))
-                    .title(
-                        "T: ${point.temperature ?: "?"}°C " +
-                                "P: ${point.precipitation ?: 0.0}mm"
-                    )
-            )
-        }
-
-        Log.d(
-            TAG,
-            "Added ${mapData.points.size} markers, centered at (${mapData.centerLat}, ${mapData.centerLon})"
+    // Add markers
+    if (mapData.points.isNotEmpty()) {
+        map.addMarker(
+            MarkerOptions()
+                .position(center)
+                .title("Center: ${mapData.centerLat?.format(3)}, ${mapData.centerLon?.format(3)}")
         )
     }
+
+    mapData.points.forEachIndexed { _, point ->
+        map.addMarker(
+            MarkerOptions()
+                .position(LatLng(point.lat, point.lon))
+                .title(
+                    "T: ${point.temperature ?: "?"}°C " +
+                            "P: ${point.precipitation ?: 0.0}mm"
+                )
+        )
+    }
+
+    Log.d(
+        TAG,
+        "Camera animated + ${mapData.points.size} markers added, centered at (${mapData.centerLat}, ${mapData.centerLon})"
+    )
 }
 
 /**
