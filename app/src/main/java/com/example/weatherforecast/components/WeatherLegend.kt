@@ -29,6 +29,7 @@ import com.example.weatherforecast.utils.WeatherLayer
 
 /**
  * Step in the legend scale — a color + its label.
+ *
  */
 private data class LegendStep(val color: Color, val label: String)
 
