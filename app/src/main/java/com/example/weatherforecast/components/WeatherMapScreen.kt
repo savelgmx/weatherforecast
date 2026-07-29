@@ -3,6 +3,7 @@ package com.example.weatherforecast.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -138,41 +140,55 @@ fun WeatherMapScreen(
             }
         }
 
-        // MapLibre MapView
+        // MapLibre MapView + legend overlay
         val context = LocalContext.current
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { ctx ->
-                MapView(ctx).apply {
-                    mapViewState = this
-                    getMapAsync { map ->
-                        // ⚠ ДЕФЕКТ 2 (исправление): Сохраняем ссылки для update-блока,
-                        // чтобы не вызывать map.getStyle() повторно.
-                        mapRef = map
-                        map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
-                            Log.d(TAG, "MapLibre style loaded: $styleUrl")
-                            styleRef = style
-                            // ⚠ Слой добавляется через LaunchedEffect(styleRef, selectedLayer),
-                            // а НЕ здесь — чтобы избежать race condition с GLThread.
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { ctx ->
+                    MapView(ctx).apply {
+                        mapViewState = this
+                        getMapAsync { map ->
+                            // ⚠ ДЕФЕКТ 2 (исправление): Сохраняем ссылки для update-блока,
+                            // чтобы не вызывать map.getStyle() повторно.
+                            mapRef = map
+                            map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
+                                Log.d(TAG, "MapLibre style loaded: $styleUrl")
+                                styleRef = style
+                                // ⚠ Слой добавляется через LaunchedEffect(styleRef, selectedLayer),
+                                // а НЕ здесь — чтобы избежать race condition с GLThread.
+                            }
                         }
                     }
+                },
+                // ⚠ ДЕФЕКТ 2 (исправление): Используем сохранённые mapRef/styleRef
+                // из factory, без getMapAsync/getStyle — эти callback'и могут не
+                // сработать повторно после первичной загрузки стиля через setStyle().
+                // ⚠ update НЕ трогает стиль (addSource/addLayer) — все манипуляции
+                // со стилем идут через LaunchedEffect(styleRef, selectedLayer) выше,
+                // чтобы избежать SIGSEGV из GLThread.
+                // Здесь только камера + маркеры.
+                update = { _ ->
+                    val map = mapRef ?: return@AndroidView
+                    if (mapData != null && !isMapInitialized) {
+                        isMapInitialized = true
+                        initMapCameraAndMarkers(map, mapData!!)
+                    }
                 }
-            },
-            // ⚠ ДЕФЕКТ 2 (исправление): Используем сохранённые mapRef/styleRef
-            // из factory, без getMapAsync/getStyle — эти callback'и могут не
-            // сработать повторно после первичной загрузки стиля через setStyle().
-            // ⚠ update НЕ трогает стиль (addSource/addLayer) — все манипуляции
-            // со стилем идут через LaunchedEffect(styleRef, selectedLayer) выше,
-            // чтобы избежать SIGSEGV из GLThread.
-            // Здесь только камера + маркеры.
-            update = { _ ->
-                val map = mapRef ?: return@AndroidView
-                if (mapData != null && !isMapInitialized) {
-                    isMapInitialized = true
-                    initMapCameraAndMarkers(map, mapData!!)
-                }
-            }
-        )
+            )
+
+            // Legend overlay — bottom-right corner
+            WeatherLegend(
+                layer = selectedLayer,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 8.dp, bottom = 8.dp)
+            )
+        }
     }
 }
 
