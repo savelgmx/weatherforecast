@@ -9,7 +9,7 @@ import com.example.weatherforecast.data.remote.AirVisualResponse
 import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
-import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ class OpenWeatherMapViewModel @Inject constructor(
 ) : BaseWeatherViewModel(application, getDeviceCityUseCase, getWeatherUseCase) {
 
     val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
-    val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
+    val weatherLiveData: MutableState<Resource<DailyWeather>> = mutableStateOf(Resource.Loading())
     val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(false)
 
     private var isWeatherLoaded = false
@@ -55,7 +55,7 @@ class OpenWeatherMapViewModel @Inject constructor(
     /*
      * Get current weather.
      */
-    private suspend fun fetchWeather(city: String, forceRefresh: Boolean = false): Resource<WeatherResponse> {
+    private suspend fun fetchWeather(city: String, forceRefresh: Boolean = false): Resource<DailyWeather> {
         return getWeatherUseCase.getCurrentWeather(city, forceRefresh)
     }
 
@@ -91,9 +91,9 @@ class OpenWeatherMapViewModel @Inject constructor(
                     isWeatherLoaded = true
                     currentCity = city
 
-                    // uses latitude / longitude from WeatherResponse
-                    val lat = result.data?.coord?.lat
-                    val lon = result.data?.coord?.lon
+                    // uses latitude / longitude from DailyWeather
+                    val lat = result.data?.latitude
+                    val lon = result.data?.longitude
                     if (lat != null && lon != null) {
                         fetchAirVisualData(lat, lon)
                     }

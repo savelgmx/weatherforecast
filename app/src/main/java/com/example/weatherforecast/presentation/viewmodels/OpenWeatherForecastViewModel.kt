@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
-import com.example.weatherforecast.response.ForecastResponse
+import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class OpenWeatherForecastViewModel @Inject constructor(
     getWeatherUseCase: GetWeatherUseCase
 ) : BaseWeatherViewModel(application, getDeviceCityUseCase, getWeatherUseCase) {
 
-    val forecastLiveData: MutableState<Resource<ForecastResponse>> = mutableStateOf(Resource.Loading())
+    val forecastLiveData: MutableState<Resource<List<DailyWeather>>> = mutableStateOf(Resource.Loading())
     private var isForecastLoaded = false
     override val stateLoaded: Boolean get() = isForecastLoaded
 

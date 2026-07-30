@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
-import com.example.weatherforecast.response.Hourly
+import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.QuickSandTypography
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
@@ -43,10 +43,10 @@ class WeatherUtils {
          * @return List of at most 24 items, sorted by dt ascending.
          */
         fun filterNext24Hours(
-            hourlyList: List<Hourly>,
+            hourlyList: List<HourlyWeather>,
             timezone: String,
             startEpochSeconds: Long? = null
-        ): List<Hourly> {
+        ): List<HourlyWeather> {
             val zoneId = try {
                 ZoneId.of(timezone)
             } catch (e: Exception) {

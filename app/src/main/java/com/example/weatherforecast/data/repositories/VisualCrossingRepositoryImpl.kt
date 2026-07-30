@@ -10,12 +10,10 @@ import com.example.weatherforecast.data.db.HourlyWeatherEntity
 import com.example.weatherforecast.data.db.WeatherDao
 import com.example.weatherforecast.data.mappers.EntityMapper
 import com.example.weatherforecast.data.mappers.WeatherMapper
-import com.example.weatherforecast.data.mappers.WeatherResponseMapper
 import com.example.weatherforecast.data.remote.WeatherApiResponse
 import com.example.weatherforecast.data.remote.WeatherApiService
+import com.example.weatherforecast.domain.models.DailyWeather
 import dagger.hilt.android.qualifiers.ApplicationContext
-import com.example.weatherforecast.response.ForecastResponse
-import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -134,11 +132,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * Получает текущую погоду из базы данных.
      * @return WeatherResponse или null, если данных нет.
      */
-    private suspend fun getCurrentWeatherFromDB(): WeatherResponse? {
+    private suspend fun getCurrentWeatherFromDB(): DailyWeather? {
         val entity = weatherDao.getCurrentDailyWeatherEntity()
         if (entity != null) {
-            val dailyWeather = EntityMapper.toDailyWeather(entity)
-            return WeatherResponseMapper.toWeatherResponse(dailyWeather, entity.cityName ?: "Unknown")
+            return EntityMapper.toDailyWeather(entity)
         }
         return null
     }
@@ -147,11 +144,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * Получает прогноз погоды из базы данных.
      * @return ForecastResponse или null, если данных нет.
      */
-    private suspend fun getForecastWeatherFromDB(): ForecastResponse? {
+    private suspend fun getForecastWeatherFromDB(): List<DailyWeather>? {
         val entities = weatherDao.getAllDailyWeatherSync()
         if (entities.isNotEmpty()) {
-            val dailyWeathers = entities.map { EntityMapper.toDailyWeather(it) }
-            return WeatherResponseMapper.toForecastResponse(dailyWeathers)
+            return entities.map { EntityMapper.toDailyWeather(it) }
         }
         return null
     }
@@ -249,7 +245,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @param forceRefresh Если true, игнорирует кэш.
      * @return Resource<WeatherResponse> с текущей погодой.
      */
-    override suspend fun getCurrentWeather(city: String, forceRefresh: Boolean): Resource<WeatherResponse> {
+    override suspend fun getCurrentWeather(city: String, forceRefresh: Boolean): Resource<DailyWeather> {
         // If a specific city is passed, use it directly
         val targetCity = if (city.isNotBlank()) {
             city
@@ -286,8 +282,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 }
             },
             mapApiToResult = { apiResponse ->
-                val dailyWeather = WeatherMapper.toDailyWeather(apiResponse.days.first(), apiResponse.timezone,apiResponse.latitude,apiResponse.longitude)
-                WeatherResponseMapper.toWeatherResponse(dailyWeather, targetCity)
+                WeatherMapper.toDailyWeather(apiResponse.days.first(), apiResponse.timezone, apiResponse.latitude, apiResponse.longitude)
             }
         )
     }
@@ -298,7 +293,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @param forceRefresh Если true, игнорирует кэш.
      * @return Resource<ForecastResponse> с прогнозом.
      */
-    override suspend fun getForecastWeather(city: String, forceRefresh: Boolean): Resource<ForecastResponse> {
+    override suspend fun getForecastWeather(city: String, forceRefresh: Boolean): Resource<List<DailyWeather>> {
         // Если передан конкретный город, используем его напрямую
         val targetCity = if (city.isNotBlank()) {
             city
@@ -335,8 +330,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 }
             },
             mapApiToResult = { apiResponse ->
-                val dailyWeathers = apiResponse.days.map { WeatherMapper.toDailyWeather(it,apiResponse.timezone,apiResponse.latitude,apiResponse.longitude) }
-                WeatherResponseMapper.toForecastResponse(dailyWeathers)
+                apiResponse.days.map { WeatherMapper.toDailyWeather(it, apiResponse.timezone, apiResponse.latitude, apiResponse.longitude) }
             }
         )
     }

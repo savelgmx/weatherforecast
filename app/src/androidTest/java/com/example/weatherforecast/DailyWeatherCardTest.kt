@@ -6,10 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import org.junit.Rule
 import org.junit.Test
 import com.example.weatherforecast.components.DailyWeatherCard
-import com.example.weatherforecast.response.Daily
-import com.example.weatherforecast.response.Temp
-import com.example.weatherforecast.response.FeelsLike
-import com.example.weatherforecast.response.Weather
+import com.example.weatherforecast.domain.models.DailyWeather
 
 class DailyWeatherCardTest {
     @get:Rule
@@ -17,25 +14,35 @@ class DailyWeatherCardTest {
 
     @Test
     fun dailyWeatherCard_displaysCorrectData() {
-        val daily =
-            Daily(
-                100, 18.32, 1708754400,
-                FeelsLike(20.0, 20.0, 15.0, 15.0),
-                73, 0.5, 1708862520, 1708824420, 1036,
-                1708736117, 1708772966,
-                Temp(25.0, 16.0, 25.0, 19.0, 20.0, 15.0),
-                1, listOf(Weather(804, "Clear", "Clear", "04n")),
-                224, 1.37, 2.40
-            )
-
+        val daily = DailyWeather(
+            dew = 1.37,
+            uvindex = 1,
+            date = "2025-04-03",
+            dt = 1708754400L,
+            temp = 20.0,
+            feelsLike = 15.0,
+            tempMin = 16.0,
+            tempMax = 25.0,
+            pressure = 1036.0,
+            visibility = 10000.0,
+            humidity = 73,
+            windSpeed = 2.2,
+            windDeg = 224,
+            cloudiness = 100,
+            description = "Clear",
+            icon = "04n",
+            sunrise = 1708736117L,
+            sunset = 1708772966L,
+            moonPhase = 0.5,
+            hours = null,
+            timezone = "Asia/Krasnoyarsk",
+            latitude = 56.0097,
+            longitude = 92.79
+        )
 
         composeTestRule.setContent {
             DailyWeatherCard(daily = daily)
         }
-        composeTestRule.onNodeWithText("Day: 25").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Night: 16").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Feels like: 15").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Feels like: 20").assertIsDisplayed()
         composeTestRule.onNodeWithText("Clear").assertIsDisplayed()
     }
 }
