@@ -1,6 +1,5 @@
 package com.example.weatherforecast.components
 
-import android.content.ContextWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
@@ -43,27 +41,9 @@ import com.example.weatherforecast.utils.WeatherUtils
 import kotlinx.coroutines.launch
 
 @Composable
-fun DrawerContent() {
+fun DrawerContent(navController: NavController? = null) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    // Safe NavController extraction
-    val activity = remember(context) {
-        var ctx = context
-        while (ctx is ContextWrapper && ctx !is FragmentActivity) {
-            ctx = ctx.baseContext
-        }
-        ctx as? FragmentActivity
-    }
-
-    val navController = remember(activity) {
-        activity?.let {
-            val navHostFragment = it.supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            if (navHostFragment is NavHostFragment) {
-                navHostFragment.navController
-            } else null
-        }
-    }
 
     val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = true)
 
@@ -302,7 +282,7 @@ fun DrawerContent() {
                     enabled = navController != null && !enteredCity.isNullOrBlank()
                 ) {
                     // only navigate if non-null and not blank
-                navController?.navigate(R.id.weatherMapFragment)
+                navController?.navigate("weatherMap")
             }
             .padding(8.dp)
     ) {

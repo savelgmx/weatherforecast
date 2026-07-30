@@ -104,7 +104,7 @@ fun MainScreen(
                 )
             },
             drawerContent = {
-                DrawerContent()
+                DrawerContent(navController = navController)
             },
             contentColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->

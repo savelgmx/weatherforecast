@@ -1,21 +1,33 @@
 package com.example.weatherforecast
 
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.weatherforecast.components.DailyWeatherForecast
+import com.example.weatherforecast.components.MainScreen
+import com.example.weatherforecast.components.WeatherMapScreen
 import com.example.weatherforecast.presentation.viewmodels.OpenWeatherForecastViewModel
 import com.example.weatherforecast.presentation.viewmodels.OpenWeatherMapViewModel
+import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
+import com.example.weatherforecast.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import org.maplibre.android.MapLibre
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -30,15 +42,75 @@ class MainActivity : AppCompatActivity() {
     private val mapViewModel: OpenWeatherMapViewModel by viewModels()
     private val forecastViewModel: OpenWeatherForecastViewModel by viewModels()
 
-    @Inject
-    lateinit var mapLibre: MapLibre   // <— this forces Hilt to call your provider
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    WeatherNavGraph()
+                }
+            }
+        }
         requestLocationPermissionsIfNeeded()
+    }
+
+    @Composable
+    private fun WeatherNavGraph() {
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = "forecast") {
+            composable("forecast") {
+                val currentViewModel: OpenWeatherMapViewModel = hiltViewModel()
+                val forecastViewModel: OpenWeatherForecastViewModel = hiltViewModel()
+                val mapViewModel: WeatherMapViewModel = hiltViewModel()
+                MainScreen(
+                    navController = navController,
+                    currentState = currentViewModel.weatherLiveData.value,
+                    forecastState = forecastViewModel.forecastLiveData.value,
+                    onRefresh = {
+                        currentViewModel.refreshWeather()
+                        forecastViewModel.refreshWeather()
+                    },
+                    showCitySelectionDialog = currentViewModel.showCitySelectionDialog.value,
+                    onCitySelected = { cityName ->
+                        forecastViewModel.selectCity(cityName)
+                    },
+                    onDismissCityDialog = {
+                        currentViewModel.dismissCitySelectionDialog()
+                    },
+                    pollution = currentViewModel.airVisualLiveData.value?.data?.current?.pollution
+                )
+            }
+            composable(
+                route = "detail/{index}",
+                arguments = listOf(navArgument("index") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val index = backStackEntry.arguments?.getInt("index") ?: 0
+                val forecastViewModel: OpenWeatherForecastViewModel = hiltViewModel()
+                val forecastState = forecastViewModel.forecastLiveData.value
+                val dailyList = forecastState?.data ?: emptyList()
+                val hourlyList = dailyList.flatMap { it.hours ?: emptyList() }
+                if (dailyList.isNotEmpty() && index in 0 until dailyList.size) {
+                    DailyWeatherForecast(
+                        navController = navController,
+                        dailyList = dailyList,
+                        hourlyList = hourlyList,
+                        startIndex = index,
+                        timeZone = dailyList.firstOrNull()?.timezone ?: "UTC"
+                    )
+                }
+            }
+            composable("weatherMap") {
+                val mapViewModel: WeatherMapViewModel = hiltViewModel()
+                WeatherMapScreen(
+                    city = "",
+                    viewModel = mapViewModel,
+                    navController = navController
+                )
+            }
+        }
     }
 
     private fun requestLocationPermissionsIfNeeded() {
@@ -66,7 +138,6 @@ class MainActivity : AppCompatActivity() {
                 mapViewModel.retryDeviceLocation()
                 forecastViewModel.retryDeviceLocation()
             } else {
-                // No permissions granted, show explanation and disable location-based features
                 Toast.makeText(
                     this,
                     "Location permissions denied. Using default location.",
@@ -76,14 +147,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Handle navigation when the up button is pressed
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp() || super.onSupportNavigateUp()
+        return false
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 }

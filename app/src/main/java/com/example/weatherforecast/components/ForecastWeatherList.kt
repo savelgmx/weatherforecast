@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
-import com.example.weatherforecast.presentation.ui.ForecastWeatherFragmentDirections
 import com.example.weatherforecast.response.Daily
 import com.example.weatherforecast.response.ForecastResponse
 import com.example.weatherforecast.theme.AppShapes
@@ -67,7 +66,7 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
             .fillMaxWidth()
            // .padding(all = 1.dp)
             .clickable {
-                navController.navigate(ForecastWeatherFragmentDirections.actionForecastWeatherFragmentToForecastDetailFragment(index))
+                navController.navigate("detail/$index")
             }  ,       shape = AppShapes.large
 
     ) {
