@@ -1,11 +1,8 @@
 package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
-import android.content.pm.PackageManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.data.remote.AirVisualResponse
@@ -15,7 +12,6 @@ import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.response.WeatherResponse
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,101 +19,37 @@ import javax.inject.Named
 @HiltViewModel
 class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
-    private val getWeatherUseCase: GetWeatherUseCase,
-    private val getDeviceCityUseCase: GetDeviceCityUseCase,
+    getDeviceCityUseCase: GetDeviceCityUseCase,
+    getWeatherUseCase: GetWeatherUseCase,
     private val getAirVisualDataUseCase: GetAirVisualDataUseCase,
     @Named("iqAirApiKey") private val iqAirApiKey: String
-) : AndroidViewModel(application) {
+) : BaseWeatherViewModel(application, getDeviceCityUseCase, getWeatherUseCase) {
 
     val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
     val weatherLiveData: MutableState<Resource<WeatherResponse>> = mutableStateOf(Resource.Loading())
     val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(false)
 
     private var isWeatherLoaded = false
-    private var currentCity: String = ""
+    override val stateLoaded: Boolean get() = isWeatherLoaded
 
-    init {
-        observeCityFromDataStore()
-    }
-
-    private fun hasLocationPermission(): Boolean {
-        val ctx = getApplication<Application>()
-        return ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun observeCityFromDataStore() {
-        viewModelScope.launch {
-            DataStoreManager.cityNamePrefFlow(getApplication())
-                .collectLatest { city ->
-                    if (!city.isNullOrBlank()) {
-                        currentCity = city
-                        refreshWeather(city)
-                        showCitySelectionDialog.value = false
-                    } else {
-                        if (hasLocationPermission()) {
-                            fetchAndSaveDeviceCity()
-                        } else {
-                            showCitySelectionDialog.value = true
-                        }
-                    }
+    override fun onCityChanged(city: String?) {
+        if (!city.isNullOrBlank()) {
+            currentCity = city
+            refreshWeather(city)
+            showCitySelectionDialog.value = false
+        } else {
+            if (hasLocationPermission()) {
+                viewModelScope.launch {
+                    fetchAndSaveDeviceCity()
                 }
-        }
-    }
-
-    /**
-     * Auto-detects device location via GPS and saves the city name to DataStore.
-     *
-     * CRITICAL DESIGN DECISION: This is a suspend function (not fire-and-forget).
-     *
-     * It is called inside collectLatest {}. collectLatest cancels its lambda's
-     * coroutine whenever a new value is emitted before the previous one finishes.
-     * Making this a suspend function ensures the cancellation propagates into the
-     * GPS resolution:
-     *
-     *   BEFORE (broken):  viewModelScope.launch { fetchAndSaveDeviceCity() }
-     *   → launched a coroutine DISCONNECTED from collectLatest's scope.
-     *   → User selects a city → collectLatest cancels the lambda, but the
-     *     launched coroutine keeps running and overwrites the city choice.
-     *
-     *   AFTER (fixed):    suspend fun fetchAndSaveDeviceCity()
-     *   → Called directly in the collectLatest lambda.
-     *   → User selects a city → collectLatest cancels the lambda → coroutine
-     *     is cancelled immediately → GPS resolution stops.
-     *
-     * See also: retryDeviceLocation() for the explicit manual retry path,
-     * which correctly wraps this suspend function in viewModelScope.launch.
-     */
-    private suspend fun fetchAndSaveDeviceCity() {
-        try {
-            val autoCity = getDeviceCityUseCase.execute()
-            if (autoCity.isNotBlank()) {
-                DataStoreManager.updateCityName(getApplication(), autoCity)
-                // No need to call getCurrentWeather directly
-                // Flow will re-emit and trigger the block again
             } else {
                 showCitySelectionDialog.value = true
             }
-        } catch (e: Exception) {
-            showCitySelectionDialog.value = true
         }
     }
 
-    /**
-     * Public retry button for auto-detect (called from the UI when the
-     * user taps "Retry" after GPS failed or was denied).
-     *
-     * Wraps fetchAndSaveDeviceCity() in viewModelScope.launch because this
-     * is called from a non-coroutine context (UI event handler), NOT from
-     * inside collectLatest. The currentCity.isBlank() guard prevents
-     * duplicate retry calls if a city has already been resolved.
-     */
-    fun retryDeviceLocation() {
-        if (currentCity.isBlank()) {
-            viewModelScope.launch {
-                fetchAndSaveDeviceCity()
-            }
-        }
+    override fun onCityDetectionFailed() {
+        showCitySelectionDialog.value = true
     }
 
     /*
@@ -177,7 +109,6 @@ class OpenWeatherMapViewModel @Inject constructor(
             try {
                 if (cityName.isNotBlank()) {
                     DataStoreManager.updateCityName(getApplication(), cityName)
-                    // refreshWeather will be called via observer
                 }
             } catch (e: Exception) {
                 weatherLiveData.value = Resource.Error(null, "Failed to set city: ${e.message}")
