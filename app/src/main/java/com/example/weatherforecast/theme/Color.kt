@@ -22,3 +22,7 @@ val DarkGrey = Color(0xFF222222)
 val RedErrorDark = Color(0xFFB00020)
 val RedErrorLight = Color(0xFFEF5350)
 
+
+val orange = Color(0xFFdb660d)
+val brightBlue = Color(0xFF027cf5)
+

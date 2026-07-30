@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weatherforecast.presentation.ui.theme.brightBlue
-import com.example.weatherforecast.presentation.ui.theme.orange
-import com.example.weatherforecast.presentation.ui.theme.white
+import com.example.weatherforecast.theme.brightBlue
+import com.example.weatherforecast.theme.orange
+import com.example.weatherforecast.theme.White
 
 @Composable
 fun CustomCircularProgressIndicator(
@@ -108,7 +108,7 @@ fun CustomCircularProgressIndicator(
                         Paint().apply {
                             textSize = 18.sp.toPx()
                             textAlign = Paint.Align.CENTER
-                            color = white.toArgb()
+                            color = White.toArgb()
                             isFakeBoldText = true
                         }
                     )
@@ -127,7 +127,7 @@ fun Preview() {
         ,
         initialValue = 91,
         primaryColor = orange,
-        secondaryColor = white,
+                secondaryColor = White,
         circleRadius = 60f,
         valueName = "%"
     )

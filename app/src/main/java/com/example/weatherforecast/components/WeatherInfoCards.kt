@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.components.DataStoreManager
-import com.example.weatherforecast.presentation.ui.theme.orange
-import com.example.weatherforecast.presentation.ui.theme.white
+import com.example.weatherforecast.theme.orange
+import com.example.weatherforecast.theme.White
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.WeatherUtils
@@ -64,7 +64,7 @@ fun HumidityCard(humidity: Int, dewPoint: Int) {
                     .background(Blue800),
                 initialValue = humidity,
                 primaryColor = orange,
-                secondaryColor = white,
+                        secondaryColor = White,
                 circleRadius = 80f,
                 valueName = "%"
             )
@@ -108,7 +108,7 @@ fun UVIndexCard(index: Int) {
                     .background(Blue800),
                 initialValue = index,
                 primaryColor = orange,
-                secondaryColor = white,
+                        secondaryColor = White,
                 circleRadius = 80f,
                 minValue = 0,
                 maxValue = 13
@@ -155,7 +155,7 @@ fun PressureCard(pressure: Int) {
                     .background(Blue800),
                 initialValue = pressureValue,
                 primaryColor = orange,
-                secondaryColor = white,
+                        secondaryColor = White,
                 circleRadius = 80f,
                 minValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 870),
                 maxValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 1033)
