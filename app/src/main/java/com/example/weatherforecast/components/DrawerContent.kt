@@ -58,6 +58,9 @@ fun DrawerContent(navController: NavController? = null) {
     val enteredCity by DataStoreManager.cityNamePrefFlow(context).collectAsState(initial = null as String?)//text field with entered city name
     var enteredCityPopup by remember { mutableStateOf(false) }
 
+    // ⚠ Bug #2 fix: весь контент drawer'а внутри одного Column.
+    // Ранее Column закрывался преждевременно — секции "Custom location"
+    // и "Weather Map" оказывались снаружи, нарушая вёрстку и наследование цветов.
 
     Column {
         Row(
@@ -75,10 +78,10 @@ fun DrawerContent(navController: NavController? = null) {
         HorizontalDivider()
 
         Row(
-
             Modifier
+                .fillMaxWidth()
                 .padding(all = 8.dp)
-                .clickable(onClick = { windSpeedUnitsPopup = true }) ,
+                .clickable(onClick = { windSpeedUnitsPopup = true }),
         )
         {
             Column( verticalArrangement = Arrangement.Center) {
@@ -121,8 +124,9 @@ fun DrawerContent(navController: NavController? = null) {
 
         Row(
             Modifier
+                .fillMaxWidth()
                 .padding(all = 8.dp)
-                .clickable(onClick = { pressureUnitsPopup = true }) ,
+                .clickable(onClick = { pressureUnitsPopup = true }),
         )
         {
             Column( verticalArrangement = Arrangement.Center) {
@@ -166,6 +170,7 @@ fun DrawerContent(navController: NavController? = null) {
         HorizontalDivider()
 
         Row(modifier = Modifier
+            .fillMaxWidth()
             .padding(8.dp)
 
         ) {
@@ -222,7 +227,6 @@ fun DrawerContent(navController: NavController? = null) {
 
         HorizontalDivider()
 
-    }
     Row(
         Modifier
             .fillMaxWidth()
@@ -240,6 +244,7 @@ fun DrawerContent(navController: NavController? = null) {
 
     Row (
         Modifier
+            .fillMaxWidth()
             .padding(all = 8.dp)
             .clickable(onClick = { enteredCityPopup = true }),
     )
@@ -274,15 +279,19 @@ fun DrawerContent(navController: NavController? = null) {
         }
     }
     HorizontalDivider()
-        // Weather Map menu item, safe with nullable enteredCity
+        // Weather Map menu item — безопасная навигация с проверкой enteredCity
+        // ⚠ Bug #3 fix: в navigate передаётся "$enteredCity" через интерполяцию.
+        // Ранее было .navigate("weatherMap") без города, из-за чего
+        // MainActivity.kt получал пустую строку и карта не центрировалась.
+        // enteredCity берётся из DataStoreManager.cityNamePrefFlow (строка 58).
     Row(
         Modifier
             .fillMaxWidth()
                 .clickable(
                     enabled = navController != null && !enteredCity.isNullOrBlank()
                 ) {
-                    // only navigate if non-null and not blank
-                navController?.navigate("weatherMap")
+                    // только навигация, если город не null и не пустой
+                navController?.navigate("weatherMap/$enteredCity")
             }
             .padding(8.dp)
     ) {
@@ -297,4 +306,5 @@ fun DrawerContent(navController: NavController? = null) {
         )
     }
     HorizontalDivider()
+    }
 }

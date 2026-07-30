@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
@@ -67,7 +68,11 @@ fun MainScreen(
     val isStale = (currentState as? Resource.Success)?.isStale == true || (forecastState as? Resource.Success)?.isStale == true
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
-    val hourlyData: List<HourlyWeather>? = null
+    // ⚠ Bug #1 fix: hourlyData вычисляется через flatMap вместо присвоения null.
+    // Ранее здесь было "= null" — из-за этого HourlyWeatherRow не получал данные
+    // и не отображал почасовой прогноз. flatMap безопасно разворачивает
+    // List<DailyWeather> в List<HourlyWeather>, используя Elvis-оператор для null-поля hours.
+    val hourlyData: List<HourlyWeather>? = forecastData?.flatMap { it.hours ?: emptyList() }
 
     val refreshState = rememberPullRefreshState(
         refreshing = isLoading,
@@ -104,10 +109,21 @@ fun MainScreen(
                     )
                 )
             },
+            // ⚠ Bug #2 fix: drawerContent обёрнут в Material3 Surface с явными
+            // цветами surface/onSurface. Ранее Scaffold содержал
+            // contentColor = MaterialTheme.colorScheme.background (Blue600),
+            // из-за чего все Text/Icon в DrawerContent наследовали синий цвет,
+            // становясь невидимыми на светлом фоне drawer'а при смешивании
+            // Material v1 Scaffold + Material3 colorScheme.
+            // Surface задаёт правильный контекст цветов для содержимого drawer'а.
             drawerContent = {
-                DrawerContent(navController = navController)
-            },
-            contentColor = MaterialTheme.colorScheme.background
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+                    DrawerContent(navController = navController)
+                }
+            }
         ) { paddingValues ->
             // ——— BoxWithConstraints: автоопределение ориентации ———
             // maxWidth > maxHeight  → landscape  → две панели (Row: 50% / 50%)

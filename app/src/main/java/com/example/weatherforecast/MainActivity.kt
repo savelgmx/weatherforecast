@@ -104,10 +104,21 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
             }
-            composable("weatherMap") {
+            // ⚠ Bug #3 fix: маршрут изменён с "weatherMap" на "weatherMap/{city}",
+            // чтобы передавать название города в WeatherMapScreen.
+            // Ранее city = "" (пустая строка) → WeatherMapViewModel.loadWeatherData("")
+            // не могла получить координаты → карта не центрировалась на городе.
+            // Город извлекается из backStackEntry.arguments и передаётся
+            // напрямую в WeatherMapScreen, который загружает данные через
+            // WeatherMapViewModel.loadWeatherData(city).
+            composable(
+                route = "weatherMap/{city}",
+                arguments = listOf(navArgument("city") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val city = backStackEntry.arguments?.getString("city") ?: ""
                 val mapViewModel: WeatherMapViewModel = hiltViewModel()
                 WeatherMapScreen(
-                    city = "",
+                    city = city,
                     viewModel = mapViewModel,
                     navController = navController
                 )
