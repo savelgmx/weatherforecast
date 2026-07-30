@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
-import com.example.weatherforecast.response.Daily
+import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.theme.Blue700
@@ -32,7 +32,7 @@ import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
 fun DailyWeatherCard(
-    daily: Daily
+    daily: DailyWeather
 )
 {
 
@@ -44,14 +44,10 @@ fun DailyWeatherCard(
 
     val feelsLike =
         localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
-            daily.feelsLike.morn.toInt(), switchState
-        )
-    val feelsLikeNight =
-        localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
-            daily.feelsLike.night.toInt(), switchState
+            daily.feelsLike.toInt(), switchState
         )
 
-    val icon = daily.weather[0].icon
+    val icon = daily.icon
     val localIconName = icon.replace("-", "_")
     val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
     val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
@@ -90,7 +86,7 @@ fun DailyWeatherCard(
 
                 Column {
                     AsyncImage(
-                        model = imageModel, //"${UIUtils.iconurl}${daily.weather[0].icon}.png",
+                        model = imageModel,
                         contentDescription = "Weather icon",
                         modifier = Modifier
                             .size(100.dp)
@@ -103,7 +99,7 @@ fun DailyWeatherCard(
                     Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
                         Text(
                             text = localContext.getString(R.string.day) + ": " + WeatherUtils.updateTemperature(
-                                daily.temp.max.toInt(),
+                                daily.tempMax.toInt(),
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
@@ -116,7 +112,7 @@ fun DailyWeatherCard(
                         Text(
                             text = localContext.getString(R.string.night) + ": "
                                     + WeatherUtils.updateTemperature(
-                                daily.temp.min.toInt(),
+                                daily.tempMin.toInt(),
                                 switchState
                             ),
                             fontWeight = FontWeight.Bold, color = Color.White,
@@ -139,7 +135,7 @@ fun DailyWeatherCard(
         )  {
 
             Text(
-                text = daily.weather[0].description,
+                text = daily.description,
                 color = Color.White,
                 style = QuickSandTypography.titleSmall,
                 modifier = Modifier.padding(all = 8.dp)

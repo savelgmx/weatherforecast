@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
-import com.example.weatherforecast.response.Daily
-import com.example.weatherforecast.response.Hourly
+import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.utils.WeatherUtils
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
 
@@ -30,8 +30,8 @@ import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
  * Used in both portrait (single LazyColumn) and landscape left pane.
  */
 fun LazyListScope.dailyWeatherLeftItems(
-    daily: Daily,
-    hourlyList: List<Hourly>,
+    daily: DailyWeather,
+    hourlyList: List<HourlyWeather>,
     timeZone: String,
     context: Context
 ) {
@@ -44,7 +44,7 @@ fun LazyListScope.dailyWeatherLeftItems(
     }
     item {
         val filteredHourlyWeatherList =
-            WeatherUtils.filterNext24Hours(hourlyList = hourlyList, timezone = timeZone, startEpochSeconds = daily.dt.toLong())
+            WeatherUtils.filterNext24Hours(hourlyList = hourlyList, timezone = timeZone, startEpochSeconds = daily.dt)
         HourlyWeatherRow(filteredHourlyWeatherList, timeZone)
     }
 }
@@ -54,7 +54,7 @@ fun LazyListScope.dailyWeatherLeftItems(
  * Used in both portrait (single LazyColumn) and landscape right pane.
  */
 fun LazyListScope.dailyWeatherRightItems(
-    daily: Daily,
+    daily: DailyWeather,
     timeZone: String
 ) {
     item {
@@ -64,7 +64,7 @@ fun LazyListScope.dailyWeatherRightItems(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            HumidityCard(humidity = daily.humidity, dewPoint = daily.dewPoint.toInt())
+            HumidityCard(humidity = daily.humidity, dewPoint = daily.dew.toInt())
             WindSpeedCard(speed = daily.windSpeed.toInt(), windDegree = daily.windDeg)
         }
     }
@@ -75,7 +75,7 @@ fun LazyListScope.dailyWeatherRightItems(
                 .padding(all = 5.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            UVIndexCard(index = daily.uvi.toInt())
+            UVIndexCard(index = daily.uvindex)
             PressureCard(pressure = daily.pressure)
         }
     }
@@ -92,8 +92,8 @@ fun LazyListScope.dailyWeatherRightItems(
             timeOfDawnAndDusk[0]?.let { dawn ->
                 timeOfDawnAndDusk[1]?.let { dusk ->
                     SunriseSunsetCard(
-                        sunrise = WeatherUtils.updateTime(daily.sunrise, timeZone),
-                        sunset = WeatherUtils.updateTime(daily.sunset, timeZone),
+                        sunrise = WeatherUtils.updateTime(daily.sunrise.toInt(), timeZone),
+                        sunset = WeatherUtils.updateTime(daily.sunset.toInt(), timeZone),
                         dawn = dawn,
                         dusk = dusk,
                         timeZone

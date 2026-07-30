@@ -26,23 +26,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
-import com.example.weatherforecast.response.Daily
-import com.example.weatherforecast.response.ForecastResponse
+import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
 fun ForecastWeatherList(
-    forecastState: Resource<ForecastResponse>,
+    dailyForecastList: List<DailyWeather>,
     navController: NavController
 ) {
-    val dailyForecast = forecastState.data?.daily
-    val count = dailyForecast?.size ?: 0
+    val dailyForecast = dailyForecastList
+    val count = dailyForecast.size
 
 
     Column(
@@ -53,14 +51,14 @@ fun ForecastWeatherList(
 
 
         for (index in 0 until count) {
-            dailyForecast?.getOrNull(index)?.let { daily ->
+            dailyForecast.getOrNull(index)?.let { daily ->
             ClickableDayForecastItem(index = index, daily = daily, navController = navController)
             }
         }
     }
 }
 @Composable
-fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavController) {
+fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,8 +72,8 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
         val localContext = LocalContext.current
         val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
 
-        val icon = daily.weather?.get(0)?.icon
-        val localIconName = icon?.replace("-", "_")
+        val icon = daily.icon
+        val localIconName = icon.replace("-", "_")
         val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
         val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
 
@@ -95,7 +93,7 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
 
                 Text(
 
-                    text = WeatherUtils.updateDateToToday(daily.dt),
+                    text = WeatherUtils.updateDateToToday(daily.dt.toInt()),
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     style = QuickSandTypography.bodyLarge,
@@ -103,7 +101,7 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
                         .padding(all = 3.dp)
                 )
                 AsyncImage(
-                    model = imageModel,//"${UIUtils.iconurl}${daily.weather[0].icon}.png",
+                    model = imageModel,
                     contentDescription = "Weather icon",
                     modifier = Modifier
                         .size(40.dp)// Define your desired width and height
@@ -111,8 +109,8 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
                 )
 
                 Text(
-                    text = "${WeatherUtils.updateTemperature(daily.temp.max.toInt(), switchState)}/${WeatherUtils.updateTemperature(
-                        daily.temp.min.toInt(),
+                    text = "${WeatherUtils.updateTemperature(daily.tempMax.toInt(), switchState)}/${WeatherUtils.updateTemperature(
+                        daily.tempMin.toInt(),
                         switchState
                     )}",
                     fontWeight = FontWeight.Bold,
@@ -129,6 +127,5 @@ fun ClickableDayForecastItem(index: Int, daily: Daily, navController: NavControl
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
 fun ForecastUISuccessPreview() {
-    val successState = Resource.Success(UIUtils.getMockForecastlist())
-    //  ForecastWeatherList( successState)
+    ForecastWeatherList(dailyForecastList = emptyList())
 }

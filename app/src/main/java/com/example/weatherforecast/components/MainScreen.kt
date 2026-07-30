@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
-import com.example.weatherforecast.response.ForecastResponse
-import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.domain.models.HourlyWeather
+import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.theme.AppTheme
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
@@ -49,8 +49,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     navController: NavController,
-    currentState: Resource<WeatherResponse>?,
-    forecastState: Resource<ForecastResponse>?,
+    currentState: Resource<DailyWeather>?,
+    forecastState: Resource<List<DailyWeather>>?,
     onRefresh: () -> Unit,
     showCitySelectionDialog: Boolean = false,
     onCitySelected: (String) -> Unit = {},
@@ -66,7 +66,7 @@ fun MainScreen(
     val isStale = (currentState as? Resource.Success)?.isStale == true || (forecastState as? Resource.Success)?.isStale == true
     val weatherData = (currentState as? Resource.Success)?.data
     val forecastData = (forecastState as? Resource.Success)?.data
-    val hourlyData = (forecastState as? Resource.Success)?.data?.hourly
+    val hourlyData: List<HourlyWeather>? = null
 
     val refreshState = rememberPullRefreshState(
         refreshing = isLoading,
@@ -174,7 +174,7 @@ fun MainScreen(
                                     }
                                     item {
                                         ForecastWeatherList(
-                                            forecastState = requireNotNull(forecastState),
+                                            dailyForecastList = forecastData,
                                             navController = navController
                                         )
                                     }

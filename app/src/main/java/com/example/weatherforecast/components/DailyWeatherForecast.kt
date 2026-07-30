@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.weatherforecast.response.Daily
-import com.example.weatherforecast.response.Hourly
+import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.utils.WeatherUtils
 
@@ -37,8 +37,8 @@ import com.example.weatherforecast.utils.WeatherUtils
 @Composable
 fun DailyWeatherForecast(
     navController: NavController,
-    dailyList: List<Daily>,
-    hourlyList: List<Hourly>,
+    dailyList: List<DailyWeather>,
+    hourlyList: List<HourlyWeather>,
     startIndex: Int = 0,
     timeZone: String
 ) {
@@ -50,7 +50,7 @@ fun DailyWeatherForecast(
             val currentPage = pagerState.currentPage
             val currentDaily = dailyList.getOrNull(currentPage) ?: dailyList.firstOrNull() ?: return@Scaffold
             TopAppBar(
-                title = { Text(text = WeatherUtils.updateDateToToday(currentDaily.dt)) },
+                title = { Text(text = WeatherUtils.updateDateToToday(currentDaily.dt.toInt())) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

@@ -16,9 +16,8 @@ import androidx.navigation.NavController
 import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
-import com.example.weatherforecast.response.ForecastResponse
-import com.example.weatherforecast.response.Hourly
-import com.example.weatherforecast.response.WeatherResponse
+import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherUtils
@@ -41,11 +40,11 @@ fun LazyListScope.weatherMainItems(
     hasError: Boolean,
     hasInternetError: Boolean,
     isStale: Boolean,
-    weatherData: WeatherResponse?,
-    forecastData: ForecastResponse?,
-    hourlyData: List<Hourly>?,
-    currentState: Resource<WeatherResponse>?,
-    forecastState: Resource<ForecastResponse>?,
+    weatherData: DailyWeather?,
+    forecastData: List<DailyWeather>?,
+    hourlyData: List<HourlyWeather>?,
+    currentState: Resource<DailyWeather>?,
+    forecastState: Resource<List<DailyWeather>>?,
     pollution: AirVisualPollution?,
     context: Context,
     navController: NavController
@@ -102,12 +101,12 @@ fun LazyListScope.weatherMainItems(
                 WeatherHeader(text = context.resources.getString(R.string.weather_24_hour))
             }
             item {
-                forecastData.hourly?.let { hourlyWeatherList ->
+                hourlyData?.let { hourlyWeatherList ->
                     val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
                         hourlyList = hourlyWeatherList,
-                        timezone = forecastData.timezone
+                        timezone = ""
                     )
-                    HourlyWeatherRow(filteredHourlyWeatherList, forecastData.timezone)
+                    HourlyWeatherRow(filteredHourlyWeatherList, "")
                 }
             }
 
@@ -119,7 +118,7 @@ fun LazyListScope.weatherMainItems(
                 }
                 item {
                     ForecastWeatherList(
-                        forecastState = requireNotNull(forecastState),
+                        dailyForecastList = forecastData,
                         navController = navController
                     )
                 }
@@ -139,16 +138,15 @@ fun LazyListScope.weatherMainItems(
                         .padding(all = 3.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    forecastData.daily[0].sunrise?.let { sunrise ->
-                        forecastData.daily[0].sunset?.let { sunset ->
-                            val timeOfSunrise = WeatherUtils.updateTime(sunrise, forecastData.timezone)
-                            val timeOfSunset = WeatherUtils.updateTime(sunset, forecastData.timezone)
-                            SunriseSunsetArcCard(
-                                sunrise = timeOfSunrise,
-                                sunset = timeOfSunset,
-                                timezone = forecastData.timezone
-                            )
-                        }
+                    val daily = forecastData.firstOrNull()
+                    if (daily != null) {
+                        val timeOfSunrise = WeatherUtils.updateTime(daily.sunrise.toInt(), "")
+                        val timeOfSunset = WeatherUtils.updateTime(daily.sunset.toInt(), "")
+                        SunriseSunsetArcCard(
+                            sunrise = timeOfSunrise,
+                            sunset = timeOfSunset,
+                            timezone = ""
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -162,16 +160,8 @@ fun LazyListScope.weatherMainItems(
                         .padding(all = 3.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    weatherData.main?.humidity?.let { humidity ->
-                        forecastData.current?.dewPoint?.let { dewPoint ->
-                            HumidityCard(humidity = humidity, dewPoint = dewPoint.toInt())
-                        }
-                    }
-                    weatherData.wind?.speed?.toInt()?.let { windSpeed ->
-                        weatherData.wind.deg?.let { windDegree ->
-                            WindSpeedCard(speed = windSpeed, windDegree = windDegree)
-                        }
-                    }
+                    HumidityCard(humidity = weatherData.humidity, dewPoint = weatherData.dew.toInt())
+                    WindSpeedCard(speed = weatherData.windSpeed.toInt(), windDegree = weatherData.windDeg)
                 }
             }
 
@@ -183,12 +173,8 @@ fun LazyListScope.weatherMainItems(
                         .padding(all = 3.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    forecastData.current?.uvi?.let { uvIndex ->
-                        UVIndexCard(index = uvIndex.toInt())
-                    }
-                    weatherData.main?.pressure?.let { pressure ->
-                        PressureCard(pressure = pressure)
-                    }
+                    UVIndexCard(index = weatherData.uvindex)
+                    PressureCard(pressure = weatherData.pressure.toInt())
                 }
             }
 
@@ -201,8 +187,8 @@ fun LazyListScope.weatherMainItems(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     pollution?.let { AirQualityCard(pollution = it) }
-                    forecastData.daily?.get(0)?.moonPhase?.let { moonPhase ->
-                        MoonriseMoonsetCard(moonPhase = moonPhase)
+                    forecastData.firstOrNull()?.let { daily ->
+                        MoonriseMoonsetCard(moonPhase = daily.moonPhase)
                     }
                 }
             }

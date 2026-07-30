@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
-import com.example.weatherforecast.response.Hourly
+import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
@@ -32,7 +32,7 @@ import com.example.weatherforecast.utils.UIUtils
 import com.example.weatherforecast.utils.WeatherUtils
 
 @Composable
-fun HourlyWeatherRow(hourlyForecast: List<Hourly>, timezone: String) {
+fun HourlyWeatherRow(hourlyForecast: List<HourlyWeather>, timezone: String) {
     Box (
         modifier = Modifier
             .background(
@@ -60,7 +60,7 @@ fun HourlyWeatherRow(hourlyForecast: List<Hourly>, timezone: String) {
     }
 }
 @Composable
-fun HourlyWeatherItem(hourly: Hourly,timezone:String) {
+fun HourlyWeatherItem(hourly: HourlyWeather,timezone:String) {
 
 
 
@@ -74,14 +74,14 @@ fun HourlyWeatherItem(hourly: Hourly,timezone:String) {
         val localContext= LocalContext.current
         val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
 
-        val icon = hourly.weather[0].icon
+        val icon = hourly.icon
         val localIconName = icon.replace("-", "_")
         val drawableId = localContext.resources.getIdentifier(localIconName, "drawable",localContext. packageName)
         val imageModel = if (drawableId != 0) drawableId else R.drawable.default_icon
 
 
         Text(
-            text = WeatherUtils.formatHour(hourly.dt.toLong(), timezone),
+            text = WeatherUtils.formatHour(hourly.dt, timezone),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.titleMedium,
@@ -89,7 +89,7 @@ fun HourlyWeatherItem(hourly: Hourly,timezone:String) {
             modifier = Modifier.padding(all = 3.dp)
         )
         AsyncImage(
-            model = imageModel, //"${iconurl}${hourly.weather[0].icon}.png",
+            model = imageModel,
             contentDescription = "Weather icon",
             modifier = Modifier
                 .size(40.dp) // Define your desired width and height
