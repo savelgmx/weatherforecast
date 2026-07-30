@@ -67,7 +67,7 @@ fun CurrentWeatherCard(
                         val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
 
                         val temperature = com.example.weatherforecast.utils.WeatherUtils.updateTemperature(firstHourly.temp.toInt(), switchState)
-                        val pressure = com.example.weatherforecast.utils.WeatherUtils.updatePressure(firstHourly.pressure)
+                        val pressure = com.example.weatherforecast.utils.WeatherUtils.updatePressure(firstHourly.pressure.toInt())
                     val feels_like = localContext.getString(R.string.feels_like) + " :" +
                                 com.example.weatherforecast.utils.WeatherUtils.updateTemperature(firstHourly.feelsLike.toInt(), switchState)
                     val wind = com.example.weatherforecast.utils.WeatherUtils.updateWind(

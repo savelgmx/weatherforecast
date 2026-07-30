@@ -73,8 +73,10 @@ class MainActivity : AppCompatActivity() {
                         currentViewModel.refreshWeather()
                         forecastViewModel.refreshWeather()
                     },
+                    cityName = currentViewModel.currentCity,
                     showCitySelectionDialog = currentViewModel.showCitySelectionDialog.value,
                     onCitySelected = { cityName ->
+                        currentViewModel.onCitySelected(cityName)
                         forecastViewModel.selectCity(cityName)
                     },
                     onDismissCityDialog = {

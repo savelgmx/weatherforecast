@@ -76,7 +76,7 @@ fun LazyListScope.dailyWeatherRightItems(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             UVIndexCard(index = daily.uvindex)
-            PressureCard(pressure = daily.pressure)
+            PressureCard(pressure = daily.pressure.toInt())
         }
     }
     item {
@@ -88,7 +88,7 @@ fun LazyListScope.dailyWeatherRightItems(
         ) {
             val timeOfDawn = daily.sunrise
             val timeOfDusk = daily.sunset
-            val timeOfDawnAndDusk = WeatherUtils.calculateDawnAndDusk(timeOfDawn, timeOfDusk)
+            val timeOfDawnAndDusk = WeatherUtils.calculateDawnAndDusk(timeOfDawn.toInt(), timeOfDusk.toInt())
             timeOfDawnAndDusk[0]?.let { dawn ->
                 timeOfDawnAndDusk[1]?.let { dusk ->
                     SunriseSunsetCard(

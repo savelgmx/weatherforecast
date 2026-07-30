@@ -17,7 +17,8 @@ abstract class BaseWeatherViewModel(
     protected val getWeatherUseCase: GetWeatherUseCase
 ) : AndroidViewModel(application) {
 
-    protected var currentCity: String = ""
+    var currentCity: String = ""
+        protected set
     protected abstract val stateLoaded: Boolean
 
     init {

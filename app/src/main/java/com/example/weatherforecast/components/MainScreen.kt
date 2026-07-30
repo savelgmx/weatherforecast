@@ -52,6 +52,7 @@ fun MainScreen(
     currentState: Resource<DailyWeather>?,
     forecastState: Resource<List<DailyWeather>>?,
     onRefresh: () -> Unit,
+    cityName: String = "",
     showCitySelectionDialog: Boolean = false,
     onCitySelected: (String) -> Unit = {},
     onDismissCityDialog: () -> Unit = {},
@@ -81,7 +82,7 @@ fun MainScreen(
                 TopAppBar(
                     title = {
                         WeatherText(
-                            text = weatherData?.name ?: "Loading...",
+                            text = cityName.ifBlank { "Loading..." },
                             style = MaterialTheme.typography.headlineSmall
                         )
                     },

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.DailyWeather
@@ -127,5 +128,5 @@ fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: Nav
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
 fun ForecastUISuccessPreview() {
-    ForecastWeatherList(dailyForecastList = emptyList())
+    ForecastWeatherList(dailyForecastList = emptyList(), navController = rememberNavController())
 }
