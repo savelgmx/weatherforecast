@@ -33,7 +33,7 @@ import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.UIUtils
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun ForecastWeatherList(
@@ -94,7 +94,7 @@ fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: Nav
 
                 Text(
 
-                    text = WeatherUtils.updateDateToToday(daily.dt.toInt()),
+                    text = WeatherFormatter.updateDateToToday(daily.dt.toInt()),
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     style = QuickSandTypography.bodyLarge,
@@ -110,7 +110,7 @@ fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: Nav
                 )
 
                 Text(
-                    text = "${WeatherUtils.updateTemperature(daily.tempMax.toInt(), switchState)}/${WeatherUtils.updateTemperature(
+                    text = "${WeatherFormatter.updateTemperature(daily.tempMax.toInt(), switchState)}/${WeatherFormatter.updateTemperature(
                         daily.tempMin.toInt(),
                         switchState
                     )}",

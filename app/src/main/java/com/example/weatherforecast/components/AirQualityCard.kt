@@ -22,7 +22,7 @@ import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.theme.Blue800
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherComposables
 
 @Composable
 fun AirQualityCard(pollution: AirVisualPollution) {
@@ -38,7 +38,7 @@ fun AirQualityCard(pollution: AirVisualPollution) {
         else -> context.getString(R.string.aqi_hazardous)
     }
 
-    val aqiIconName= WeatherUtils.getAirQualityIconName(context,pollution.aqius)
+    val aqiIconName= WeatherComposables.getAirQualityIconName(context,pollution.aqius)
 
     Surface(
         modifier = Modifier

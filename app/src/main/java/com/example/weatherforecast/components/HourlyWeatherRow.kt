@@ -29,7 +29,7 @@ import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.UIUtils
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun HourlyWeatherRow(hourlyForecast: List<HourlyWeather>, timezone: String) {
@@ -81,7 +81,7 @@ fun HourlyWeatherItem(hourly: HourlyWeather,timezone:String) {
 
 
         Text(
-            text = WeatherUtils.formatHour(hourly.dt, timezone),
+            text = WeatherFormatter.formatHour(hourly.dt, timezone),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.titleMedium,
@@ -96,7 +96,7 @@ fun HourlyWeatherItem(hourly: HourlyWeather,timezone:String) {
                 .padding(all = 3.dp)
         )
         Text(
-            text = WeatherUtils.updateTemperature(hourly.temp.toInt(), switchState),
+            text = WeatherFormatter.updateTemperature(hourly.temp.toInt(), switchState),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             style = QuickSandTypography.titleMedium,

@@ -1,61 +1,61 @@
 package com.example.weatherforecast
 
 import com.example.weatherforecast.domain.models.HourlyWeather
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class WeatherUtilsTest {
+class WeatherFormatterTest {
 
     @Test
     fun updateTemperature_switchStateTrue_returnsCelsius() {
-        val result = WeatherUtils.updateTemperature(25, true)
+        val result = WeatherFormatter.updateTemperature(25, true)
         assertEquals("25C° ", result)
     }
 
     @Test
     fun updateTemperature_switchStateFalse_returnsFahrenheit() {
-        val result = WeatherUtils.updateTemperature(25, false)
+        val result = WeatherFormatter.updateTemperature(25, false)
         // (25 * 9/5) + 32 = 77
         assertEquals("77F° ", result)
     }
 
     @Test
     fun updateTemperature_zeroCelsius_returns32Fahrenheit() {
-        val result = WeatherUtils.updateTemperature(0, false)
+        val result = WeatherFormatter.updateTemperature(0, false)
         assertEquals("32F° ", result)
     }
 
     @Test
     fun updateTemperature_negativeCelsius_returnsCorrectFahrenheit() {
-        val result = WeatherUtils.updateTemperature(-10, false)
+        val result = WeatherFormatter.updateTemperature(-10, false)
         // (-10 * 9/5) + 32 = 14
         assertEquals("14F° ", result)
     }
 
     @Test
     fun convertWindSpeed_defaultUnit_returnsKmh() {
-        val result = WeatherUtils.convertWindSpeed(10, 0)
+        val result = WeatherFormatter.convertWindSpeed(10, 0)
         assertEquals("10", result)
     }
 
     @Test
     fun convertWindSpeed_ms_convertsCorrectly() {
-        val result = WeatherUtils.convertWindSpeed(36, 1)
+        val result = WeatherFormatter.convertWindSpeed(36, 1)
         // 36 / 3.6 = 10
         assertEquals("10", result)
     }
 
     @Test
     fun convertWindSpeed_knots_convertsCorrectly() {
-        val result = WeatherUtils.convertWindSpeed(10, 2)
+        val result = WeatherFormatter.convertWindSpeed(10, 2)
         // 10 * 0.587 = 5 (toInt)
         assertEquals("5", result)
     }
 
     @Test
     fun convertWindSpeed_fts_convertsCorrectly() {
-        val result = WeatherUtils.convertWindSpeed(10, 3)
+        val result = WeatherFormatter.convertWindSpeed(10, 3)
         // 10 * 0.91 = 9 (toInt)
         assertEquals("9", result)
     }
@@ -63,7 +63,7 @@ class WeatherUtilsTest {
     @Test
     fun updateDateToToday_withValidTimestamp_returnsFormattedDate() {
         // 2025-04-03 00:00:00 UTC = 1743638400
-        val result = WeatherUtils.updateDateToToday(1743638400)
+        val result = WeatherFormatter.updateDateToToday(1743638400)
         // The exact format depends on locale, but should contain the date
         org.junit.Assert.assertNotNull(result)
         org.junit.Assert.assertTrue(result.contains("2025") || result.contains("April") || result.contains("Apr"))
@@ -71,7 +71,7 @@ class WeatherUtilsTest {
 
     @Test
     fun updateDateToToday_withNull_returnsToday() {
-        val result = WeatherUtils.updateDateToToday(null)
+        val result = WeatherFormatter.updateDateToToday(null)
         assertEquals("Today", result)
     }
 
@@ -79,13 +79,13 @@ class WeatherUtilsTest {
     fun updateTime_withValidEpoch_returnsFormattedTime() {
         // 1708754400 = 2024-02-24 06:00:00 UTC
         // The exact output depends on timezone, but should be non-empty
-        val result = WeatherUtils.updateTime(1708754400, "UTC")
+        val result = WeatherFormatter.updateTime(1708754400, "UTC")
         assertEquals("06:00", result)
     }
 
     @Test
     fun updateTime_withNullEpoch_returnsDefault() {
-        val result = WeatherUtils.updateTime(null, "UTC")
+        val result = WeatherFormatter.updateTime(null, "UTC")
         assertEquals("--:--", result)
     }
 
@@ -108,7 +108,7 @@ class WeatherUtilsTest {
             )
         }
 
-        val result = WeatherUtils.filterNext24Hours(hourly, "UTC", now)
+        val result = WeatherFormatter.filterNext24Hours(hourly, "UTC", now)
 
         assertEquals(24, result.size)
         assertEquals(now, result.first().dt)
@@ -117,7 +117,7 @@ class WeatherUtilsTest {
 
     @Test
     fun calculateDayDuration_returnsNonEmpty() {
-        val result = WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(
+        val result = WeatherFormatter.calculateDayDurationElapsedDayTimeAndSunIconProgress(
             "06:00", "18:00", "UTC"
         )
         assertEquals(3, result.size)

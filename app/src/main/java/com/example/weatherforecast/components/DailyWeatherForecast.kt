@@ -30,7 +30,7 @@ import androidx.navigation.NavController
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.Blue500
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -50,7 +50,7 @@ fun DailyWeatherForecast(
             val currentPage = pagerState.currentPage
             val currentDaily = dailyList.getOrNull(currentPage) ?: dailyList.firstOrNull() ?: return@Scaffold
             TopAppBar(
-                title = { Text(text = WeatherUtils.updateDateToToday(currentDaily.dt.toInt())) },
+                title = { Text(text = WeatherFormatter.updateDateToToday(currentDaily.dt.toInt())) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

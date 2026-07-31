@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 import java.lang.Math.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
@@ -43,7 +43,7 @@ import kotlin.math.sin
 fun SunriseSunsetArcCard(sunrise: String, sunset: String, timezone: String) {
     val context = LocalContext.current
 
-    val dayProgressArray=WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise,sunset, timezone)
+    val dayProgressArray=WeatherFormatter.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise,sunset, timezone)
     val dayDuration= dayProgressArray[0]
     val elapsedDayTime= dayProgressArray[1]
     val progress=dayProgressArray[2].toFloat()

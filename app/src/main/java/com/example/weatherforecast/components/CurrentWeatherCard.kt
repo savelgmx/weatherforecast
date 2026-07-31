@@ -32,6 +32,8 @@ import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
+import com.example.weatherforecast.utils.WeatherComposables
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun CurrentWeatherCard(
@@ -66,21 +68,21 @@ fun CurrentWeatherCard(
                         val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
                         val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
 
-                        val temperature = com.example.weatherforecast.utils.WeatherUtils.updateTemperature(firstHourly.temp.toInt(), switchState)
-                        val pressure = com.example.weatherforecast.utils.WeatherUtils.updatePressure(firstHourly.pressure.toInt())
+                        val temperature = WeatherFormatter.updateTemperature(firstHourly.temp.toInt(), switchState)
+                        val pressure = WeatherComposables.updatePressure(firstHourly.pressure.toInt())
                     val feels_like = localContext.getString(R.string.feels_like) + " :" +
-                                com.example.weatherforecast.utils.WeatherUtils.updateTemperature(firstHourly.feelsLike.toInt(), switchState)
-                    val wind = com.example.weatherforecast.utils.WeatherUtils.updateWind(
+                                WeatherFormatter.updateTemperature(firstHourly.feelsLike.toInt(), switchState)
+                    val wind = WeatherComposables.updateWind(
                             firstHourly.windDeg.toString(),
                             firstHourly.windSpeed.toInt(),
                         localContext
                     ) + ":  " +
-                                com.example.weatherforecast.utils.WeatherUtils.convertWindSpeed(firstHourly.windSpeed.toInt(), windSpeedUnits) +
-                            " " + com.example.weatherforecast.utils.WeatherUtils.selectionWindSignature(selection = windSpeedUnits)
+                                WeatherFormatter.convertWindSpeed(firstHourly.windSpeed.toInt(), windSpeedUnits) +
+                            " " + WeatherComposables.selectionWindSignature(selection = windSpeedUnits)
                         val icon = firstHourly.icon
-                        val tempMax = weatherState.data?.tempMax?.let { com.example.weatherforecast.utils.WeatherUtils.updateTemperature(it.toInt(), switchState) }
-                        val tempMin = weatherState.data?.tempMin?.let { com.example.weatherforecast.utils.WeatherUtils.updateTemperature(it.toInt(), switchState) }
-                        val day = weatherState.data?.dt?.let { com.example.weatherforecast.utils.WeatherUtils.updateDateToToday(it.toInt()) }
+                        val tempMax = weatherState.data?.tempMax?.let { WeatherFormatter.updateTemperature(it.toInt(), switchState) }
+                        val tempMin = weatherState.data?.tempMin?.let { WeatherFormatter.updateTemperature(it.toInt(), switchState) }
+                        val day = weatherState.data?.dt?.let { WeatherFormatter.updateDateToToday(it.toInt()) }
                         val now = localContext.getString(R.string.now)
 
                     Row(
@@ -182,7 +184,7 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                        text = "$pressure  ${com.example.weatherforecast.utils.WeatherUtils.updatePressureUnit()}",
+                                        text = "$pressure  ${WeatherComposables.updatePressureUnit()}",
                                     color = Color.White,
                                     style = QuickSandTypography.titleSmall,
                                     modifier = Modifier.padding(1.dp)

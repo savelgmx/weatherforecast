@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
-import com.example.weatherforecast.utils.WeatherUtils
-import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
+import com.example.weatherforecast.utils.WeatherFormatter
+import com.example.weatherforecast.utils.WeatherComposables.WeatherHeader
 
 /**
  * Shared LazyListScope extension functions for DailyWeatherForecast portrait/landscape content.
@@ -44,7 +44,7 @@ fun LazyListScope.dailyWeatherLeftItems(
     }
     item {
         val filteredHourlyWeatherList =
-            WeatherUtils.filterNext24Hours(hourlyList = hourlyList, timezone = timeZone, startEpochSeconds = daily.dt)
+            WeatherFormatter.filterNext24Hours(hourlyList = hourlyList, timezone = timeZone, startEpochSeconds = daily.dt)
         HourlyWeatherRow(filteredHourlyWeatherList, timeZone)
     }
 }
@@ -88,12 +88,12 @@ fun LazyListScope.dailyWeatherRightItems(
         ) {
             val timeOfDawn = daily.sunrise
             val timeOfDusk = daily.sunset
-            val timeOfDawnAndDusk = WeatherUtils.calculateDawnAndDusk(timeOfDawn.toInt(), timeOfDusk.toInt())
+            val timeOfDawnAndDusk = WeatherFormatter.calculateDawnAndDusk(timeOfDawn.toInt(), timeOfDusk.toInt())
             timeOfDawnAndDusk[0]?.let { dawn ->
                 timeOfDawnAndDusk[1]?.let { dusk ->
                     SunriseSunsetCard(
-                        sunrise = WeatherUtils.updateTime(daily.sunrise.toInt(), timeZone),
-                        sunset = WeatherUtils.updateTime(daily.sunset.toInt(), timeZone),
+                        sunrise = WeatherFormatter.updateTime(daily.sunrise.toInt(), timeZone),
+                        sunset = WeatherFormatter.updateTime(daily.sunset.toInt(), timeZone),
                         dawn = dawn,
                         dusk = dusk,
                         timeZone

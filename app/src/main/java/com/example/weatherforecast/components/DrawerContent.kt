@@ -37,7 +37,7 @@ import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherComposables
 import kotlinx.coroutines.launch
 
 @Composable
@@ -117,7 +117,7 @@ fun DrawerContent(navController: NavController? = null) {
                     )
                 }
             }
-            Column { Text(" "+WeatherUtils.selectionWindSignature(selectedWindOption)) }
+            Column { Text(" "+WeatherComposables.selectionWindSignature(selectedWindOption)) }
         }
 
         HorizontalDivider()
@@ -164,7 +164,7 @@ fun DrawerContent(navController: NavController? = null) {
 
             }
             Column{
-                Text(" "+ WeatherUtils.selectionPressureSignature(selectedPressureOption))
+                Text(" "+ WeatherComposables.selectionPressureSignature(selectedPressureOption))
             }
         }
         HorizontalDivider()

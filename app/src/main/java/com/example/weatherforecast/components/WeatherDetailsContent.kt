@@ -20,9 +20,9 @@ import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils
-import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
-import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
+import com.example.weatherforecast.utils.WeatherFormatter
+import com.example.weatherforecast.utils.WeatherComposables.WeatherHeader
+import com.example.weatherforecast.utils.WeatherComposables.WeatherText
 
 /**
  * Shared LazyListScope extension functions for MainScreen portrait/landscape content.
@@ -102,7 +102,7 @@ fun LazyListScope.weatherMainItems(
             }
             item {
                 hourlyData?.let { hourlyWeatherList ->
-                    val filteredHourlyWeatherList = WeatherUtils.filterNext24Hours(
+                    val filteredHourlyWeatherList = WeatherFormatter.filterNext24Hours(
                         hourlyList = hourlyWeatherList,
                         timezone = ""
                     )
@@ -140,8 +140,8 @@ fun LazyListScope.weatherMainItems(
                 ) {
                     val daily = forecastData.firstOrNull()
                     if (daily != null) {
-                        val timeOfSunrise = WeatherUtils.updateTime(daily.sunrise.toInt(), "")
-                        val timeOfSunset = WeatherUtils.updateTime(daily.sunset.toInt(), "")
+                        val timeOfSunrise = WeatherFormatter.updateTime(daily.sunrise.toInt(), "")
+                        val timeOfSunset = WeatherFormatter.updateTime(daily.sunset.toInt(), "")
                         SunriseSunsetArcCard(
                             sunrise = timeOfSunrise,
                             sunset = timeOfSunset,

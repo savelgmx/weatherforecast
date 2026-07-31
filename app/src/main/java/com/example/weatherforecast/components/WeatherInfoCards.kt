@@ -29,7 +29,9 @@ import com.example.weatherforecast.theme.orange
 import com.example.weatherforecast.theme.White
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.MoonPhaseCalculator
+import com.example.weatherforecast.utils.WeatherComposables
+import com.example.weatherforecast.utils.WeatherFormatter
 
 /**
  * Card displaying humidity percentage and dew point.
@@ -38,7 +40,7 @@ import com.example.weatherforecast.utils.WeatherUtils
 fun HumidityCard(humidity: Int, dewPoint: Int) {
     val context = LocalContext.current
     val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = false)
-    val dewPointValue = WeatherUtils.updateTemperature(dewPoint, switchState)
+    val dewPointValue = WeatherFormatter.updateTemperature(dewPoint, switchState)
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -114,7 +116,7 @@ fun UVIndexCard(index: Int) {
                 maxValue = 13
             )
             Text(
-                text = WeatherUtils.updateUVLevel(LocalContext.current, index),
+                text = WeatherFormatter.updateUVLevel(LocalContext.current, index),
                 color = Color.White,
                 style = QuickSandTypography.labelLarge
             )
@@ -128,8 +130,8 @@ fun UVIndexCard(index: Int) {
 @Composable
 fun PressureCard(pressure: Int) {
     val context = LocalContext.current
-    val pressureValue = WeatherUtils.updatePressure(pressureValue = pressure)
-    val pressureUnit = WeatherUtils.updatePressureUnit()
+    val pressureValue = WeatherComposables.updatePressure(pressureValue = pressure)
+    val pressureUnit = WeatherComposables.updatePressureUnit()
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -157,8 +159,8 @@ fun PressureCard(pressure: Int) {
                 primaryColor = orange,
                         secondaryColor = White,
                 circleRadius = 80f,
-                minValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 870),
-                maxValue = WeatherUtils.updateMinMaxPressureValue(minMaxPressure = 1033)
+                minValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 870),
+                maxValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 1033)
             )
             Text(
                 text = "$pressureValue $pressureUnit",
@@ -250,7 +252,7 @@ fun SunriseSunsetCard(
             ) {
                 Text(
                     text = context.getString(R.string.day_duration_time) + " "
-                            + WeatherUtils.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise, sunset, timezone)[0] + "\n",
+                            + WeatherFormatter.calculateDayDurationElapsedDayTimeAndSunIconProgress(sunrise, sunset, timezone)[0] + "\n",
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White,
                     style = QuickSandTypography.bodyMedium
@@ -280,7 +282,7 @@ fun MoonriseMoonsetCard(moonPhase: Double) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.padding(1.dp)) {
-                val moonPhaseIconId = WeatherUtils.getMoonPhaseIconName(localContext, moonPhase)
+                val moonPhaseIconId = MoonPhaseCalculator.getMoonPhaseIconName(localContext, moonPhase)
                 AsyncImage(
                     model = moonPhaseIconId,
                     contentDescription = "MoonPhase icon",
@@ -291,7 +293,7 @@ fun MoonriseMoonsetCard(moonPhase: Double) {
             }
             Row(modifier = Modifier.padding(1.dp)) {
                 Text(
-                    text = WeatherUtils.calculateMoonPhase(localContext, moonPhase),
+                    text = MoonPhaseCalculator.calculateMoonPhase(localContext, moonPhase),
                     color = Color.White,
                     fontWeight = FontWeight.Light,
                     style = QuickSandTypography.titleMedium,

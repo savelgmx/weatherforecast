@@ -28,7 +28,7 @@ import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.theme.Blue700
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.UIUtils
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun DailyWeatherCard(
@@ -43,7 +43,7 @@ fun DailyWeatherCard(
         .collectAsState(initial = false)
 
     val feelsLike =
-        localContext.getString(R.string.feels_like) + ": " + WeatherUtils.updateTemperature(
+        localContext.getString(R.string.feels_like) + ": " + WeatherFormatter.updateTemperature(
             daily.feelsLike.toInt(), switchState
         )
 
@@ -98,7 +98,7 @@ fun DailyWeatherCard(
 
                     Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
                         Text(
-                            text = localContext.getString(R.string.day) + ": " + WeatherUtils.updateTemperature(
+                            text = localContext.getString(R.string.day) + ": " + WeatherFormatter.updateTemperature(
                                 daily.tempMax.toInt(),
                                 switchState
                             ),
@@ -111,7 +111,7 @@ fun DailyWeatherCard(
                     Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
                         Text(
                             text = localContext.getString(R.string.night) + ": "
-                                    + WeatherUtils.updateTemperature(
+                                    + WeatherFormatter.updateTemperature(
                                 daily.tempMin.toInt(),
                                 switchState
                             ),

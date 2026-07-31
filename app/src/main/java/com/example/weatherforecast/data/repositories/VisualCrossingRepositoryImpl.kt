@@ -16,7 +16,7 @@ import com.example.weatherforecast.domain.models.DailyWeather
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.example.weatherforecast.utils.AppConstants
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.CityResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -43,17 +43,17 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Gets the current city name from WeatherUtils
+     * Gets the current city name from CityResolver
      */
     override suspend fun getDeviceCity(): String {
-        return WeatherUtils.getCityName(context)
+        return CityResolver.getCityName(context)
     }
 
     /**
-     * Sets the city name using WeatherUtils
+     * Sets the city name using CityResolver
      */
     override suspend fun setCityName(city: String) {
-        WeatherUtils.saveCityName(context, city)
+        CityResolver.saveCityName(context, city)
         if (BuildConfig.DEBUG) Log.d("City set", " $city")
     }
 
@@ -98,7 +98,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     moonPhase = dailyWeather.moonPhase,
                     dew=dailyWeather.dew,              //point of dew (точка росы)
                     uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
-                    cityName = WeatherUtils.getCityName(context) ?: "Unknown",
+                    cityName = CityResolver.getCityName(context) ?: "Unknown",
                     timezone = dailyWeather.timezone,
                     latitude = dailyWeather.latitude,
                     longitude = dailyWeather.longitude
@@ -250,8 +250,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         val targetCity = if (city.isNotBlank()) {
             city
         } else {
-            // If no city is passed, get from WeatherUtils
-            val cityFromUtils = WeatherUtils.getCityName(context)
+            // If no city is passed, get from CityResolver
+            val cityFromUtils = CityResolver.getCityName(context)
             if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }
@@ -299,7 +299,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             city
         } else {
             // Если город не передан, проверяем установленный город
-            val cityFromUtils = WeatherUtils.getCityName(context)
+            val cityFromUtils = CityResolver.getCityName(context)
             if (cityFromUtils.isBlank()) {
             return Resource.Error(null, "City name is not set")
         }

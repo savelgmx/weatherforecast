@@ -41,8 +41,8 @@ import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.theme.AppTheme
 import com.example.weatherforecast.utils.Resource
-import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherHeader
-import com.example.weatherforecast.utils.WeatherUtils.Companion.WeatherText
+import com.example.weatherforecast.utils.WeatherComposables.WeatherHeader
+import com.example.weatherforecast.utils.WeatherComposables.WeatherText
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedBoxWithConstraintsScope")

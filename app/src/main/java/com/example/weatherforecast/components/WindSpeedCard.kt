@@ -29,7 +29,8 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
-import com.example.weatherforecast.utils.WeatherUtils
+import com.example.weatherforecast.utils.WeatherComposables
+import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun WindSpeedCard(speed: Int, windDegree: Int) {
@@ -54,14 +55,14 @@ fun WindSpeedCard(speed: Int, windDegree: Int) {
                 style= QuickSandTypography.bodyMedium
             )
             WindDirectionShape(windDegree = windDegree)
-            Text("${WeatherUtils.convertWindSpeed(speed,selectedWindOptions)} ${WeatherUtils.selectionWindSignature(selection = selectedWindOptions)}",
+            Text("${WeatherFormatter.convertWindSpeed(speed,selectedWindOptions)} ${WeatherComposables.selectionWindSignature(selection = selectedWindOptions)}",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.headlineSmall,
                 color = Color.White
             )
             Text(
-                WeatherUtils.updateWind(windDirection = windDegree.toString(), windSpeed = speed, context =context ),
+                WeatherComposables.updateWind(windDirection = windDegree.toString(), windSpeed = speed, context =context ),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 style = QuickSandTypography.headlineSmall,
