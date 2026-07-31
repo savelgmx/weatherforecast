@@ -28,6 +28,6 @@ object LocalModule {
                 context,
                 OpenWeatherMapDatabase::class.java,
                 "open_weather_map_database"
-            ).fallbackToDestructiveMigration().build()
+            ).addMigrations(OpenWeatherMapDatabase.MIGRATION_4_5).build()
     }
 
