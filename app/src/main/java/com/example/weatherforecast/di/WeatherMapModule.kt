@@ -34,7 +34,7 @@ object WeatherMapModule {
     @Provides
     @Singleton
     fun provideWeatherMapRepository(
-        api: WeatherApiService,
+        @Named("weatherApi") api: WeatherApiService,
         @Named("visualCrossingApiKey") apiKey: String,
         @Named("weatherTileBaseUrl") tileBaseUrl: String,
         @Named("currentTime") currentTime: String
