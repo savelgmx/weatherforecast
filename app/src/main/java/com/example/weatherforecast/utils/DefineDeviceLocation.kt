@@ -23,22 +23,62 @@ class DefineDeviceLocation(private val context: Context) {
             return emptyArray()
         }
 
-        val location = getCurrentLocationOrNull() ?: return emptyArray()
-        return showLocation(location)
+        return getCurrentLocationOrNull() ?: emptyArray()
     }
 
-    private suspend fun getCurrentLocationOrNull(): Location? = withTimeoutOrNull(10_000) {
+    private suspend fun getCurrentLocationOrNull(): Array<String?>? = withTimeoutOrNull(10_000) {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         suspendCancellableCoroutine { continuation ->
             val cancellationTokenSource = CancellationTokenSource()
+            val task = try {
+                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+            } catch (e: SecurityException) {
+                Log.e("DefineDeviceLocation", "getCurrentLocation SecurityException: ${e.message}")
+                null
+            }
+            if (task == null) {
+                // SecurityException path — fall back to last known location
+                if (continuation.isActive) {
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { last ->
+                            if (continuation.isActive) {
+                                cancellationTokenSource.cancel()
+                                continuation.resume(if (last != null) showLocation(last) else emptyArray())
+                            }
+                        }
+                        .addOnFailureListener {
+                            if (continuation.isActive) {
+                                cancellationTokenSource.cancel()
+                                continuation.resume(emptyArray())
+                            }
+                        }
+                }
+            } else {
+                task.addOnSuccessListener { loc ->
+                    if (continuation.isActive) {
+                        cancellationTokenSource.cancel()
+                        continuation.resume(if (loc != null) showLocation(loc) else emptyArray())
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e("DefineDeviceLocation", "getCurrentLocation failed: ${e.message}")
+                    if (continuation.isActive) {
+                        fusedLocationClient.lastLocation
+                            .addOnSuccessListener { last ->
+                                if (continuation.isActive) {
+                                    cancellationTokenSource.cancel()
+                                    continuation.resume(if (last != null) showLocation(last) else emptyArray())
+                                }
+                            }
+                            .addOnFailureListener {
+                                if (continuation.isActive) {
+                                    cancellationTokenSource.cancel()
+                                    continuation.resume(emptyArray())
+                                }
+                            }
+                    }
+                }
+            }
             continuation.invokeOnCancellation { cancellationTokenSource.cancel() }
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
-                .addOnSuccessListener { location ->
-                    if (continuation.isActive) continuation.resume(location)
-                }
-                .addOnFailureListener {
-                    if (continuation.isActive) continuation.resume(null)
-                }
         }
     }
 
