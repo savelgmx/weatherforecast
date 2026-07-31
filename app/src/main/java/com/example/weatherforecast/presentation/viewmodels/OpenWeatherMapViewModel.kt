@@ -3,6 +3,7 @@ package com.example.weatherforecast.presentation.viewmodels
 import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.data.remote.AirVisualResponse
@@ -19,15 +20,18 @@ import javax.inject.Named
 @HiltViewModel
 class OpenWeatherMapViewModel @Inject constructor(
     application: Application,
+    savedStateHandle: SavedStateHandle,
     getDeviceCityUseCase: GetDeviceCityUseCase,
     getWeatherUseCase: GetWeatherUseCase,
     private val getAirVisualDataUseCase: GetAirVisualDataUseCase,
     @Named("iqAirApiKey") private val iqAirApiKey: String
-) : BaseWeatherViewModel(application, getDeviceCityUseCase, getWeatherUseCase) {
+) : BaseWeatherViewModel(application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase) {
 
     val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
     val weatherLiveData: MutableState<Resource<DailyWeather>> = mutableStateOf(Resource.Loading())
-    val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(false)
+    val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(
+        savedStateHandle.get<Boolean>(KEY_SHOW_CITY_SELECTION_DIALOG) ?: false
+    )
 
     private var isWeatherLoaded = false
     override val stateLoaded: Boolean get() = isWeatherLoaded
@@ -36,20 +40,20 @@ class OpenWeatherMapViewModel @Inject constructor(
         if (!city.isNullOrBlank()) {
             currentCity = city
             refreshWeather(city)
-            showCitySelectionDialog.value = false
+            setShowCitySelectionDialog(false)
         } else {
             if (hasLocationPermission()) {
                 viewModelScope.launch {
                     fetchAndSaveDeviceCity()
                 }
             } else {
-                showCitySelectionDialog.value = true
+                setShowCitySelectionDialog(true)
             }
         }
     }
 
     override fun onCityDetectionFailed() {
-        showCitySelectionDialog.value = true
+        setShowCitySelectionDialog(true)
     }
 
     /*
@@ -117,6 +121,15 @@ class OpenWeatherMapViewModel @Inject constructor(
     }
 
     fun dismissCitySelectionDialog() {
-        showCitySelectionDialog.value = false
+        setShowCitySelectionDialog(false)
+    }
+
+    private fun setShowCitySelectionDialog(value: Boolean) {
+        showCitySelectionDialog.value = value
+        savedStateHandle[KEY_SHOW_CITY_SELECTION_DIALOG] = value
+    }
+
+    companion object {
+        const val KEY_SHOW_CITY_SELECTION_DIALOG = "showCitySelectionDialog"
     }
 }

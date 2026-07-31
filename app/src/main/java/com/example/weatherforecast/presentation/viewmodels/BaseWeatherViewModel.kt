@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
@@ -13,12 +14,16 @@ import kotlinx.coroutines.launch
 
 abstract class BaseWeatherViewModel(
     application: Application,
+    protected val savedStateHandle: SavedStateHandle,
     protected val getDeviceCityUseCase: GetDeviceCityUseCase,
     protected val getWeatherUseCase: GetWeatherUseCase
 ) : AndroidViewModel(application) {
 
-    var currentCity: String = ""
-        protected set
+    var currentCity: String = savedStateHandle.get<String>(KEY_CURRENT_CITY) ?: ""
+        protected set(value) {
+            field = value
+            savedStateHandle[KEY_CURRENT_CITY] = value
+        }
     protected abstract val stateLoaded: Boolean
 
     init {
@@ -100,5 +105,9 @@ abstract class BaseWeatherViewModel(
      */
     protected open fun onCityDetectionFailed() {
         // no-op by default
+    }
+
+    companion object {
+        const val KEY_CURRENT_CITY = "currentCity"
     }
 }

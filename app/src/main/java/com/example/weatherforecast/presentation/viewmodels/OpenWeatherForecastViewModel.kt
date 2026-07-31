@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
@@ -20,9 +21,10 @@ import javax.inject.Inject
 @HiltViewModel
 class OpenWeatherForecastViewModel @Inject constructor(
     application: Application,
+    savedStateHandle: SavedStateHandle,
     getDeviceCityUseCase: GetDeviceCityUseCase,
     getWeatherUseCase: GetWeatherUseCase
-) : BaseWeatherViewModel(application, getDeviceCityUseCase, getWeatherUseCase) {
+) : BaseWeatherViewModel(application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase) {
 
     val forecastLiveData: MutableState<Resource<List<DailyWeather>>> = mutableStateOf(Resource.Loading())
     private var isForecastLoaded = false

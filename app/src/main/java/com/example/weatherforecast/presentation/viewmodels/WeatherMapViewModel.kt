@@ -6,6 +6,7 @@ package com.example.weatherforecast.presentation.viewmodels
 
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.data.repositories.WeatherMapRepository
@@ -33,6 +34,7 @@ data class WeatherMapUiState(
 
 @HiltViewModel
 class WeatherMapViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val getWeatherMapDataUseCase: GetWeatherMapDataUseCase,
     private val repository: WeatherMapRepository
 ) : ViewModel() {
@@ -43,11 +45,18 @@ class WeatherMapViewModel @Inject constructor(
     private val _selectedLayer = MutableStateFlow(WeatherLayer.Temperature)
     val selectedLayer: StateFlow<WeatherLayer> = _selectedLayer
 
+    init {
+        savedStateHandle.get<WeatherLayer>(KEY_SELECTED_LAYER)?.let { layer ->
+            _selectedLayer.value = layer
+        }
+    }
+
     private val _styleUrl = MutableStateFlow(repository.getMapStyleUrl())
     val styleUrl: StateFlow<String> = _styleUrl
 
     fun onLayerSelected(layer: WeatherLayer) {
         _selectedLayer.value = layer
+        savedStateHandle[KEY_SELECTED_LAYER] = layer
     }
 
     fun loadWeatherData(city: String) {
@@ -64,4 +73,8 @@ class WeatherMapViewModel @Inject constructor(
     }
 
     fun getTileUrl(layer: WeatherLayer): String = repository.getWeatherTileUrl(layer)
+
+    companion object {
+        const val KEY_SELECTED_LAYER = "selectedLayer"
+    }
 }
