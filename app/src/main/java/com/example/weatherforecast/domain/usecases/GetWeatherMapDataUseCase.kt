@@ -4,6 +4,7 @@
 
 package com.example.weatherforecast.domain.usecases
 
+import com.example.weatherforecast.data.repositories.WeatherMapPointsResult
 import com.example.weatherforecast.data.repositories.WeatherMapRepository
 import com.example.weatherforecast.domain.models.WeatherMapData
 import com.example.weatherforecast.domain.models.WeatherPoint
@@ -18,12 +19,19 @@ class GetWeatherMapDataUseCase @Inject constructor(
     private val repository: WeatherMapRepository
 ) {
     suspend operator fun invoke(city: String, layer: WeatherLayer): WeatherMapData {
-        val points = repository.getWeatherPoints(city, layer)
-        val center = repository.getCityCenter(city)
+        val result: WeatherMapPointsResult = repository.getWeatherPoints(city, layer)
+        var centerLat = result.centerLat
+        var centerLon = result.centerLon
+        if (centerLat == null || centerLon == null) {
+            repository.getCityCenter(city)?.let { center ->
+                centerLat = center.first
+                centerLon = center.second
+            }
+        }
         return WeatherMapData(
-            centerLat = center?.first,
-            centerLon = center?.second,
-            points = points
+            centerLat = centerLat,
+            centerLon = centerLon,
+            points = result.points
         )
     }
 }

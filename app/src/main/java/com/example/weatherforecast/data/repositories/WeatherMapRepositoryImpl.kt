@@ -10,12 +10,6 @@ import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 
-data class WeatherMapResponseWithCenter(
-    val centerLat: Double,
-    val centerLon: Double,
-    val points: List<WeatherPoint>
-)
-
 // Repository implementation
 class WeatherMapRepositoryImpl @Inject constructor(
     private val api: WeatherApiService,
@@ -24,9 +18,7 @@ class WeatherMapRepositoryImpl @Inject constructor(
     @Named("currentTime") private val currentTime: String
 ) : WeatherMapRepository {
 
-    private var lastCenter: Pair<Double, Double>? = null
-
-    override suspend fun getWeatherPoints(city: String, layer: WeatherLayer): List<WeatherPoint> {
+    override suspend fun getWeatherPoints(city: String, layer: WeatherLayer): WeatherMapPointsResult {
         val response =
             api.getWeather(
                 location = city,
@@ -38,21 +30,22 @@ class WeatherMapRepositoryImpl @Inject constructor(
             )
 
         // extract center
-        val centerLat = response.latitude ?: 0.0
-        val centerLon = response.longitude ?: 0.0
-        lastCenter = Pair(centerLat, centerLon)
+        val centerLat = response.latitude
+        val centerLon = response.longitude
 
         // build points
         val points = mutableListOf<WeatherPoint>()
         val days = response.days ?: emptyList()
-        if (days.isEmpty()) return emptyList()
+        if (days.isEmpty()) {
+            return WeatherMapPointsResult(points = emptyList(), centerLat = centerLat, centerLon = centerLon)
+        }
 
         days.forEach { day ->
             day.hours?.forEach { hour ->
                 points.add(
                     WeatherPoint(
-                        lat = centerLat,
-                        lon = centerLon,
+                        lat = centerLat ?: 0.0,
+                        lon = centerLon ?: 0.0,
                         temperature = hour.temp,
                         precipitation = hour.precipitation ?: 0.0,
                         cloudCover = hour.cloudCover ?: 0.0
@@ -61,13 +54,11 @@ class WeatherMapRepositoryImpl @Inject constructor(
             }
         }
 
-        Log.d("WeatherMapRepo", "Returning ${points.size} points for $city ($centerLat,$centerLon)")
-        return points
+        Log.d("WeatherMapRepo", "Returning ${points.size} points for $city (${centerLat ?: 0.0},${centerLon ?: 0.0})")
+        return WeatherMapPointsResult(points = points, centerLat = centerLat, centerLon = centerLon)
     }
 
     override suspend fun getCityCenter(city: String): Pair<Double, Double>? {
-        lastCenter?.let { return it }
-
         val response = api.getWeather(
             location = city,
             unitGroup = "metric",
@@ -80,7 +71,7 @@ class WeatherMapRepositoryImpl @Inject constructor(
         val lat = response.latitude
         val lon = response.longitude
         return if (lat != null && lon != null) {
-            Pair(lat, lon).also { lastCenter = it }
+            Pair(lat, lon)
         } else null
     }
 
