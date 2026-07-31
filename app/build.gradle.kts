@@ -22,6 +22,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        // buildConfigField blocks - API keys are injected via Gradle project properties (gradle.properties)
+        // and never committed to VCS; each field is read back through BuildConfig
         buildConfigField("String", "MAP_API_KEY", "\"${project.findProperty("MAP_API_KEY") ?: ""}\"")
         buildConfigField("String", "OWM_API_KEY", "\"${project.findProperty("OWM_API_KEY") ?: ""}\"")
         buildConfigField("String", "MAPTILER_API_KEY", "\"${project.findProperty("MAPTILER_API_KEY") ?: ""}\"")
@@ -43,6 +45,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // isCoreLibraryDesugaringEnabled = true - required so java.time (java.time.LocalDate etc.)
+        // works on minSdk 24 devices
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -55,6 +59,8 @@ android {
     }
 
     composeOptions {
+        // composeOptions kotlinCompilerExtensionVersion must stay aligned with the Kotlin 2.0.21
+        // Compose compiler plugin version declared at the root
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
@@ -64,6 +70,8 @@ android {
         }
     }
 
+    // testOptions block is intentionally commented out - unit tests run on JUnit 4
+    // (testImplementation junit:junit), not the JUnit Platform
 //    testOptions {
   //      unitTests.all { useJUnitPlatform() }
     //    }
