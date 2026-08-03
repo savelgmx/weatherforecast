@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+//is this class necessary?
 data class WeatherMapUiState(
     val city: String = "",
     val points: List<WeatherPoint> = emptyList(),
