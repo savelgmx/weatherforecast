@@ -128,7 +128,7 @@ object WeatherComposables {
             aqiLevel <= 150 -> aiqAirIcons[2]
             aqiLevel <= 200 -> aiqAirIcons[3]
             aqiLevel <= 300 -> aiqAirIcons[4]
-            else -> aiqAirIcons[5]
+            else -> aiqAirIcons[4]
         }
 
     }
