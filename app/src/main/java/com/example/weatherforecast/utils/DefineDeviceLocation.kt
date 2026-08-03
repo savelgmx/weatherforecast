@@ -1,5 +1,6 @@
 package com.example.weatherforecast.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
@@ -26,6 +27,13 @@ class DefineDeviceLocation(private val context: Context) {
         return getCurrentLocationOrNull() ?: emptyArray()
     }
 
+    // @SuppressLint is safe here: the only public entry point (getLocation())
+    // gates this call behind checkSelfPermission(ACCESS_FINE/COARSE_LOCATION),
+    // and both lastLocation/getCurrentLocation call sites additionally guard
+    // against a permission revocation race with a catch (SecurityException).
+    // Lint's MissingPermission rule cannot see across the function boundary,
+    // so it would otherwise report false positives on lines 42 and 65.
+    @SuppressLint("MissingPermission")
     private suspend fun getCurrentLocationOrNull(): Array<String?>? = withTimeoutOrNull(10_000) {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         suspendCancellableCoroutine { continuation ->

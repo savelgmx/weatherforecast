@@ -183,6 +183,12 @@ debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    // The Compose BOM must also be applied to the androidTest configuration.
+    // Without it, version-less artifacts on this classpath (e.g. ui-test-junit4)
+    // cannot be resolved and the full `./gradlew build` fails on
+    // debugAndroidTestRuntimeClasspath. Pre-existing defect fixed as a chore
+    // (see review round-2 report, item "build").
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.navigation:navigation-testing:2.8.0")
 
