@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,29 +32,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.weatherforecast.R
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.WeatherComposables
 import kotlinx.coroutines.launch
 
 @Composable
-fun DrawerContent(navController: NavController? = null) {
+fun DrawerContent(
+    navController: NavController? = null,
+    // Review item 5: preferences are read through the shared SettingsViewModel
+    // (Activity-scoped via hiltViewModel) instead of the static DataStoreManager.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = true)
+    val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
 
-    val selectedWindOption by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
+    val selectedWindOption by settingsViewModel.windPref.collectAsStateWithLifecycle()
     var windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
     var windSpeedUnitsPopup by remember { mutableStateOf(false) }
 
-    val selectedPressureOption by DataStoreManager.pressurePrefFlow(context).collectAsState(initial = 0)
+    val selectedPressureOption by settingsViewModel.pressurePref.collectAsStateWithLifecycle()
     var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
     var pressureUnitsPopup by remember { mutableStateOf(false) }
 
-    val enteredCity by DataStoreManager.cityNamePrefFlow(context).collectAsState(initial = null as String?)//text field with entered city name
+    val enteredCity by settingsViewModel.cityName.collectAsStateWithLifecycle()//text field with entered city name
     var enteredCityPopup by remember { mutableStateOf(false) }
 
     // ⚠ Bug #2 fix: весь контент drawer'а внутри одного Column.
@@ -102,7 +109,7 @@ fun DrawerContent(navController: NavController? = null) {
                                     optionsToSelect = windSpeedUnitsToSelect,
                                     onOptionSelected = { option ->
                                         scope.launch {
-                                            DataStoreManager.updateWindPref(context, option)
+                                            settingsViewModel.updateWindPref(option)
                                             windSpeedUnitsPopup = false
                                         }
                                     }
@@ -147,7 +154,7 @@ fun DrawerContent(navController: NavController? = null) {
                                     optionsToSelect = pressureUnitsToSelect,
                                     onOptionSelected = { option ->
                                         scope.launch {
-                                            DataStoreManager.updatePressurePref(context, option)
+                                            settingsViewModel.updatePressurePref(option)
                                             pressureUnitsPopup = false
                                         }
                                     }
@@ -208,7 +215,7 @@ fun DrawerContent(navController: NavController? = null) {
                     checked = switchState,
                     onCheckedChange = { isChecked ->
                         scope.launch {
-                            DataStoreManager.updateSwitchPref(context, isChecked)
+                            settingsViewModel.updateTempSwitch(isChecked)
                         }
                     }
                 )
@@ -268,8 +275,8 @@ fun DrawerContent(navController: NavController? = null) {
                             // ViewModel observers to restart auto-detect or show
                             // the dialog. This ordering matches selectCity() in
                             // OpenWeatherForecastViewModel.
-                            DataStoreManager.updateCityName(context, cityName)
-                            DataStoreManager.addRecentCity(context, cityName)
+                            settingsViewModel.updateCityName(cityName)
+                            settingsViewModel.addRecentCity(cityName)
                             enteredCityPopup = false
                         }
                     },

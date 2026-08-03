@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,16 +67,22 @@ class MainActivity : AppCompatActivity() {
                 val currentViewModel: OpenWeatherMapViewModel = hiltViewModel()
                 val forecastViewModel: OpenWeatherForecastViewModel = hiltViewModel()
                 val mapViewModel: WeatherMapViewModel = hiltViewModel()
+                // StateFlows are collected with lifecycle-awareness so recomposition
+                // happens on each emission (review item 5).
+                val currentState by currentViewModel.weatherLiveData.collectAsStateWithLifecycle()
+                val forecastState by forecastViewModel.forecastLiveData.collectAsStateWithLifecycle()
+                val showCitySelectionDialog by currentViewModel.showCitySelectionDialog.collectAsStateWithLifecycle()
+                val pollution by currentViewModel.airVisualLiveData.collectAsStateWithLifecycle()
                 MainScreen(
                     navController = navController,
-                    currentState = currentViewModel.weatherLiveData.value,
-                    forecastState = forecastViewModel.forecastLiveData.value,
+                    currentState = currentState,
+                    forecastState = forecastState,
                     onRefresh = {
                         currentViewModel.refreshWeather()
                         forecastViewModel.refreshWeather()
                     },
                     cityName = currentViewModel.currentCity,
-                    showCitySelectionDialog = currentViewModel.showCitySelectionDialog.value,
+                    showCitySelectionDialog = showCitySelectionDialog,
                     onCitySelected = { cityName ->
                         currentViewModel.onCitySelected(cityName)
                         forecastViewModel.selectCity(cityName)
@@ -82,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                     onDismissCityDialog = {
                         currentViewModel.dismissCitySelectionDialog()
                     },
-                    pollution = currentViewModel.airVisualLiveData.value?.data?.current?.pollution
+                    pollution = pollution?.data?.current?.pollution
                 )
             }
             composable(
@@ -91,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             ) { backStackEntry ->
                 val index = backStackEntry.arguments?.getInt("index") ?: 0
                 val forecastViewModel: OpenWeatherForecastViewModel = hiltViewModel()
-                val forecastState = forecastViewModel.forecastLiveData.value
+                val forecastState by forecastViewModel.forecastLiveData.collectAsStateWithLifecycle()
                 val dailyList = forecastState?.data ?: emptyList()
                 val hourlyList = dailyList.flatMap { it.hours ?: emptyList() }
                 if (dailyList.isNotEmpty() && index in 0 until dailyList.size) {

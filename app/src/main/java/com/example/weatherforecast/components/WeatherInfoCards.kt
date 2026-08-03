@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,9 +21,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
-import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.orange
 import com.example.weatherforecast.theme.White
 import com.example.weatherforecast.theme.Blue800
@@ -37,9 +38,14 @@ import com.example.weatherforecast.utils.WeatherFormatter
  * Card displaying humidity percentage and dew point.
  */
 @Composable
-fun HumidityCard(humidity: Int, dewPoint: Int) {
+fun HumidityCard(
+    humidity: Int,
+    dewPoint: Int,
+    // Review item 5: temperature preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = false)
+    val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
     val dewPointValue = WeatherFormatter.updateTemperature(dewPoint, switchState)
     Surface(
         modifier = Modifier
@@ -128,10 +134,15 @@ fun UVIndexCard(index: Int) {
  * Card displaying atmospheric pressure.
  */
 @Composable
-fun PressureCard(pressure: Int) {
+fun PressureCard(
+    pressure: Int,
+    // Review item 5: pressure preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val pressureValue = WeatherComposables.updatePressure(pressureValue = pressure)
-    val pressureUnit = WeatherComposables.updatePressureUnit()
+    val pressureOption by settingsViewModel.pressurePref.collectAsStateWithLifecycle()
+    val pressureValue = WeatherComposables.updatePressure(pressureValue = pressure, pressureOption = pressureOption)
+    val pressureUnit = WeatherComposables.updatePressureUnit(pressureOption)
     Surface(
         modifier = Modifier
             .width(160.dp)
@@ -159,8 +170,8 @@ fun PressureCard(pressure: Int) {
                 primaryColor = orange,
                         secondaryColor = White,
                 circleRadius = 80f,
-                minValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 870),
-                maxValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 1033)
+                minValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 870, pressureOption = pressureOption),
+                maxValue = WeatherComposables.updateMinMaxPressureValue(minMaxPressure = 1033, pressureOption = pressureOption)
             )
             Text(
                 text = "$pressureValue $pressureUnit",

@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.data.repositories.SettingsRepository
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +16,8 @@ abstract class BaseWeatherViewModel(
     application: Application,
     protected val savedStateHandle: SavedStateHandle,
     protected val getDeviceCityUseCase: GetDeviceCityUseCase,
-    protected val getWeatherUseCase: GetWeatherUseCase
+    protected val getWeatherUseCase: GetWeatherUseCase,
+    protected val settingsRepository: SettingsRepository
 ) : AndroidViewModel(application) {
 
     var currentCity: String = savedStateHandle.get<String>(KEY_CURRENT_CITY) ?: ""
@@ -38,7 +39,9 @@ abstract class BaseWeatherViewModel(
 
     protected fun observeCityFromDataStore() {
         viewModelScope.launch {
-            DataStoreManager.cityNamePrefFlow(getApplication())
+            // City selection changes flow through the SettingsRepository rather than
+            // the static DataStoreManager (review item 5).
+            settingsRepository.cityName
                 .collectLatest { city ->
                     onCityChanged(city)
                 }
@@ -72,7 +75,7 @@ abstract class BaseWeatherViewModel(
         try {
             val autoCity = getDeviceCityUseCase.execute()
             if (autoCity.isNotBlank()) {
-                DataStoreManager.updateCityName(getApplication(), autoCity)
+                settingsRepository.updateCityName(autoCity)
             } else {
                 onCityDetectionFailed()
             }

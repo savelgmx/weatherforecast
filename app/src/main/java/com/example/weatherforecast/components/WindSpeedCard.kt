@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,16 +25,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.weatherforecast.R
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.Blue800
 import com.example.weatherforecast.theme.QuickSandTypography
 import com.example.weatherforecast.utils.WeatherComposables
 import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
-fun WindSpeedCard(speed: Int, windDegree: Int) {
+fun WindSpeedCard(
+    speed: Int,
+    windDegree: Int,
+    // Review item 5: wind unit preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val selectedWindOptions by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
+    val selectedWindOptions by settingsViewModel.windPref.collectAsStateWithLifecycle()
     Surface(
         modifier = Modifier
             .width(160.dp)

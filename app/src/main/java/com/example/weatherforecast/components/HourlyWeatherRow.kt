@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,9 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.HourlyWeather
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
@@ -60,7 +62,12 @@ fun HourlyWeatherRow(hourlyForecast: List<HourlyWeather>, timezone: String) {
     }
 }
 @Composable
-fun HourlyWeatherItem(hourly: HourlyWeather,timezone:String) {
+fun HourlyWeatherItem(
+    hourly: HourlyWeather,
+    timezone:String,
+    // Review item 5: temperature preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
 
 
 
@@ -72,7 +79,7 @@ fun HourlyWeatherItem(hourly: HourlyWeather,timezone:String) {
     {
 
         val localContext= LocalContext.current
-        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+        val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
 
         val icon = hourly.icon
         val localIconName = icon.replace("-", "_")

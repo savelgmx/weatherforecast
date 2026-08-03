@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,6 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.utils.WeatherLayer
 
 /**
@@ -107,10 +109,15 @@ private fun scaleFor(layer: WeatherLayer): LegendScale = when (layer) {
  * sized so the bar height matches the label count × 14 dp.
  */
 @Composable
-fun WeatherLegend(layer: WeatherLayer, modifier: Modifier = Modifier) {
+fun WeatherLegend(
+    layer: WeatherLayer,
+    modifier: Modifier = Modifier,
+    // Review item 5: unit preferences via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val switchState by DataStoreManager.tempSwitchPrefFlow(context).collectAsState(initial = true)
-    val selectedWindOptions by DataStoreManager.windPrefFlow(context).collectAsState(initial = 0)
+    val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
+    val selectedWindOptions by settingsViewModel.windPref.collectAsStateWithLifecycle()
 
     val scale = scaleFor(layer)
 

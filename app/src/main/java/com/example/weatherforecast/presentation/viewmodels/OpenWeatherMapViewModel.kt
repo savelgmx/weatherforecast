@@ -1,18 +1,19 @@
 package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecast.components.DataStoreManager
 import com.example.weatherforecast.data.remote.AirVisualResponse
+import com.example.weatherforecast.data.repositories.SettingsRepository
 import com.example.weatherforecast.domain.usecases.GetAirVisualDataUseCase
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,15 +24,27 @@ class OpenWeatherMapViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getDeviceCityUseCase: GetDeviceCityUseCase,
     getWeatherUseCase: GetWeatherUseCase,
+    settingsRepository: SettingsRepository,
     private val getAirVisualDataUseCase: GetAirVisualDataUseCase,
     @Named("iqAirApiKey") private val iqAirApiKey: String
-) : BaseWeatherViewModel(application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase) {
+) : BaseWeatherViewModel(
+    application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase, settingsRepository
+) {
 
-    val airVisualLiveData: MutableState<AirVisualResponse?> = mutableStateOf(null)
-    val weatherLiveData: MutableState<Resource<DailyWeather>> = mutableStateOf(Resource.Loading())
-    val showCitySelectionDialog: MutableState<Boolean> = mutableStateOf(
+    // StateFlows (review item 5) — external reads are immutable StateFlow, all writes
+    // go through the private MutableStateFlow so state cannot be mutated from the UI.
+    private val _airVisualLiveData = MutableStateFlow<AirVisualResponse?>(null)
+    val airVisualLiveData: StateFlow<AirVisualResponse?> = _airVisualLiveData.asStateFlow()
+
+    private val _weatherLiveData = MutableStateFlow<Resource<DailyWeather>>(Resource.Loading())
+    val weatherLiveData: StateFlow<Resource<DailyWeather>> = _weatherLiveData.asStateFlow()
+
+    // PRESERVES SavedStateHandle restore: the dialog visibility survives process
+    // death / config change via the initial value read from the SavedStateHandle.
+    private val _showCitySelectionDialog = MutableStateFlow<Boolean>(
         savedStateHandle.get<Boolean>(KEY_SHOW_CITY_SELECTION_DIALOG) ?: false
     )
+    val showCitySelectionDialog: StateFlow<Boolean> = _showCitySelectionDialog.asStateFlow()
 
     private var isWeatherLoaded = false
     override val stateLoaded: Boolean get() = isWeatherLoaded
@@ -74,9 +87,9 @@ class OpenWeatherMapViewModel @Inject constructor(
                 lon,
                 iqAirApiKey
             )
-            airVisualLiveData.value = result
+            _airVisualLiveData.value = result
         } catch (e: Exception) {
-            airVisualLiveData.value = null
+            _airVisualLiveData.value = null
         }
     }
 
@@ -87,10 +100,10 @@ class OpenWeatherMapViewModel @Inject constructor(
     fun refreshWeather(city: String = currentCity) {
         isWeatherLoaded = false
         viewModelScope.launch {
-            weatherLiveData.value = Resource.Loading()
+            _weatherLiveData.value = Resource.Loading()
             try {
                 val result = fetchWeather(city, forceRefresh = true)
-                weatherLiveData.value = result
+                _weatherLiveData.value = result
                 if (result is Resource.Success) {
                     isWeatherLoaded = true
                     currentCity = city
@@ -103,7 +116,7 @@ class OpenWeatherMapViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
+                _weatherLiveData.value = Resource.Error(null, "An error occurred: ${e.message}")
             }
         }
     }
@@ -112,10 +125,10 @@ class OpenWeatherMapViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 if (cityName.isNotBlank()) {
-                    DataStoreManager.updateCityName(getApplication(), cityName)
+                    settingsRepository.updateCityName(cityName)
                 }
             } catch (e: Exception) {
-                weatherLiveData.value = Resource.Error(null, "Failed to set city: ${e.message}")
+                _weatherLiveData.value = Resource.Error(null, "Failed to set city: ${e.message}")
             }
         }
     }
@@ -125,7 +138,7 @@ class OpenWeatherMapViewModel @Inject constructor(
     }
 
     private fun setShowCitySelectionDialog(value: Boolean) {
-        showCitySelectionDialog.value = value
+        _showCitySelectionDialog.value = value
         savedStateHandle[KEY_SHOW_CITY_SELECTION_DIALOG] = value
     }
 

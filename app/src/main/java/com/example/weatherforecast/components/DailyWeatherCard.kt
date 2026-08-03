@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,9 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue500
 import com.example.weatherforecast.theme.Blue700
@@ -32,15 +34,16 @@ import com.example.weatherforecast.utils.WeatherFormatter
 
 @Composable
 fun DailyWeatherCard(
-    daily: DailyWeather
+    daily: DailyWeather,
+    // Review item 5: temperature preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 )
 {
 
     val localContext = LocalContext.current //To access the context within a Composable function,
     // use the LocalContext provided by Jetpack Compose
     //we need this context to load  string values form strings.xml
-    val switchState by DataStoreManager.tempSwitchPrefFlow(localContext)
-        .collectAsState(initial = false)
+    val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
 
     val feelsLike =
         localContext.getString(R.string.feels_like) + ": " + WeatherFormatter.updateTemperature(

@@ -16,6 +16,9 @@
 .cxx
 local.properties
 
+# --- Kotlin Gradle plugin session cache ---
+.kotlin/
+
 # --- Tooling & AI artifacts ---
 .claude/
 .claude-flow/

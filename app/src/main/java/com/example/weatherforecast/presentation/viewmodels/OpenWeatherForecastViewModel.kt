@@ -2,16 +2,17 @@ package com.example.weatherforecast.presentation.viewmodels
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecast.components.DataStoreManager
+import com.example.weatherforecast.data.repositories.SettingsRepository
 import com.example.weatherforecast.domain.usecases.GetDeviceCityUseCase
 import com.example.weatherforecast.domain.usecases.GetWeatherUseCase
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,10 +24,15 @@ class OpenWeatherForecastViewModel @Inject constructor(
     application: Application,
     savedStateHandle: SavedStateHandle,
     getDeviceCityUseCase: GetDeviceCityUseCase,
-    getWeatherUseCase: GetWeatherUseCase
-) : BaseWeatherViewModel(application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase) {
+    getWeatherUseCase: GetWeatherUseCase,
+    settingsRepository: SettingsRepository
+) : BaseWeatherViewModel(
+    application, savedStateHandle, getDeviceCityUseCase, getWeatherUseCase, settingsRepository
+) {
 
-    val forecastLiveData: MutableState<Resource<List<DailyWeather>>> = mutableStateOf(Resource.Loading())
+    // StateFlow (review item 5) — external reads immutable, writes via private MutableStateFlow.
+    private val _forecastLiveData = MutableStateFlow<Resource<List<DailyWeather>>>(Resource.Loading())
+    val forecastLiveData: StateFlow<Resource<List<DailyWeather>>> = _forecastLiveData.asStateFlow()
     private var isForecastLoaded = false
     override val stateLoaded: Boolean get() = isForecastLoaded
 
@@ -49,16 +55,16 @@ class OpenWeatherForecastViewModel @Inject constructor(
     private fun getForecast(city: String, forceRefresh: Boolean = false) {
         if(!isForecastLoaded||forceRefresh){
             viewModelScope.launch {
-                forecastLiveData.value = Resource.Loading()
+                _forecastLiveData.value = Resource.Loading()
                 try {
                     val result = getWeatherUseCase.getForecastWeather(city, forceRefresh)
-                    forecastLiveData.value = result
+                    _forecastLiveData.value = result
                     if (result is Resource.Success) {
                         isForecastLoaded = true
                         currentCity = city
                     }
                 } catch (e: Exception) {
-                    forecastLiveData.value = Resource.Error(null, "Forecast error: ${e.message}")
+                    _forecastLiveData.value = Resource.Error(null, "Forecast error: ${e.message}")
                 }
             }
         }
@@ -80,9 +86,14 @@ class OpenWeatherForecastViewModel @Inject constructor(
         Log.d("ViewModel", "selectCity called: $city")
         viewModelScope.launch {
             Log.d("ViewModel", "selectCity coroutine started")
-            DataStoreManager.updateCityName(getApplication(), city)
+            // IMPORTANT: updateCityName MUST be called before addRecentCity.
+            // addRecentCity writes RECENT_CITIES_KEY, which triggers a DataStore
+            // emission; if the city hasn't been saved to LOCATED_CITY_NAME_KEY yet,
+            // the cityName flow re-emits the old (blank) value. The ordering here is
+            // preserved through the SettingsRepository (review item 5).
+            settingsRepository.updateCityName(city)
             Log.d("ViewModel", "updateCityName completed")
-            DataStoreManager.addRecentCity(getApplication(), city)
+            settingsRepository.addRecentCity(city)
             Log.d("ViewModel", "addRecentCity completed")
         }
     }

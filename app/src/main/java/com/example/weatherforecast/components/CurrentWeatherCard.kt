@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,10 +22,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.domain.models.HourlyWeather
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
@@ -38,7 +40,9 @@ import com.example.weatherforecast.utils.WeatherFormatter
 @Composable
 fun CurrentWeatherCard(
     weatherState: Resource<DailyWeather>,
-    filteredCurrentWeatherList: List<HourlyWeather>
+    filteredCurrentWeatherList: List<HourlyWeather>,
+    // Review item 5: measurement preferences via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
     Box(
@@ -65,11 +69,12 @@ fun CurrentWeatherCard(
                     val firstHourly = filteredCurrentWeatherList.firstOrNull()
                     if (firstHourly != null) {
                         val localContext = LocalContext.current
-                        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
-                        val windSpeedUnits by DataStoreManager.windPrefFlow(localContext).collectAsState(initial = 0)
+                        val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
+                        val windSpeedUnits by settingsViewModel.windPref.collectAsStateWithLifecycle()
+                        val pressureOption by settingsViewModel.pressurePref.collectAsStateWithLifecycle()
 
                         val temperature = WeatherFormatter.updateTemperature(firstHourly.temp.toInt(), switchState)
-                        val pressure = WeatherComposables.updatePressure(firstHourly.pressure.toInt())
+                        val pressure = WeatherComposables.updatePressure(firstHourly.pressure.toInt(), pressureOption)
                     val feels_like = localContext.getString(R.string.feels_like) + " :" +
                                 WeatherFormatter.updateTemperature(firstHourly.feelsLike.toInt(), switchState)
                     val wind = WeatherComposables.updateWind(
@@ -184,7 +189,7 @@ fun CurrentWeatherCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                        text = "$pressure  ${WeatherComposables.updatePressureUnit()}",
+                                        text = "$pressure  ${WeatherComposables.updatePressureUnit(pressureOption)}",
                                     color = Color.White,
                                     style = QuickSandTypography.titleSmall,
                                     modifier = Modifier.padding(1.dp)

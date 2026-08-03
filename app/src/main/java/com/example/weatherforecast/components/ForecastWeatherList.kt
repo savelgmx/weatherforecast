@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,11 +22,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.weatherforecast.R
 import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.AppShapes
 import com.example.weatherforecast.theme.Blue600
 import com.example.weatherforecast.theme.Blue700
@@ -59,7 +61,13 @@ fun ForecastWeatherList(
     }
 }
 @Composable
-fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: NavController) {
+fun ClickableDayForecastItem(
+    index: Int,
+    daily: DailyWeather,
+    navController: NavController,
+    // Review item 5: temperature preference via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,7 +79,7 @@ fun ClickableDayForecastItem(index: Int, daily: DailyWeather, navController: Nav
     ) {
 
         val localContext = LocalContext.current
-        val switchState by DataStoreManager.tempSwitchPrefFlow(localContext).collectAsState(initial = false)
+        val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
 
         val icon = daily.icon
         val localIconName = icon.replace("-", "_")

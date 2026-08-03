@@ -106,6 +106,10 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    // collectAsStateWithLifecycle() — used by all composables that read the
+    // SettingsViewModel StateFlows (review item 5). Version aligned with the
+    // existing lifecycle 2.8.4 group.
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
     implementation("androidx.fragment:fragment-ktx:1.8.2")
     implementation("androidx.activity:activity-compose:1.9.1")
 
