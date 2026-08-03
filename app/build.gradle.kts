@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,26 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
+}
+
+/**
+ * Resolves a build secret by name.
+ *
+ * Priority: gitignored `local.properties` first, then the committed
+ * `local.defaults.properties` placeholder file. Returns an EMPTY STRING (not "null")
+ * when the key is missing in both, so the generated `buildConfigField` string literal
+ * stays valid Kotlin and CI/dev builds never fail on absent keys.
+ */
+fun secretKey(name: String): String {
+    val props = Properties()
+    val local = rootProject.file("local.properties")
+    if (local.exists()) props.load(local.inputStream())
+    return props.getProperty(name) ?: run {
+        val p = Properties()
+        val defaults = rootProject.file("local.defaults.properties")
+        if (defaults.exists()) p.load(defaults.inputStream())
+        p.getProperty(name) ?: ""
+    }
 }
 
 android {
@@ -22,24 +44,25 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        // buildConfigField blocks - API keys are injected via Gradle project properties (gradle.properties)
-        // and never committed to VCS; each field is read back through BuildConfig
-        buildConfigField("String", "MAP_API_KEY", "\"${project.findProperty("MAP_API_KEY") ?: ""}\"")
-        buildConfigField("String", "OWM_API_KEY", "\"${project.findProperty("OWM_API_KEY") ?: ""}\"")
-        buildConfigField("String", "MAPTILER_API_KEY", "\"${project.findProperty("MAPTILER_API_KEY") ?: ""}\"")
-        buildConfigField("String", "IQAIR_API_KEY", "\"${project.findProperty("IQAIR_API_KEY") ?: ""}\"")
+        // buildConfigField blocks - API keys are read via secretKey() from gitignored
+        // local.properties (fallback: committed empty local.defaults.properties) and
+        // are never committed to VCS; each field is read back through BuildConfig
+        buildConfigField("String", "MAP_API_KEY", "\"${secretKey("MAP_API_KEY")}\"")
+        buildConfigField("String", "OWM_API_KEY", "\"${secretKey("OWM_API_KEY")}\"")
+        buildConfigField("String", "MAPTILER_API_KEY", "\"${secretKey("MAPTILER_API_KEY")}\"")
+        buildConfigField("String", "IQAIR_API_KEY", "\"${secretKey("IQAIR_API_KEY")}\"")
 
-        manifestPlaceholders["googleMapsKey"] = "${project.findProperty("googleMapsKey") ?: ""}"
+        manifestPlaceholders["googleMapsKey"] = secretKey("googleMapsKey")
     }
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") ?: ""}\"")
+            buildConfigField("String", "API_KEY", "\"${secretKey("API_KEY")}\"")
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") ?: ""}\"")
+            buildConfigField("String", "API_KEY", "\"${secretKey("API_KEY")}\"")
         }
     }
     compileOptions {

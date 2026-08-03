@@ -3,6 +3,7 @@ package com.example.weatherforecast.data.repositories
 // data/repositories/WeatherMapRepositoryImpl.kt
 // =============================
 import android.util.Log
+import com.example.weatherforecast.BuildConfig
 import com.example.weatherforecast.data.remote.WeatherApiService
 import com.example.weatherforecast.domain.models.WeatherPoint
 import com.example.weatherforecast.utils.WeatherLayer
@@ -75,8 +76,13 @@ class WeatherMapRepositoryImpl @Inject constructor(
         } else null
     }
 
+    /**
+     * MapLibre style URL for the streets style.
+     * The MapTiler key is injected via BuildConfig (from gitignored local.properties)
+     * instead of being hardcoded in source control.
+     */
     override fun getMapStyleUrl(): String {
-        return "https://api.maptiler.com/maps/streets/style.json?key=o79YaVvsT94U5HX9WA6e"
+        return "https://api.maptiler.com/maps/streets/style.json?key=${BuildConfig.MAPTILER_API_KEY}"
     }
 
     override fun getWeatherTileUrl(layer: WeatherLayer): String {

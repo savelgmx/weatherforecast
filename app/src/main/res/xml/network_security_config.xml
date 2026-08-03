@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    HTTPS-only network security config (review item 1).
+    Cleartext (http://) traffic and user-installed CA certificates are disabled:
+    the app only trusts the system CA store over TLS. All runtime base URLs are https.
+-->
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
 </network-security-config>
-
