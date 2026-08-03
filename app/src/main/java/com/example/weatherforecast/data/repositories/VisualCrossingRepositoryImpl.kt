@@ -69,11 +69,16 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Сохраняет данные о погоде в базу данных Room.
-     * Использует транзакцию для атомарной вставки DailyWeatherEntity и HourlyWeatherEntity.
-     * @param response Ответ API с данными о погоде.
+     * Persists an API response into the Room cache.
+     * Each daily row is tagged with the target [city] (instead of the device's
+     * CityResolver value) so the cache stays scoped per city and item-2 tests can
+     * assert on the stored cityName. Inserts run inside an atomic transaction
+     * (DailyWeatherEntity + HourlyWeatherEntity).
+     *
+     * @param response ответ API с данными о погоде
+     * @param city the city name every row is stored under
      */
-    private suspend fun insertWeatherData(response: WeatherApiResponse) {
+    private suspend fun insertWeatherData(response: WeatherApiResponse, city: String) {
         withContext(Dispatchers.IO) {
             response.days.forEach { day ->
                 val dailyWeather = WeatherMapper.toDailyWeather(day,response.timezone,response.latitude,response.longitude)
@@ -98,7 +103,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     moonPhase = dailyWeather.moonPhase,
                     dew=dailyWeather.dew,              //point of dew (точка росы)
                     uvindex=dailyWeather.uvindex,             //UV index (УФ индекс)
-                    cityName = CityResolver.getCityName(context) ?: "Unknown",
+                    cityName = city,
                     timezone = dailyWeather.timezone,
                     latitude = dailyWeather.latitude,
                     longitude = dailyWeather.longitude
@@ -129,35 +134,35 @@ class VisualCrossingRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Получает текущую погоду из базы данных.
-     * @return WeatherResponse или null, если данных нет.
+     * Читает текущую погоду для [city] из базы данных и восстанавливает почасовые
+     * данные (EntityMapper.toHourlyWeather), которые хранятся в отдельной таблице.
+     * @return DailyWeather или null, если для этого города кэша нет.
      */
-    private suspend fun getCurrentWeatherFromDB(): DailyWeather? {
-        val entity = weatherDao.getCurrentDailyWeatherEntity()
+    private suspend fun getCurrentWeatherFromDB(city: String): DailyWeather? {
+        val entity = weatherDao.getDailyWeatherByCity(city)
         if (entity != null) {
-            return EntityMapper.toDailyWeather(entity)
+            val hours = weatherDao.getHourlyWeatherForDay(entity.id)
+                .map { EntityMapper.toHourlyWeather(it) }
+            return EntityMapper.toDailyWeather(entity, hours)
         }
         return null
     }
 
     /**
-     * Получает прогноз погоды из базы данных.
-     * @return ForecastResponse или null, если данных нет.
+     * Читает полный прогноз для [city] из базы данных, восстанавливая почасовые
+     * данные для каждой дневной записи.
+     * @return список DailyWeather или null, если для этого города кэша нет.
      */
-    private suspend fun getForecastWeatherFromDB(): List<DailyWeather>? {
-        val entities = weatherDao.getAllDailyWeatherSync()
+    private suspend fun getForecastWeatherFromDB(city: String): List<DailyWeather>? {
+        val entities = weatherDao.getAllDailyWeatherByCity(city)
         if (entities.isNotEmpty()) {
-            return entities.map { EntityMapper.toDailyWeather(it) }
+            return entities.map { entity ->
+                val hours = weatherDao.getHourlyWeatherForDay(entity.id)
+                    .map { EntityMapper.toHourlyWeather(it) }
+                EntityMapper.toDailyWeather(entity, hours)
+            }
         }
         return null
-    }
-
-    /**
-     * Очищает базу данных от всех записей о погоде.
-     */
-    private suspend fun clearDatabase() {
-        weatherDao.deleteAllDailyWeather()
-        weatherDao.deleteAllHourlyWeather()
     }
 
     /**
@@ -178,8 +183,8 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         mapApiToResult: suspend (WeatherApiResponse) -> T
     ): Resource<T> where T : Any {
         return withContext(Dispatchers.IO) {
-            // Проверяем наличие данных в базе
-            val hasData = weatherDao.getDailyWeatherCount() > 0
+            // Проверяем наличие данных в базе (scoped to the target city)
+            val hasData = weatherDao.getDailyWeatherCountByCity(city) > 0
             // Получаем данные из базы
             val dbData = fromDb()
 
@@ -199,7 +204,10 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                 if (apiResult is Resource.Success) {
                     // Если запрос успешен, сохраняем данные в базу и преобразуем в нужный тип
                     apiResult.data?.let { apiData ->
-                        insertWeatherData(apiData)
+                        // Force refresh must replace ONLY the target city's rows,
+                        // otherwise repeated refreshes accumulate duplicate cache entries.
+                        if (forceRefresh) weatherDao.deleteCityWeather(city)
+                        insertWeatherData(apiData, city)
                         val mappedResult = mapApiToResult(apiData)
                         Resource.Success(mappedResult)
                     } ?: Resource.Error("No data from API", "")
@@ -210,7 +218,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
             } else {
                 // Проверяем свежесть данных
                 val currentTime = System.currentTimeMillis()
-                val lastUpdateTime = weatherDao.getLastUpdateTime()
+                val lastUpdateTime = weatherDao.getLastUpdateTimeByCity(city)
                 val isDataFresh = lastUpdateTime != null && currentTime <= lastUpdateTime + AppConstants.FORECAST_UPDATE_INTERVAL
 
                 if (isDataFresh) {
@@ -224,9 +232,11 @@ class VisualCrossingRepositoryImpl @Inject constructor(
                     val apiResult = fromApi(city)
                     if (apiResult is Resource.Success) {
                         apiResult.data?.let { apiData ->
-                            // Очищаем базу перед сохранением новых данных
-                            clearDatabase()
-                            insertWeatherData(apiData)
+                            // Per-city cache refresh: delete only this city's rows.
+                            // deleteCityWeather is @Transactional and removes hourly rows
+                            // first so the daily FK stays valid during the delete.
+                            weatherDao.deleteCityWeather(city)
+                            insertWeatherData(apiData, city)
                             val mappedResult = mapApiToResult(apiData)
                             Resource.Success(mappedResult)
                         } ?: Resource.Error("No data from API", "")
@@ -261,7 +271,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         return fetchWeather(
             city = targetCity,
             forceRefresh = forceRefresh,
-            fromDb = { getCurrentWeatherFromDB() },
+            fromDb = { getCurrentWeatherFromDB(targetCity) },
             fromApi = { cityName ->
                 withContext(Dispatchers.IO) {
                     try {
@@ -309,7 +319,7 @@ class VisualCrossingRepositoryImpl @Inject constructor(
         return fetchWeather(
             city = targetCity,
             forceRefresh = forceRefresh,
-            fromDb = { getForecastWeatherFromDB() },
+            fromDb = { getForecastWeatherFromDB(targetCity) },
             fromApi = { cityName ->
                 withContext(Dispatchers.IO) {
                     try {
@@ -340,13 +350,15 @@ class VisualCrossingRepositoryImpl @Inject constructor(
      * @param city Название города.
      */
     override suspend fun syncWeather(city: String) {
-        clearDatabase()
+        // Per-city sync: drop this city's cached rows (hourly first inside the
+        // @Transaction) before writing the fresh API payload under the same cityName.
+        weatherDao.deleteCityWeather(city)
         val response = apiService.getWeather(
             location = city,
             apiKey = BuildConfig.API_KEY,
             include = "days,hours",
             lang = devLocaleLanguage
         )
-        insertWeatherData(response)
+        insertWeatherData(response, city)
     }
 }
