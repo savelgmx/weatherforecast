@@ -27,6 +27,7 @@ import com.example.weatherforecast.utils.WeatherComposables.WeatherText
 /**
  * Shared LazyListScope extension functions for MainScreen portrait/landscape content.
  *
+ *
  * Eliminates code duplication between the portrait single-column layout
  * and the landscape left-pane layout in MainScreen.
  *
