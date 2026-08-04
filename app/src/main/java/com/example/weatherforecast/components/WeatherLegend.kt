@@ -78,20 +78,20 @@ private val PRECIP_SCALE = LegendScale(
     )
 )
 
-/** Wind speed scale (km/h). */
+/** Wind speed scale (km/h). Colours run blue → orange. */
 private val WIND_SCALE = LegendScale(
     title = "Wind",
     unit = "km/h",
     steps = listOf(
-        LegendStep(Color(0xFF88FF88), "0"),
-        LegendStep(Color(0xFF44DD44), "10"),
-        LegendStep(Color(0xFF00BB00), "20"),
-        LegendStep(Color(0xFFBBBB00), "30"),
-        LegendStep(Color(0xFFFFAA00), "40"),
-        LegendStep(Color(0xFFFF6600), "50"),
-        LegendStep(Color(0xFFFF3300), "60"),
-        LegendStep(Color(0xFFFF0000), "80"),
-        LegendStep(Color(0xFFCC00CC), "100+"),
+        LegendStep(Color(0xFF3366FF), "0"),
+        LegendStep(Color(0xFF00AAFF), "10"),
+        LegendStep(Color(0xFF00E5E5), "20"),
+        LegendStep(Color(0xFF33DD99), "30"),
+        LegendStep(Color(0xFFAADD00), "40"),
+        LegendStep(Color(0xFFFFCC00), "50"),
+        LegendStep(Color(0xFFFF9900), "60"),
+        LegendStep(Color(0xFFFF6600), "80"),
+        LegendStep(Color(0xFFFF4400), "100+"),
     )
 )
 

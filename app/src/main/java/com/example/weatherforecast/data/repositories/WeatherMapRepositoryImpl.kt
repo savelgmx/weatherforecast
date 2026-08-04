@@ -49,7 +49,8 @@ class WeatherMapRepositoryImpl @Inject constructor(
                         lon = centerLon ?: 0.0,
                         temperature = hour.temp,
                         precipitation = hour.precipitation ?: 0.0,
-                        cloudCover = hour.cloudCover ?: 0.0
+                        cloudCover = hour.cloudCover ?: 0.0,
+                        windSpeed = hour.windSpeed
                     )
                 )
             }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
@@ -18,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -29,12 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.weatherforecast.domain.models.WeatherMapData
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.presentation.viewmodels.WeatherMapViewModel
+import com.example.weatherforecast.utils.WeatherFormatter
 import com.example.weatherforecast.utils.WeatherLayer
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
@@ -56,11 +63,16 @@ private const val WEATHER_SOURCE_ID = "weather-source"
 fun WeatherMapScreen(
     city: String,
     viewModel: WeatherMapViewModel,
-    navController: NavController
+    navController: NavController,
+    // Review item 5 pattern: unit preferences via the shared SettingsViewModel.
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val mapData by viewModel.mapData.collectAsState()
     val selectedLayer by viewModel.selectedLayer.collectAsState()
     val styleUrl by viewModel.styleUrl.collectAsState()
+    // Unit preferences (selected measurement units) for the numeric info card + markers.
+    val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
+    val windPref by settingsViewModel.windPref.collectAsStateWithLifecycle()
     var mapViewState by remember { mutableStateOf<MapView?>(null) }
 
     // ⚠ ДЕФЕКТ 2 (исправление): Сохраняем ссылки на MapLibreMap и Style,
@@ -176,7 +188,7 @@ fun WeatherMapScreen(
                     val map = mapRef ?: return@AndroidView
                     if (mapData != null && !isMapInitialized) {
                         isMapInitialized = true
-                        initMapCameraAndMarkers(map, mapData!!)
+                        initMapCameraAndMarkers(map, mapData!!, switchState, windPref)
                     }
                 }
             )
@@ -187,6 +199,17 @@ fun WeatherMapScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 8.dp, bottom = 8.dp)
+            )
+
+            // Numeric values (temp / precip / wind) for the selected city, in the
+            // user's selected measurement units — top-left overlay.
+            CityWeatherInfoCard(
+                mapData = mapData,
+                isCelsius = switchState,
+                windPref = windPref,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 8.dp, top = 8.dp)
             )
         }
     }
@@ -234,7 +257,9 @@ private fun updateWeatherTileLayer(
  */
 private fun initMapCameraAndMarkers(
     map: org.maplibre.android.maps.MapLibreMap,
-    mapData: WeatherMapData
+    mapData: WeatherMapData,
+    isCelsius: Boolean,
+    windPref: Int
 ) {
     val center = LatLng(mapData.centerLat ?: 0.0, mapData.centerLon ?: 0.0)
     val camera = CameraPosition.Builder()
@@ -258,8 +283,9 @@ private fun initMapCameraAndMarkers(
             MarkerOptions()
                 .position(LatLng(point.lat, point.lon))
                 .title(
-                    "T: ${point.temperature ?: "?"}°C " +
-                            "P: ${point.precipitation ?: 0.0}mm"
+                    "T: ${mapTemp(point.temperature, isCelsius)} " +
+                            "P: ${mapPrecip(point.precipitation)} " +
+                            "W: ${mapWind(point.windSpeed, windPref)}"
                 )
         )
     }
@@ -274,3 +300,70 @@ private fun initMapCameraAndMarkers(
  * Utility: format double nicely for logs / titles.
  */
 private fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
+/**
+ * Numeric info card: temperature / precipitation / wind for the selected city,
+ * in the user's selected measurement units (temp: °C/°F, wind: km/h/m/s/knots/ft/s).
+ */
+@Composable
+private fun CityWeatherInfoCard(
+    mapData: WeatherMapData?,
+    isCelsius: Boolean,
+    windPref: Int,
+    modifier: Modifier = Modifier
+) {
+    val point = mapData?.points?.firstOrNull() ?: return
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = Color.Black.copy(alpha = 0.55f),
+        tonalElevation = 0.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = "Temp: ${mapTemp(point.temperature, isCelsius)}",
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+            )
+            Text(
+                text = "Precip: ${mapPrecip(point.precipitation)}",
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+            )
+            Text(
+                text = "Wind: ${mapWind(point.windSpeed, windPref)}",
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+    }
+}
+
+/** Formats a temperature for the map overlay/markers in the selected unit. */
+private fun mapTemp(value: Double?, isCelsius: Boolean): String {
+    val v = value?.toInt() ?: return "?"
+    return if (isCelsius) "${v}°C" else "${(v * 9 / 5) + 32}°F"
+}
+
+/** Formats precipitation (always mm — no unit preference exists yet). */
+private fun mapPrecip(value: Double?): String {
+    val v = value ?: 0.0
+    return String.format("%.1f mm", v)
+}
+
+/** Formats wind speed in the selected unit. */
+private fun mapWind(value: Double?, option: Int): String {
+    val raw = value?.toInt() ?: return "?"
+    return "${WeatherFormatter.convertWindSpeed(raw, option)} ${windUnitLabel(option)}"
+}
+
+/** Unit label for the wind speed preference. */
+private fun windUnitLabel(option: Int): String = when (option) {
+    0 -> "km/h"
+    1 -> "m/s"
+    2 -> "knots"
+    3 -> "ft/s"
+    else -> "km/h"
+}
