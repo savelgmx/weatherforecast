@@ -182,6 +182,12 @@ debugImplementation("androidx.compose.ui:ui-test-manifest")
     testImplementation("app.cash.turbine:turbine:1.1.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // Explicit androidx.test:core so instrumented Compose tests can resolve
+    // ApplicationProvider.getApplicationContext() (e.g. to build a real
+    // SettingsRepositoryImpl-backed SettingsViewModel without a Hilt graph).
+    // Previously it was only available transitively, which broke IDE/compile
+    // resolution of androidx.test.core.app.ApplicationProvider.
+    androidTestImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     // The Compose BOM must also be applied to the androidTest configuration.
     // Without it, version-less artifacts on this classpath (e.g. ui-test-junit4)

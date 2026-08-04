@@ -1,12 +1,16 @@
 package com.example.weatherforecast
 
+import android.content.Context
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.test.core.app.ApplicationProvider
 import org.junit.Rule
 import org.junit.Test
 import com.example.weatherforecast.components.DailyWeatherCard
+import com.example.weatherforecast.data.repositories.SettingsRepositoryImpl
 import com.example.weatherforecast.domain.models.DailyWeather
+import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 
 class DailyWeatherCardTest {
     @get:Rule
@@ -14,6 +18,8 @@ class DailyWeatherCardTest {
 
     @Test
     fun dailyWeatherCard_displaysCorrectData() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+
         val daily = DailyWeather(
             dew = 1.37,
             uvindex = 1,
@@ -41,7 +47,15 @@ class DailyWeatherCardTest {
         )
 
         composeTestRule.setContent {
-            DailyWeatherCard(daily = daily)
+            // Pass a real repository-backed SettingsViewModel explicitly instead of
+            // relying on the hiltViewModel() default. An instrumented Compose test
+            // hosts the UI in a plain ComponentActivity with no Hilt graph, so the
+            // default would throw IllegalStateException from dagger.hilt.EntryPoints.
+            // DataStore is reachable through the test ApplicationContext.
+            DailyWeatherCard(
+                daily = daily,
+                settingsViewModel = SettingsViewModel(SettingsRepositoryImpl(context))
+            )
         }
         composeTestRule.onNodeWithText("Clear").assertIsDisplayed()
     }
