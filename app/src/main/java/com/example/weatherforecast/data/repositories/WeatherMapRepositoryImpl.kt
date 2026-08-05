@@ -34,7 +34,9 @@ class WeatherMapRepositoryImpl @Inject constructor(
         val centerLat = response.latitude
         val centerLon = response.longitude
 
-        // build points
+        // build points — one WeatherPoint per hourly forecast slice of each day.
+        // NOTE: all points are built at the city-center coordinates because the map
+        // has no per-location geometry; every point describes the selected city.
         val points = mutableListOf<WeatherPoint>()
         val days = response.days ?: emptyList()
         if (days.isEmpty()) {
@@ -51,6 +53,16 @@ class WeatherMapRepositoryImpl @Inject constructor(
                         precipitation = hour.precipitation ?: 0.0,
                         cloudCover = hour.cloudCover ?: 0.0,
                         windSpeed = hour.windSpeed,
+                        // BUG FIX: carry the hour's epoch timestamp into the domain model.
+                        //
+                        // WHY: before this field existed, the UI card could NOT know which
+                        // hour a point belonged to, so it fell back to `firstOrNull()` and
+                        // always rendered the 00:00 sample of the first forecast day — a
+                        // constant value that did not match the current weather. Placing
+                        // `timeEpoch` here lets the UI pick the sample closest to "now".
+                        //
+                        // ApiHour.timeEpoch is a non-null Long (epoch seconds), so it flows
+                        // straight through without nullability handling.
                         timeEpoch = hour.timeEpoch
                     )
                 )

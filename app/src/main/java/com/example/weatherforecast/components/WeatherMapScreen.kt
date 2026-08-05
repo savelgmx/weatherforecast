@@ -304,6 +304,12 @@ private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 /**
  * Numeric info card: temperature / precipitation / wind for the selected city,
  * in the user's selected measurement units (temp: °C/°F, wind: km/h/m/s/knots/ft/s).
+ *
+ * BUG FIX: the card previously rendered `points.firstOrNull()` — the very FIRST
+ * hourly sample (00:00 of the first forecast day) — so Temp/Precip/Wind never
+ * changed and did NOT match the current weather. Since each WeatherPoint now
+ * carries `timeEpoch`, this card selects the sample whose hour is CLOSEST to the
+ * current time, so the values reflect the city's current conditions.
  */
 @Composable
 private fun CityWeatherInfoCard(
@@ -312,6 +318,18 @@ private fun CityWeatherInfoCard(
     windPref: Int,
     modifier: Modifier = Modifier
 ) {
+    // BUG FIX: pick the hourly sample closest to "now" instead of the static
+    // first point (00:00). Steps:
+    //  1. nowEpoch — current time in seconds (epoch), read ONCE per composition
+    //     so it is stable within a single frame (no per-item recompute loop).
+    //  2. minByOrNull { abs(timeEpoch - nowEpoch) } — the point whose timestamp
+    //     is nearest to the current time.
+    //  3. `(it.timeEpoch ?: Long.MAX_VALUE)`: a point without a timestamp sorts to
+    //     the FAR end, so it always loses the tie and is never selected ahead of a
+    //     real hour (Long.MAX_VALUE, NOT MIN_VALUE, is the correct sentinel).
+    //  4. `?: return` — on an empty `points` list minByOrNull returns null and the
+    //     card hides (no crash), preserving the old firstOrNull() fallback where
+    //     every point has a null timeEpoch.
     val nowEpoch = System.currentTimeMillis() / 1000
     val point = mapData?.points?.minByOrNull { kotlin.math.abs((it.timeEpoch ?: Long.MAX_VALUE) - nowEpoch) } ?: return
     Surface(
