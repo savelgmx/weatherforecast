@@ -11,5 +11,6 @@ data class WeatherPoint(
     val temperature: Double?,
     val cloudCover: Double?,
     val precipitation: Double?,
-    val windSpeed: Double? = null
+    val windSpeed: Double? = null,
+    val timeEpoch: Long? = null
 )

@@ -312,7 +312,8 @@ private fun CityWeatherInfoCard(
     windPref: Int,
     modifier: Modifier = Modifier
 ) {
-    val point = mapData?.points?.firstOrNull() ?: return
+    val nowEpoch = System.currentTimeMillis() / 1000
+    val point = mapData?.points?.minByOrNull { kotlin.math.abs((it.timeEpoch ?: Long.MAX_VALUE) - nowEpoch) } ?: return
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
