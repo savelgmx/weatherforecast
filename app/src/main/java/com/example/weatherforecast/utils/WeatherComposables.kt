@@ -2,7 +2,7 @@ package com.example.weatherforecast.utils
 
 import android.content.Context
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -144,7 +144,7 @@ object WeatherComposables {
         Text(
             text = text,
             style = style,
-            color = MaterialTheme.colors.surface,
+            color = MaterialTheme.colorScheme.surface,
             modifier = modifier
         )
     }
@@ -158,7 +158,7 @@ object WeatherComposables {
             text = text,
             fontWeight = FontWeight.Bold,
             style = QuickSandTypography.titleMedium,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = modifier
         )
     }
