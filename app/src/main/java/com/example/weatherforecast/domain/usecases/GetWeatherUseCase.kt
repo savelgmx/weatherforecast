@@ -6,7 +6,7 @@ import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.utils.Resource
 import javax.inject.Inject
 
-//Создадим юзкейс для получения прогноза погоды.
+//create a use case for obtaining a weather forecast.
 class GetWeatherUseCase @Inject constructor(
     private val weatherRepository: VisualCrossingRepository
 ) {
