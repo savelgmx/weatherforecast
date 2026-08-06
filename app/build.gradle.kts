@@ -120,7 +120,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material")
+    // M2 composable artifact removed (only M3 composables are used now). The
+    // shared Icons.* (Icons.Filled.Menu, Icons.AutoMirrored.Filled.ArrowBack)
+    // live in the dedicated icons artifact, so it is added explicitly instead
+    // of relying on the transitive dependency that used to come with material.
+    implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.foundation:foundation")
     //implementation 'androidx.compose.foundation:foundation:1.10.3'// pager
