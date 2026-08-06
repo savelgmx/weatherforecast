@@ -12,25 +12,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -46,7 +45,7 @@ import com.example.weatherforecast.utils.WeatherComposables.WeatherText
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
@@ -59,7 +58,9 @@ fun MainScreen(
     onDismissCityDialog: () -> Unit = {},
     pollution: AirVisualPollution? = null
 ) {
-    val scaffoldState = rememberScaffoldState()
+    // Material 3: вместо M2 rememberScaffoldState используем rememberDrawerState —
+    // состояние выдвижной панели, которой управляет ModalNavigationDrawer (см. ниже).
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading = currentState is Resource.Loading || forecastState is Resource.Loading
@@ -74,15 +75,28 @@ fun MainScreen(
     // List<DailyWeather> в List<HourlyWeather>, используя Elvis-оператор для null-поля hours.
     val hourlyData: List<HourlyWeather>? = forecastData?.flatMap { it.hours ?: emptyList() }
 
-    val refreshState = rememberPullRefreshState(
-        refreshing = isLoading,
-        onRefresh = onRefresh
-    )
-
     AppTheme {
+        // ——— Material 3: drawer вынесен из Scaffold в ModalNavigationDrawer ———
+        // M2 Scaffold имел параметры drawerContent / drawerElevation / scaffoldState.
+        // В Material 3 их НЕТ — Scaffold стал проще, а drawer реализуется отдельным
+        // компонентом ModalNavigationDrawer + ModalDrawerSheet. Внешний вид и поведение
+        // (открытие по кнопке-меню, swipe-жест с края) сохранены полностью.
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                // ⚠ Bug #2 fix (сохранён из M2-версии): содержимое drawer'а обёрнуто
+                // в Surface с явными цветами surface/onSurface — чтобы Text/Icon
+                // не наследовали синий фон приложения (MaterialTheme.colorScheme.background)
+                // и оставались видимыми на светлом фоне drawer'а.
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+                    DrawerContent(navController = navController)
+                }
+            }
+        ) {
         Scaffold(
-            scaffoldState = scaffoldState,
-            drawerElevation = 16.dp,
             topBar = {
                 TopAppBar(
                     title = {
@@ -94,7 +108,7 @@ fun MainScreen(
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
-                                scaffoldState.drawerState.open()
+                                drawerState.open()
                             }
                         }) {
                             Icon(
@@ -108,21 +122,6 @@ fun MainScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 )
-            },
-            // ⚠ Bug #2 fix: drawerContent обёрнут в Material3 Surface с явными
-            // цветами surface/onSurface. Ранее Scaffold содержал
-            // contentColor = MaterialTheme.colorScheme.background (Blue600),
-            // из-за чего все Text/Icon в DrawerContent наследовали синий цвет,
-            // становясь невидимыми на светлом фоне drawer'а при смешивании
-            // Material v1 Scaffold + Material3 colorScheme.
-            // Surface задаёт правильный контекст цветов для содержимого drawer'а.
-            drawerContent = {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    DrawerContent(navController = navController)
-                }
             }
         ) { paddingValues ->
             // ——— BoxWithConstraints: автоопределение ориентации ———
@@ -141,10 +140,10 @@ fun MainScreen(
                     // Левая  (weight 0.5f): CurrentWeatherCard + 24-hour почасовой прогноз + детали
                     //                        (Sunrise/Sunset, Humidity/Wind, UV/Pressure, AirQuality/MoonPhase)
                     // Правая (weight 0.5f): 15-day forecast
-                    // PullRefreshIndicator один на обе панели — поверх Row по TopCenter
-                    Box(
+                    PullToRefreshBox(
+                        isRefreshing = isLoading,
+                        onRefresh = onRefresh,
                         modifier = Modifier
-                            .pullRefresh(refreshState)
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.primary)
                     ) {
@@ -198,21 +197,15 @@ fun MainScreen(
                                 }
                             }
                         }
-                        // PullRefreshIndicator для landscape — один на обе панели,
-                        // выровнен по TopCenter внутри Box (над Row).
-                        PullRefreshIndicator(
-                            refreshing = isLoading,
-                            state = refreshState,
-                            modifier = Modifier.align(Alignment.TopCenter)
-                        )
                     }
                 } else {
                     // ——— PORTRAIT: однопанельный режим ———
                     // Тот же контент, но в одной LazyColumn. isLandscape=false
                     // включает 15-дневный прогноз (который в landscape уходит в правую панель).
-                    Box(
+                    PullToRefreshBox(
+                        isRefreshing = isLoading,
+                        onRefresh = onRefresh,
                         modifier = Modifier
-                            .pullRefresh(refreshState)
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.primary)
                     ) {
@@ -234,14 +227,7 @@ fun MainScreen(
                                 navController = navController
                             )
                         }
-                        // PullRefreshIndicator для portrait — стандартный, над единственной
-                        // LazyColumn. refreshState общий с landscape-режимом.
-                        PullRefreshIndicator(
-                            refreshing = isLoading,
-                            state = refreshState,
-                            modifier = Modifier.align(Alignment.TopCenter)
-                        )
-                    }
+                        }
                 }
             }
 
@@ -252,6 +238,7 @@ fun MainScreen(
                     onDismiss = onDismissCityDialog
                 )
             }
+        }
         }
     }
 }
