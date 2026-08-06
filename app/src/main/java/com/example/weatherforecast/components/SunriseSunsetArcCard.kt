@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +55,11 @@ fun SunriseSunsetArcCard(sunrise: String, sunset: String, timezone: String) {
             .height(200.dp),
         shape = RoundedCornerShape(16.dp),
         color = Color(Blue800.value),  // Dark blue background (Blue800)
-        elevation = 16.dp
+        // M2 Surface's `elevation` was renamed `shadowElevation` in Material3
+        // (a `tonalElevation` token also exists, but that would tint the surface
+        // colour, which is not the intended dark-blue card look). 16.dp is kept
+        // to preserve the exact shadow that the M2 card cast.
+        shadowElevation = 16.dp
     ) {
         Column(
             modifier = Modifier
