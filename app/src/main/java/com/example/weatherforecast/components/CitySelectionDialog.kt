@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -86,21 +87,21 @@ fun CitySelectionDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Blue800)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = context.getString(R.string.select_city),
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 Text(
                     text = context.getString(R.string.city_selection_message),
                     style = QuickSandTypography.bodyMedium,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
@@ -111,13 +112,13 @@ fun CitySelectionDialog(
                         label = {
                             Text(
                                 text = context.getString(R.string.entered_city_name),
-                                color = Color.White.copy(alpha = 0.7f)
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Blue800,
-                            unfocusedContainerColor = Blue800
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
                         ),
                         singleLine = true
                     )
@@ -134,7 +135,7 @@ fun CitySelectionDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(max = 200.dp)
-                                    .background(Color.White)
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                             ) {
                                 items(filteredSuggestions) { suggestion ->
                                     Row(
@@ -152,17 +153,17 @@ fun CitySelectionDialog(
                                         Icon(
                                             imageVector = Icons.Default.LocationOn,
                                             contentDescription = null,
-                                            tint = Blue800
+                                            tint = MaterialTheme.colorScheme.primary
                                         )
                                         Text(
                                             text = suggestion,
-                                            color = Blue800,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
                                     if (suggestion != filteredSuggestions.last()) {
-                                        HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
+                                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
                                     }
                                 }
                             }
@@ -178,10 +179,10 @@ fun CitySelectionDialog(
                 ) {
                     Button(
                         onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.weight(1f).padding(end = 8.dp)
                     ) {
-                        Text(text = context.getString(R.string.cancel), color = Color.White)
+                        Text(text = context.getString(R.string.cancel), color = MaterialTheme.colorScheme.onSurface)
                     }
 
                     Button(
@@ -195,12 +196,12 @@ fun CitySelectionDialog(
                             }
                         },
                         enabled = cityName.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         modifier = Modifier.weight(1f).padding(start = 8.dp)
                     ) {
                         Text(
                             text = context.getString(R.string.confirm),
-                            color = Blue800,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     }
