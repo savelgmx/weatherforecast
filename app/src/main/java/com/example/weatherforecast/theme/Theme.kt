@@ -21,7 +21,7 @@ val LightColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme = darkColorScheme(
-    primary = Blue700,
+    primary = Color(0xFF1565C0), // #1565C0 Blue800 — dark primary per spec token table (brand blue)
     onPrimary = White,
     secondary = Color(0xFF03DAC5),
     onSecondary = Black,
