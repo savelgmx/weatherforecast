@@ -133,7 +133,7 @@ fun CitySelectionDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(max = 200.dp)
-                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .background(MaterialTheme.colorScheme.surface)
                             ) {
                                 items(filteredSuggestions) { suggestion ->
                                     Row(

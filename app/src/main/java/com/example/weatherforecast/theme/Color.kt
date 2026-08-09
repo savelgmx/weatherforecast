@@ -19,6 +19,11 @@ val ErrorLight = Color(0xFFB00020) // Standard error color for light theme
 val ErrorDark = Color(0xFFCF6679) // Standard error color for dark theme
 val DarkGrey = Color(0xFF222222)
 
+val DrawerSurfaceDark = Color(0xFF1E1E1E) // Dark theme drawer background (dark grey, matches screen)
+val DrawerSurfaceLight = Color(0xFFFFFFFF) // Light theme drawer background (white)
+val OnDrawerSurfaceDark = Color(0xFFFFFFFF) // Dark theme drawer text (white)
+val OnDrawerSurfaceLight = Color(0xFF000000) // Light theme drawer text (black)
+
 
 val RedErrorDark = Color(0xFFB00020)
 val RedErrorLight = Color(0xFFEF5350)
