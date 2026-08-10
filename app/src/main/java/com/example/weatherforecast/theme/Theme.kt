@@ -48,19 +48,25 @@ val DarkColorScheme = darkColorScheme(
 data class WeatherTokens(
     val drawerSurface: Color,
     val onDrawerSurface: Color,
-    val dialogTitleColor: Color
+    val dialogTitleColor: Color,
+    val dialogSurface: Color,
+    val onDialogSurface: Color
 )
 
 private val LightWeatherTokens = WeatherTokens(
     drawerSurface = DrawerSurfaceLight,   // #FFFFFF
     onDrawerSurface = OnDrawerSurfaceLight, // #000000
-    dialogTitleColor = Black
+    dialogTitleColor = Black,
+    dialogSurface = DialogSurfaceLight,   // #FFFFFF
+    onDialogSurface = Black               // #000000
 )
 
 private val DarkWeatherTokens = WeatherTokens(
     drawerSurface = DrawerSurfaceDark,    // #1E1E1E тёмно-серый
     onDrawerSurface = OnDrawerSurfaceDark, // #FFFFFF
-    dialogTitleColor = White
+    dialogTitleColor = White,
+    dialogSurface = DialogSurfaceDark,    // #1E1E1E тёмно-серый
+    onDialogSurface = White               // #FFFFFF
 )
 
 private val LocalWeatherTokens = staticCompositionLocalOf { LightWeatherTokens }

@@ -17,7 +17,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -103,9 +102,9 @@ fun DrawerContent(
                 {
                     AlertDialog(
                         onDismissRequest = { windSpeedUnitsPopup = false },
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = WeatherTheme.tokens.dialogSurface,
                         titleContentColor = WeatherTheme.tokens.dialogTitleColor,
-                        textContentColor = MaterialTheme.colorScheme.onSurface,
+                        textContentColor = WeatherTheme.tokens.onDialogSurface,
                         title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {
@@ -151,9 +150,9 @@ fun DrawerContent(
                 {
                     AlertDialog(
                         onDismissRequest = { pressureUnitsPopup = false },
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = WeatherTheme.tokens.dialogSurface,
                         titleContentColor = WeatherTheme.tokens.dialogTitleColor,
-                        textContentColor = MaterialTheme.colorScheme.onSurface,
+                        textContentColor = WeatherTheme.tokens.onDialogSurface,
                         title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {

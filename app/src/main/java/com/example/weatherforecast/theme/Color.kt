@@ -24,6 +24,9 @@ val DrawerSurfaceLight = Color(0xFFFFFFFF) // Light theme drawer background (whi
 val OnDrawerSurfaceDark = Color(0xFFFFFFFF) // Dark theme drawer text (white)
 val OnDrawerSurfaceLight = Color(0xFF000000) // Light theme drawer text (black)
 
+val DialogSurfaceDark = Color(0xFF1E1E1E) // Dark theme dialog background (dark grey, matches screen/drawer)
+val DialogSurfaceLight = Color(0xFFFFFFFF) // Light theme dialog background (white)
+
 
 val RedErrorDark = Color(0xFFB00020)
 val RedErrorLight = Color(0xFFEF5350)

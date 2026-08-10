@@ -40,6 +40,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.weatherforecast.R
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.theme.WeatherTheme
 
 @Composable
 fun CitySelectionDialog(
@@ -80,26 +81,27 @@ fun CitySelectionDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = WeatherTheme.tokens.dialogSurface)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(WeatherTheme.tokens.dialogSurface)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = context.getString(R.string.select_city),
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = WeatherTheme.tokens.onDialogSurface,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 Text(
                     text = context.getString(R.string.city_selection_message),
                     style = QuickSandTypography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = WeatherTheme.tokens.onDialogSurface,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
@@ -110,13 +112,13 @@ fun CitySelectionDialog(
                         label = {
                             Text(
                                 text = context.getString(R.string.entered_city_name),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                color = WeatherTheme.tokens.onDialogSurface.copy(alpha = 0.7f)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            focusedContainerColor = WeatherTheme.tokens.dialogSurface,
+                            unfocusedContainerColor = WeatherTheme.tokens.dialogSurface
                         ),
                         singleLine = true
                     )
@@ -127,13 +129,14 @@ fun CitySelectionDialog(
                                 .fillMaxWidth()
                                 .padding(top = 4.dp),
                             shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = WeatherTheme.tokens.dialogSurface)
                         ) {
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(max = 200.dp)
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .background(WeatherTheme.tokens.dialogSurface)
                             ) {
                                 items(filteredSuggestions) { suggestion ->
                                     Row(
@@ -155,7 +158,7 @@ fun CitySelectionDialog(
                                         )
                                         Text(
                                             text = suggestion,
-                                            color = MaterialTheme.colorScheme.onSurface,
+                                            color = WeatherTheme.tokens.onDialogSurface,
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -180,7 +183,7 @@ fun CitySelectionDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.weight(1f).padding(end = 8.dp)
                     ) {
-                        Text(text = context.getString(R.string.cancel), color = MaterialTheme.colorScheme.onSurface)
+                        Text(text = context.getString(R.string.cancel), color = WeatherTheme.tokens.onDialogSurface)
                     }
 
                     Button(
