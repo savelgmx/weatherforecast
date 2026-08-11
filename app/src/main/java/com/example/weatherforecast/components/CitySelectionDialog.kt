@@ -118,7 +118,11 @@ fun CitySelectionDialog(
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = WeatherTheme.tokens.dialogSurface,
-                            unfocusedContainerColor = WeatherTheme.tokens.dialogSurface
+                            unfocusedContainerColor = WeatherTheme.tokens.dialogSurface,
+                            // Введённый текст должен наследовать onDialogSurface (белый в тёмной теме),
+                            // иначе дефолтный onSurface = чёрный сливается с тёмным фоном поля.
+                            focusedTextColor = WeatherTheme.tokens.onDialogSurface,
+                            unfocusedTextColor = WeatherTheme.tokens.onDialogSurface
                         ),
                         singleLine = true
                     )
