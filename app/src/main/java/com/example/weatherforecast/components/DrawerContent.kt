@@ -39,6 +39,7 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.presentation.viewmodels.SettingsViewModel
 import com.example.weatherforecast.theme.Blue300
 import com.example.weatherforecast.theme.QuickSandTypography
+import com.example.weatherforecast.theme.WeatherTheme
 import com.example.weatherforecast.utils.WeatherComposables
 import kotlinx.coroutines.launch
 
@@ -101,6 +102,9 @@ fun DrawerContent(
                 {
                     AlertDialog(
                         onDismissRequest = { windSpeedUnitsPopup = false },
+                        containerColor = WeatherTheme.tokens.dialogSurface,
+                        titleContentColor = WeatherTheme.tokens.dialogTitleColor,
+                        textContentColor = WeatherTheme.tokens.onDialogSurface,
                         title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {
@@ -146,6 +150,9 @@ fun DrawerContent(
                 {
                     AlertDialog(
                         onDismissRequest = { pressureUnitsPopup = false },
+                        containerColor = WeatherTheme.tokens.dialogSurface,
+                        titleContentColor = WeatherTheme.tokens.dialogTitleColor,
+                        textContentColor = WeatherTheme.tokens.onDialogSurface,
                         title = { Text(context.getString(R.string.choose_option)) },
                         text = {
                             Column {

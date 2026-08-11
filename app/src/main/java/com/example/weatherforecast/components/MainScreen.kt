@@ -37,10 +37,12 @@ import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.domain.models.DailyWeather
 import com.example.weatherforecast.theme.AppTheme
+import com.example.weatherforecast.theme.WeatherTheme
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherComposables.WeatherHeader
 import com.example.weatherforecast.utils.WeatherComposables.WeatherText
 import kotlinx.coroutines.launch
+
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,13 +84,12 @@ fun MainScreen(
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                // ⚠ Bug #2 fix (сохранён из M2-версии): содержимое drawer'а обёрнуто
-                // в Surface с явными цветами surface/onSurface — чтобы Text/Icon
-                // не наследовали синий фон приложения (MaterialTheme.colorScheme.background)
-                // и оставались видимыми на светлом фоне drawer'а.
+                // ——— Drawer: отдельная группа токенов drawerSurface/onDrawerSurface ———
+                // Не равен surface/onSurface: тёмная тема — тёмно-серый фон (#1E1E1E)/
+                // белый текст; светлая — белый фон/чёрный текст.
                 Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    color = WeatherTheme.tokens.drawerSurface,
+                    contentColor = WeatherTheme.tokens.onDrawerSurface
                 ) {
                     DrawerContent(navController = navController)
                 }

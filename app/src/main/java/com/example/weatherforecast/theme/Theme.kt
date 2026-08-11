@@ -5,6 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 val LightColorScheme = lightColorScheme(
@@ -21,29 +25,58 @@ val LightColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF1565C0), // Using Blue700 for primary in dark theme for contrast
+    primary = Color(0xFF1565C0), // #1565C0 Blue800 — dark primary per spec token table (brand blue)
     onPrimary = White,
     secondary = Color(0xFF03DAC5),
     onSecondary = Black,
-    background = Blue600, // Keeping Blue600 for consistency, though a darker shade could be used
+    background = BackgroundDark,
     onBackground = White,
     surface = SurfaceDark,
-    onSurface = White,
+    onSurface = Black,
     error = ErrorDark,
     onError = White
 )
-/*
-Implementation Details
-Background Color: Setting background = Blue600 ensures that the main background,
-including the scaffold if it uses the theme's background, is blue. If in MainScreen.kt,
-the Scaffold has a specific backgroundColor, ensure it's set to MaterialTheme.colorScheme.background or remove the override to use the theme.
-Text Color: By setting onBackground = Color.White, any text using MaterialTheme.colorScheme.onBackground, like in WeatherHeader, will be white, resolving the issue of black text on a blue background.
-Theme Consistency: For light theme, using Blue 600 as background might make it look like a colored theme rather than a standard light theme, but since you specified this color, it's acceptable. For dark theme, Blue 600 is dark enough, so keeping it consistent is fine, though you could consider a darker shade like Blue 700 (0xFF1565C0) for background in dark theme if preferred.
-Other Color Roles: We set surface to white for light theme and a dark gray for dark theme, ensuring cards and elevated surfaces have appropriate backgrounds. error and onError are set to standard Material 3 values for consistency, with onError = White for both to ensure readability on error colors.
-Comparative Analysis
-To organize the options, consider the following table comparing the current and proposed settings:
-*/
 
+/**
+ * Токены групп, отсутствующие в стандартном ColorScheme Material3.
+ * drawerSurface/onDrawerSurface — отдельная группа (НЕ равна surface/onSurface):
+ * тёмная тема — тёмно-серый фон/белый текст, светлая — белый/чёрный.
+ * dialogTitleColor — исключение для заголовка dialogs (R.string.choose_option):
+ * белый только в тёмной теме, в светлой — чёрный (тело/кнопки остаются чёрными в обеих).
+ */
+@Immutable
+data class WeatherTokens(
+    val drawerSurface: Color,
+    val onDrawerSurface: Color,
+    val dialogTitleColor: Color,
+    val dialogSurface: Color,
+    val onDialogSurface: Color
+)
+
+private val LightWeatherTokens = WeatherTokens(
+    drawerSurface = DrawerSurfaceLight,   // #FFFFFF
+    onDrawerSurface = OnDrawerSurfaceLight, // #000000
+    dialogTitleColor = Black,
+    dialogSurface = DialogSurfaceLight,   // #FFFFFF
+    onDialogSurface = Black               // #000000
+)
+
+private val DarkWeatherTokens = WeatherTokens(
+    drawerSurface = DrawerSurfaceDark,    // #1E1E1E тёмно-серый
+    onDrawerSurface = OnDrawerSurfaceDark, // #FFFFFF
+    dialogTitleColor = White,
+    dialogSurface = DialogSurfaceDark,    // #1E1E1E тёмно-серый
+    onDialogSurface = White               // #FFFFFF
+)
+
+private val LocalWeatherTokens = staticCompositionLocalOf { LightWeatherTokens }
+
+object WeatherTheme {
+    val tokens: WeatherTokens
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalWeatherTokens.current
+}
 
 @Composable
 fun AppTheme(
@@ -51,11 +84,15 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = QuickSandTypography,
-        shapes = AppShapes,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalWeatherTokens provides if (darkTheme) DarkWeatherTokens else LightWeatherTokens
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = QuickSandTypography,
+            shapes = AppShapes,
+            content = content
+        )
+    }
 }
 

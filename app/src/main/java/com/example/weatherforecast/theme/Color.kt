@@ -12,11 +12,20 @@ val Blue800 = Color(0xFF1565C0)
 
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
-val SurfaceLight = Color(0xFFFFFFFF) // For light theme surface, e.g., cards
-val SurfaceDark = Color(0xFF22252D) // For dark theme surface
+val BackgroundDark = Color(0xFF1E1E1E) // Dark theme screen background (dark grey, per theme spec)
+val SurfaceLight = Color(0xFFFFFFFF) // Light theme surface, e.g., cards
+val SurfaceDark = Color(0xFFF5F5F5) // Dark theme surface kept LIGHT so black onSurface stays readable
 val ErrorLight = Color(0xFFB00020) // Standard error color for light theme
 val ErrorDark = Color(0xFFCF6679) // Standard error color for dark theme
 val DarkGrey = Color(0xFF222222)
+
+val DrawerSurfaceDark = Color(0xFF1E1E1E) // Dark theme drawer background (dark grey, matches screen)
+val DrawerSurfaceLight = Color(0xFFFFFFFF) // Light theme drawer background (white)
+val OnDrawerSurfaceDark = Color(0xFFFFFFFF) // Dark theme drawer text (white)
+val OnDrawerSurfaceLight = Color(0xFF000000) // Light theme drawer text (black)
+
+val DialogSurfaceDark = Color(0xFF1E1E1E) // Dark theme dialog background (dark grey, matches screen/drawer)
+val DialogSurfaceLight = Color(0xFFFFFFFF) // Light theme dialog background (white)
 
 
 val RedErrorDark = Color(0xFFB00020)
