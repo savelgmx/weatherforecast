@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 val LightColorScheme = lightColorScheme(
     primary = Blue600,
     onPrimary = White,
-    secondary = Color(0xFF03DAC5), // You can adjust this to your preferred secondary color
+    secondary = Color(0xFF03DAC5),
     onSecondary = Black,
     background = Blue600,
     onBackground = White,

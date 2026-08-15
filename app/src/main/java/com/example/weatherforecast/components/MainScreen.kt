@@ -36,7 +36,6 @@ import com.example.weatherforecast.R
 import com.example.weatherforecast.data.remote.AirVisualPollution
 import com.example.weatherforecast.domain.models.HourlyWeather
 import com.example.weatherforecast.domain.models.DailyWeather
-import com.example.weatherforecast.theme.AppTheme
 import com.example.weatherforecast.theme.WeatherTheme
 import com.example.weatherforecast.utils.Resource
 import com.example.weatherforecast.utils.WeatherComposables.WeatherHeader
@@ -75,8 +74,7 @@ fun MainScreen(
     // List<DailyWeather> в List<HourlyWeather>, используя Elvis-оператор для null-поля hours.
     val hourlyData: List<HourlyWeather>? = forecastData?.flatMap { it.hours ?: emptyList() }
 
-    AppTheme {
-        // ——— Material 3: drawer вынесен из Scaffold в ModalNavigationDrawer ———
+    // ——— Material 3: drawer вынесен из Scaffold в ModalNavigationDrawer ———
         // M2 Scaffold имел параметры drawerContent / drawerElevation / scaffoldState.
         // В Material 3 их НЕТ — Scaffold стал проще, а drawer реализуется отдельным
         // компонентом ModalNavigationDrawer + ModalDrawerSheet. Внешний вид и поведение
@@ -229,5 +227,4 @@ fun MainScreen(
                 }
             }
         }
-    }
 }

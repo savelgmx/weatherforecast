@@ -22,8 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,15 +56,15 @@ fun DrawerContent(
     val switchState by settingsViewModel.tempSwitch.collectAsStateWithLifecycle()
 
     val selectedWindOption by settingsViewModel.windPref.collectAsStateWithLifecycle()
-    var windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
-    var windSpeedUnitsPopup by remember { mutableStateOf(false) }
+    val windSpeedUnitsToSelect= context.resources.getStringArray(R.array.wind_speed_units) //arrayOf("km/h", "m/s", "knots", "ft/s")
+    var windSpeedUnitsPopup by rememberSaveable { mutableStateOf(false) }
 
     val selectedPressureOption by settingsViewModel.pressurePref.collectAsStateWithLifecycle()
-    var pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
-    var pressureUnitsPopup by remember { mutableStateOf(false) }
+    val pressureUnitsToSelect= context.resources.getStringArray(R.array.pressure_units)//arrayOf("mm Hg", "inches Hg", "hPa", "mbar")
+    var pressureUnitsPopup by rememberSaveable { mutableStateOf(false) }
 
     val enteredCity by settingsViewModel.cityName.collectAsStateWithLifecycle()//text field with entered city name
-    var enteredCityPopup by remember { mutableStateOf(false) }
+    var enteredCityPopup by rememberSaveable { mutableStateOf(false) }
 
     // ⚠ Bug #2 fix: весь контент drawer'а внутри одного Column.
     // Ранее Column закрывался преждевременно — секции "Custom location"
